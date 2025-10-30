@@ -2,6 +2,7 @@ import React, { useState, useCallback, useLayoutEffect, useRef, useEffect } from
 import Header from './components/Header';
 import PromptInput from './components/PromptInput';
 import OutputDisplay from './components/OutputDisplay';
+import SettingsModal from './components/SettingsModal';
 import HelpModal from './components/HelpModal';
 import { brainstormIdea } from './services/geminiService';
 import { CodeOutput } from './copilot/agent';
@@ -13,7 +14,7 @@ const App: React.FC = () => {
   const [response, setResponse] = useState<CodeOutput | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  // FIX: The settings modal and its state are removed as API key management is no longer part of the UI.
+  const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
   const [isHelpOpen, setIsHelpOpen] = useState<boolean>(false);
   const [theme, setTheme] = useState<Theme>(() => {
     const savedTheme = localStorage.getItem('theme') as Theme | null;
@@ -103,6 +104,7 @@ const App: React.FC = () => {
       <Header 
         theme={theme}
         onToggleTheme={toggleTheme}
+        onSettingsClick={() => setIsSettingsOpen(true)}
         onHelpClick={() => setIsHelpOpen(true)}
       />
       <main className="flex-grow p-4 md:p-6 lg:p-8 flex flex-col overflow-hidden">
@@ -157,7 +159,10 @@ const App: React.FC = () => {
       <footer className="text-center py-4 text-slate-500 dark:text-slate-500 text-xs border-t border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-950">
         © 2025 WesAI.Dev | Powered by Google Gemini.
       </footer>
-      {/* FIX: SettingsModal is removed as API key management is no longer needed in the UI. */}
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+      />
       <HelpModal
         isOpen={isHelpOpen}
         onClose={() => setIsHelpOpen(false)}

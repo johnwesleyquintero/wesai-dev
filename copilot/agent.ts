@@ -23,10 +23,9 @@ export interface CodeOutput {
 
 class CopilotAgent {
     public async generate(prompt: string): Promise<CodeOutput> {
-        // FIX: Per @google/genai guidelines, the API key must be obtained exclusively from the environment variable `process.env.API_KEY`.
-        const apiKey = process.env.API_KEY;
+        const apiKey = localStorage.getItem('gemini-api-key');
         if (!apiKey) {
-            throw new Error("API key is not configured. Please contact the administrator.");
+            throw new Error("API key not found. Please set your Gemini API key in the settings.");
         }
 
         try {
@@ -58,8 +57,7 @@ class CopilotAgent {
             console.error("Error generating content with CopilotAgent:", error);
             if (error instanceof Error) {
                 if (error.message.includes('API key not valid')) {
-                     // FIX: Per @google/genai guidelines, do not prompt the user for an API key.
-                     throw new Error('The configured API key is invalid. Please contact the administrator.');
+                     throw new Error('The API key is invalid. Please check your key in the settings.');
                 }
                  if (error.message.includes('fetch')) {
                     throw new Error('A network error occurred. Please check your connection and try again.')
