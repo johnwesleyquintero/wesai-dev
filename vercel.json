@@ -1,7 +1,0 @@
-{
-  "functions": {
-    "api/get-key.ts": {
-      "runtime": "edge"
-    }
-  }
-}
