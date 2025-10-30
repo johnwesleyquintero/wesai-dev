@@ -36,10 +36,10 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
             <div>
                 <h3 className="text-lg font-semibold text-indigo-600 dark:text-indigo-400 mb-3 border-b border-slate-200 dark:border-slate-700 pb-2">What's New</h3>
                 <ul className="space-y-2 list-disc list-inside text-sm">
-                    <li><span className="font-semibold">Light/Dark Mode:</span> You can now toggle the UI theme using the new sun/moon icon in the header!</li>
-                    <li><span className="font-semibold">API Key Settings:</span> You can now provide your own Gemini API key via the new settings panel (⚙️ icon).</li>
+                    <li><span className="font-semibold">UI/UX Overhaul:</span> Refreshed the entire interface with a cleaner header, improved spacing, and more polished components for a professional feel.</li>
+                    <li><span className="font-semibold">Streamlined API:</span> Removed user-facing API key settings to simplify setup and improve security.</li>
+                    <li><span className="font-semibold">Light/Dark Mode:</span> You can now toggle the UI theme using the sun/moon icon in the header.</li>
                     <li><span className="font-semibold">Help Center:</span> Added this helpful modal to answer common questions and announce updates.</li>
-                    <li><span className="font-semibold">UI Polish:</span> Incremental improvements to the theme, layout, and animations for a smoother experience.</li>
                 </ul>
             </div>
 
@@ -51,13 +51,9 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
                         <h4 className="font-semibold text-slate-800 dark:text-slate-200 mb-1">How do I use this app?</h4>
                         <p>Simply type a description of a web component you want to create in the text area. Be as descriptive as possible! Then, click "Generate" or press <code className="bg-slate-200 dark:bg-slate-700 px-1.5 py-0.5 rounded">Cmd/Ctrl + Enter</code>. Your component will appear in the output panel.</p>
                     </div>
-                    <div>
-                        <h4 className="font-semibold text-slate-800 dark:text-slate-200 mb-1">Where do I get a Gemini API key?</h4>
-                        <p>You can create a free API key at <a href="https://makersuite.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-cyan-600 dark:text-cyan-400 underline hover:text-cyan-500 dark:hover:text-cyan-300">Google AI Studio</a>. Follow the instructions to create and copy your key.</p>
-                    </div>
-                    <div>
-                        <h4 className="font-semibold text-slate-800 dark:text-slate-200 mb-1">Is my API key secure?</h4>
-                        <p>Yes. Your API key is stored exclusively in your browser's local storage. It is never transmitted to our servers and is only used to communicate directly with the Google Gemini API from your browser.</p>
+                     <div>
+                        <h4 className="font-semibold text-slate-800 dark:text-slate-200 mb-1">How does it work?</h4>
+                        <p>This app uses the Google Gemini large language model to interpret your prompt and generate HTML, CSS, and JavaScript code. You can preview the result instantly and copy the code to use in your projects.</p>
                     </div>
                 </div>
             </div>

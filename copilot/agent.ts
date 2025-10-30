@@ -21,24 +21,32 @@ export interface CodeOutput {
 }
 
 class CopilotAgent {
-    
-    private getApiKey(): string {
-        const userApiKey = localStorage.getItem('gemini_api_key');
-        if (userApiKey) {
-            return userApiKey;
+    private apiKeyPromise: Promise<string> | null = null;
+
+    private getApiKey(): Promise<string> {
+        if (!this.apiKeyPromise) {
+            this.apiKeyPromise = fetch('/api/get-key')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch API key (status: ${response.status}). Ensure it's set in Vercel environment variables.`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error || !data.apiKey) {
+                        throw new Error(data.error || "API key not found in response from server. Ensure it's set in Vercel.");
+                    }
+                    return data.apiKey;
+                });
         }
-        return process.env.API_KEY || '';
+        return this.apiKeyPromise;
     }
 
     public async generate(prompt: string): Promise<CodeOutput> {
-        const apiKey = this.getApiKey();
-        if (!apiKey) {
-            throw new Error("Gemini API key not found. Please set it in the settings panel.");
-        }
-
-        const ai = new GoogleGenAI({ apiKey });
-
         try {
+            const apiKey = await this.getApiKey();
+            const ai = new GoogleGenAI({ apiKey });
+
             const response = await ai.models.generateContent({
                 model: 'gemini-2.5-pro',
                 contents: prompt,
@@ -61,11 +69,13 @@ class CopilotAgent {
             return JSON.parse(jsonString) as CodeOutput;
         } catch (error) {
             console.error("Error generating content with CopilotAgent:", error);
+            // In case of an error (e.g., network failure), clear the promise to allow a retry on the next call.
+            this.apiKeyPromise = null;
             if (error instanceof Error) {
                 if (error.message.includes('API key not valid')) {
-                     throw new Error('The provided API key is invalid. Please check it in the settings.');
+                     throw new Error('The API key provided by the server is invalid. Please check your Vercel project settings.');
                 }
-                throw new Error(`Agent failed to generate response: ${error.message}`);
+                throw error; // Re-throw the original error to be displayed in the UI.
             }
             throw new Error("An unknown error occurred within the CopilotAgent.");
         }

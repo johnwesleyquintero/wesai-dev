@@ -73,8 +73,8 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ language, code }) => {
 const InitialState: React.FC = () => (
     <div className="text-slate-500 flex flex-col items-center justify-center h-full text-center p-4">
         <CubeIcon className="text-slate-300 dark:text-slate-700 mb-4" />
-        <h3 className="text-lg font-semibold text-slate-600 dark:text-slate-400">Design Canvas</h3>
-        <p className="max-w-xs text-slate-500">From prompt to prototype. Describe an interface and watch it materialize.</p>
+        <h3 className="text-lg font-semibold text-slate-600 dark:text-slate-400">From Prompt to Prototype</h3>
+        <p className="max-w-xs text-slate-500">Your AI-Powered Dev Scratchpad & Brainstorming Partner.</p>
     </div>
 );
 
@@ -114,16 +114,6 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
       </html>
     `;
   }, [response, theme]);
-  
-  const checkerboardStyle = useMemo(() => {
-    const color = theme === 'dark' ? '#334155' : '#e2e8f0'; // slate-700 or slate-200
-    return {
-      backgroundImage: `linear-gradient(45deg, ${color} 25%, transparent 25%), linear-gradient(-45deg, ${color} 25%, transparent 25%), linear-gradient(45deg, transparent 75%, ${color} 75%), linear-gradient(-45deg, transparent 75%, ${color} 75%)`,
-      backgroundSize: '20px 20px',
-      backgroundPosition: '0 0, 0 10px, 10px -10px, -10px 0px',
-    };
-  }, [theme]);
-
 
   const renderContent = () => {
     if (isLoading) {
@@ -148,7 +138,7 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
       return (
         <div className="flex flex-col h-full">
           {activeTab === 'preview' ? (
-            <div style={checkerboardStyle} className="w-full h-full bg-white dark:bg-slate-800 rounded-b-md">
+             <div className="w-full h-full bg-white dark:bg-slate-900 rounded-b-md">
                 <iframe
                 srcDoc={srcDoc}
                 title="Preview"
@@ -172,10 +162,10 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
   const TabButton: React.FC<{ tab: Tab; label: string }> = ({ tab, label }) => (
     <button
       onClick={() => setActiveTab(tab)}
-      className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-indigo-500 ${
+      className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-100 dark:focus:ring-offset-slate-800 focus:ring-indigo-500 ${
         activeTab === tab
-          ? 'bg-indigo-600 text-white shadow-sm'
-          : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700/50 hover:text-slate-800 dark:hover:text-slate-200'
+          ? 'bg-white dark:bg-slate-700/80 text-indigo-600 dark:text-white shadow-sm'
+          : 'text-slate-600 dark:text-slate-400 hover:bg-white/60 dark:hover:bg-slate-700/50 hover:text-slate-800 dark:hover:text-slate-200'
       }`}
     >
       {label}
@@ -189,7 +179,7 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
         <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 bg-slate-200/50 dark:bg-slate-900/50 p-2 rounded-t-lg">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-200 px-2">Output</h2>
             {response && (
-                <nav className="flex items-center gap-1">
+                <nav className="flex items-center gap-1 bg-slate-300/50 dark:bg-slate-800/50 p-1 rounded-lg">
                     <TabButton tab="preview" label="Preview" />
                     <TabButton tab="code" label="Code" />
                 </nav>
