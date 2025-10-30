@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useLayoutEffect, useRef, useEffect } from 'react';
 import Header from './components/Header';
 import PromptInput from './components/PromptInput';
@@ -101,7 +100,7 @@ const App: React.FC = () => {
   }, [prompt, isLoading]);
 
   return (
-    <div className="h-screen flex flex-col bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+    <div className="h-screen flex flex-col bg-slate-100 dark:bg-slate-950 transition-colors duration-300">
       <Header 
         theme={theme}
         onToggleTheme={toggleTheme}
@@ -121,18 +120,18 @@ const App: React.FC = () => {
             </div>
             <div className="w-full flex flex-col flex-1 min-h-0">
               <OutputDisplay
-                theme={theme}
                 response={response}
                 isLoading={isLoading}
                 error={error}
                 setPrompt={setPrompt}
+                theme={theme}
               />
             </div>
         </div>
         
         {/* Desktop Layout: Resizable */}
-        <div ref={mainContainerRef} className="hidden md:flex flex-row w-full flex-grow">
-            <div className="flex flex-col h-full" style={{ width: `calc(${dividerPosition}% - 4px)` }}>
+        <div ref={mainContainerRef} className="hidden md:flex flex-row w-full flex-grow gap-4">
+            <div className="flex flex-col h-full" style={{ width: `${dividerPosition}%` }}>
                <PromptInput 
                 prompt={prompt}
                 setPrompt={setPrompt}
@@ -144,15 +143,15 @@ const App: React.FC = () => {
                 onMouseDown={handleMouseDown}
                 className="w-2 cursor-col-resize flex-shrink-0 flex items-center justify-center group"
             >
-                <div className="w-0.5 h-1/4 bg-slate-300 dark:bg-slate-700 rounded-full group-hover:bg-indigo-500 transition-all duration-200 group-hover:scale-x-[2]"></div>
+                <div className="w-1 h-1/4 bg-slate-300 dark:bg-slate-700 rounded-full group-hover:bg-indigo-500 transition-all duration-200 group-hover:scale-x-150"></div>
             </div>
-            <div className="flex flex-col h-full" style={{ width: `calc(${100 - dividerPosition}% - 4px)` }}>
+            <div className="flex flex-col h-full" style={{ width: `calc(100% - ${dividerPosition}% - 8px)` }}>
               <OutputDisplay
-                theme={theme}
                 response={response}
                 isLoading={isLoading}
                 error={error}
                 setPrompt={setPrompt}
+                theme={theme}
               />
             </div>
         </div>

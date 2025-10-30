@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+    <style>
+      body { 
+        background-color: transparent;
+        font-family: 'Inter', sans-serif;
+        margin: 0;
+        padding: 1.5rem; /* Add some padding so components aren't against the edge */
+      }
+      /* Ensure body takes up full height for centering */
+      html, body, #root {
+          height: 100%;
+      }
+    </style>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/javascript">
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+
+        window.addEventListener('message', (event) => {
+            // A simple security check
+            if (event.source !== window.parent) {
+                return;
+            }
+
+            const { type, payload } = event.data;
+
+            if (type === 'RENDER_CODE') {
+                try {
+                    // Transpile and render the React component
+                    const transformedCode = Babel.transform(payload.code, { presets: ['react'] }).code;
+                    
+                    // The generated component is named 'GeneratedComponent'
+                    const componentFunction = new Function('React', `${transformedCode}; return GeneratedComponent;`);
+                    const Component = componentFunction(React);
+
+                    root.render(React.createElement(Component));
+
+                    // Send success confirmation back if needed
+                    window.parent.postMessage({ type: 'RENDER_SUCCESS' }, '*');
+                } catch (e) {
+                    console.error("Sandbox Render Error:", e);
+                    const errorMessage = e.message || 'An unknown error occurred during preview.';
+                    root.render(
+                        React.createElement('div', { 
+                            style: { 
+                                color: '#f87171', // text-red-400
+                                backgroundColor: '#450a0a', // red-950
+                                border: '1px solid #7f1d1d', // red-800
+                                padding: '1rem', 
+                                borderRadius: '0.5rem',
+                                fontFamily: 'monospace',
+                                whiteSpace: 'pre-wrap'
+                            }
+                        }, `Preview Error: ${errorMessage}`)
+                    );
+                    // Send error details back to the parent
+                    window.parent.postMessage({ type: 'RENDER_ERROR', payload: { message: errorMessage } }, '*');
+                }
+            } else if (type === 'SET_THEME') {
+                 if (payload.theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                    document.body.style.color = '#cbd5e1'; // slate-400
+                 } else {
+                    document.documentElement.classList.remove('dark');
+                    document.body.style.color = '#334155'; // slate-700
+                 }
+            }
+        });
+
+        // Notify parent that the sandbox is ready
+        window.parent.postMessage({ type: 'SANDBOX_READY' }, '*');
+    </script>
+</body>
+</html>

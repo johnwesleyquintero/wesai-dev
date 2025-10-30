@@ -1,23 +1,24 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
-const SYSTEM_INSTRUCTION = `You are WesAI, an expert AI assistant and strategic partner to a senior software architect. Your role is to generate code for web components. When given a prompt describing a UI element, you must generate the necessary HTML, CSS, and JavaScript for it.
+const SYSTEM_INSTRUCTION = `You are WesAI, an expert AI assistant and strategic partner to a senior software architect. Your role is to generate code for web components. When given a prompt describing a UI element, you must generate a single, self-contained React component.
 
 Your response MUST be a valid JSON object with the following structure:
 {
-  "html": "<string>",
-  "css": "<string>",
-  "js": "<string>"
+  "react": "<string>"
 }
 
-- The HTML should be self-contained in the 'html' field.
-- The CSS in the 'css' field should style the HTML. Use modern techniques like Flexbox or Grid.
-- The JavaScript in the 'js' field should add any requested interactivity. If no interactivity is needed, provide an empty string.
+- The 'react' field must contain a single, self-contained React functional component in TypeScript (.tsx). This component should encapsulate all the necessary JSX, styling, and logic.
+- The component will be rendered in a sandboxed iframe for previewing. Therefore, it must be completely self-contained. It should not rely on any external file imports, dependencies, or images beyond what is available in a standard browser environment and React.
+- All CSS should be included directly within the component's returned JSX using a <style> tag with template literals. Use modern techniques like Flexbox or Grid.
+- All JavaScript logic should be integrated using React hooks. Use 'useEffect' for DOM manipulations or event listener setup, 'useRef' to reference elements, and 'useState' for any state management. Convert inline event handlers (like 'onclick') to React's synthetic event props (like 'onClick').
+- The component must be a function declaration named 'GeneratedComponent'. Do not include an export statement.
+- Include necessary React imports at the top, like 'import React, { useEffect, useState, useRef } from "react";'.
+- Convert HTML to JSX (e.g., 'class' becomes 'className', inline 'style' attributes become JSX style objects).
+
 - Do not include backticks or the word 'json' in your response. Respond ONLY with the JSON object.`;
 
 export interface CodeOutput {
-  html: string;
-  css: string;
-  js: string;
+  react: string;
 }
 
 class CopilotAgent {
@@ -39,11 +40,9 @@ class CopilotAgent {
                     responseSchema: {
                         type: Type.OBJECT,
                         properties: {
-                            html: { type: Type.STRING },
-                            css: { type: Type.STRING },
-                            js: { type: Type.STRING },
+                            react: { type: Type.STRING },
                         },
-                        required: ["html", "css", "js"],
+                        required: ["react"],
                     }
                 },
             });
