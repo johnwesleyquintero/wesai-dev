@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 interface PromptInputProps {
@@ -28,14 +27,14 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
 
   return (
     <div className="flex flex-col gap-4 flex-1 h-full">
-      <label htmlFor="prompt-input" className="text-xl font-semibold text-slate-200">Describe a Component</label>
+      <label htmlFor="prompt-input" className="text-xl font-semibold text-slate-900 dark:text-slate-200">Describe a Component</label>
       <textarea
         id="prompt-input"
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="e.g., A responsive login form with a 'remember me' checkbox and a pulsing gradient on the submit button... (Cmd+Enter to generate)"
-        className="w-full flex-grow p-4 bg-slate-800 text-slate-200 border border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 resize-none placeholder:text-slate-500"
+        className="w-full flex-grow p-4 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-200 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 resize-none placeholder:text-slate-500 dark:placeholder:text-slate-500"
         disabled={isLoading}
       />
       <button

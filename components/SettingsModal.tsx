@@ -30,24 +30,24 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <div 
-      className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in"
+      className="fixed inset-0 bg-slate-500/50 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in"
       onClick={onClose}
       onKeyDown={handleKeyDown}
       role="dialog"
       aria-modal="true"
     >
       <div 
-        className="bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-md border border-slate-700"
+        className="bg-white dark:bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-md border border-slate-200 dark:border-slate-700"
         onClick={e => e.stopPropagation()}
       >
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-white">Settings</h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white">Settings</h2>
+          <button onClick={onClose} className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-2xl leading-none">&times;</button>
         </div>
         
         <div className="space-y-4">
             <div>
-                <label htmlFor="api-key-input" className="block text-sm font-medium text-slate-300 mb-2">
+                <label htmlFor="api-key-input" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                     Gemini API Key
                 </label>
                 <input
@@ -56,11 +56,11 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                     value={apiKey}
                     onChange={(e) => setApiKey(e.target.value)}
                     placeholder="Enter your API key"
-                    className="w-full p-2 bg-slate-900 text-slate-200 border border-slate-600 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full p-2 bg-slate-100 dark:bg-slate-900 text-slate-900 dark:text-slate-200 border border-slate-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 />
             </div>
 
-            <div className="text-xs text-slate-500 bg-slate-900/50 p-3 rounded-md">
+            <div className="text-xs text-slate-600 dark:text-slate-500 bg-slate-100 dark:bg-slate-900/50 p-3 rounded-md">
                 <p>Your API key is stored locally in your browser's localStorage and is never sent to our servers. Be cautious about pasting sensitive keys into web applications.</p>
             </div>
         </div>
