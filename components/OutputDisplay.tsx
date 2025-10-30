@@ -58,7 +58,7 @@ const InitialState: React.FC<{ setPrompt: (prompt: string) => void }> = ({ setPr
                     <button
                         key={i}
                         onClick={() => setPrompt(example)}
-                        className="text-left p-2.5 bg-slate-200/50 dark:bg-slate-800/50 hover:bg-slate-200 dark:hover:bg-slate-700/80 rounded-md transition-colors text-sm text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+                        className="text-left p-2.5 bg-slate-200/50 dark:bg-slate-800/50 hover:bg-slate-200 dark:hover:bg-slate-700/80 rounded-md text-sm text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-transform hover:scale-[1.02]"
                     >
                         {example}
                     </button>
@@ -210,7 +210,7 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
                 />
             </div>
           ) : (
-            <div className="flex-grow overflow-auto p-4 bg-slate-100/50 dark:bg-slate-800/50 rounded-b-md">
+            <div className="flex-grow overflow-auto p-4 bg-slate-50 dark:bg-slate-800/50 rounded-b-md">
                 <CodeBlock language="HTML" code={response.html} />
                 <CodeBlock language="CSS" code={response.css} />
                 <CodeBlock language="JavaScript" code={response.js} />
@@ -238,8 +238,8 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
   const contentKey = isLoading ? 'loading' : error ? 'error' : response ? 'response' : 'initial';
 
   return (
-    <div className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg flex flex-col h-full">
-        <div className="flex-shrink-0 flex items-center justify-between border-b border-slate-200 dark:border-slate-700 bg-slate-200/50 dark:bg-slate-900/50 p-2 rounded-t-lg">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg flex flex-col h-full">
+        <div className="flex-shrink-0 flex items-center justify-between border-b border-slate-200 dark:border-slate-700 bg-slate-100/50 dark:bg-slate-800/50 p-2 rounded-t-lg">
             <div className="flex items-center gap-2">
                  <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-200 px-2">Output</h2>
                  {response && activeTab === 'code' && (

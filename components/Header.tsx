@@ -18,7 +18,7 @@ const Header: React.FC<HeaderProps> = ({ theme, onToggleTheme, onHelpClick, onSe
             WesAI<span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-cyan-500">.Dev</span>
             </h1>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                Create stunning apps & websites by chatting with AI.
+                Build stunning apps & websites by chatting with AI.
             </p>
         </div>
         <div className="flex items-center gap-4">

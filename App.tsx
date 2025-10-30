@@ -101,7 +101,7 @@ const App: React.FC = () => {
   }, [prompt, isLoading]);
 
   return (
-    <div className="h-screen flex flex-col bg-white dark:bg-slate-900 transition-colors duration-300">
+    <div className="h-screen flex flex-col bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
       <Header 
         theme={theme}
         onToggleTheme={toggleTheme}
@@ -144,7 +144,7 @@ const App: React.FC = () => {
                 onMouseDown={handleMouseDown}
                 className="w-2 cursor-col-resize flex-shrink-0 flex items-center justify-center group"
             >
-                <div className="w-0.5 h-1/4 bg-slate-300 dark:bg-slate-700 rounded-full group-hover:bg-indigo-500 transition-colors duration-200"></div>
+                <div className="w-0.5 h-1/4 bg-slate-300 dark:bg-slate-700 rounded-full group-hover:bg-indigo-500 transition-all duration-200 group-hover:scale-x-[2]"></div>
             </div>
             <div className="flex flex-col h-full" style={{ width: `calc(${100 - dividerPosition}% - 4px)` }}>
               <OutputDisplay

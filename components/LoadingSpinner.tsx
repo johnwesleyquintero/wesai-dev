@@ -1,10 +1,11 @@
 
 import React from 'react';
+import { ModernSpinnerIcon } from './Icons';
 
 const LoadingSpinner: React.FC = () => {
     return (
         <div className="flex justify-center items-center h-full">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
+            <ModernSpinnerIcon className="w-16 h-16 text-indigo-500 animate-spin" />
         </div>
     );
 };
