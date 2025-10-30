@@ -1,4 +1,5 @@
 import React from 'react';
+import { CloseIcon } from './Icons';
 
 interface HelpModalProps {
   isOpen: boolean;
@@ -28,7 +29,13 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
       >
         <div className="flex justify-between items-center mb-6 sticky top-0 bg-white dark:bg-slate-800 py-2 -mt-2">
           <h2 className="text-xl font-bold text-slate-900 dark:text-white">Help & What's New</h2>
-          <button onClick={onClose} className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-3xl leading-none">&times;</button>
+          <button 
+            onClick={onClose} 
+            className="p-1 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+            aria-label="Close help"
+          >
+            <CloseIcon className="w-6 h-6" />
+          </button>
         </div>
 
         <div className="space-y-8 text-slate-700 dark:text-slate-300">

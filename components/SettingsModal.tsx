@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { CloseIcon } from './Icons';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -42,7 +43,13 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
       >
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-slate-900 dark:text-white">Settings</h2>
-          <button onClick={onClose} className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-2xl leading-none">&times;</button>
+          <button 
+            onClick={onClose} 
+            className="p-1 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+            aria-label="Close settings"
+          >
+            <CloseIcon className="w-6 h-6" />
+          </button>
         </div>
         
         <div className="space-y-4">

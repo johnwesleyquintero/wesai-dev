@@ -49,6 +49,16 @@
     pre::-webkit-scrollbar-thumb:hover {
         background-color: rgba(71, 85, 105, 0.7); /* slate-600 with opacity */
     }
+    /* Animated Gradient for Buttons */
+    @keyframes gradient-animation {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    .animate-gradient {
+        background-size: 200% 200%;
+        animation: gradient-animation 4s ease infinite;
+    }
 </style>
 </head>
 <body class="font-sans">

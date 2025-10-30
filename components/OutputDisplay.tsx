@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import LoadingSpinner from './LoadingSpinner';
 import { CodeOutput } from '../copilot/agent';
-import { CopyIcon, CheckIcon, CubeIcon, AlertTriangleIcon } from './Icons';
+import { CopyIcon, CheckIcon, WesAILogoIcon, AlertTriangleIcon, CopyAllIcon } from './Icons';
 
 
 // --- SUB-COMPONENTS ---
@@ -32,7 +32,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ language, code }) => {
                     className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors disabled:opacity-50"
                     disabled={isCopied}
                 >
-                    {isCopied ? <CheckIcon className="text-green-500" /> : <CopyIcon />}
+                    {isCopied ? <CheckIcon className="text-green-500 w-4 h-4" /> : <CopyIcon className="w-4 h-4" />}
                     {isCopied ? 'Copied!' : 'Copy'}
                 </button>
             </div>
@@ -50,7 +50,7 @@ const InitialState: React.FC<{ setPrompt: (prompt: string) => void }> = ({ setPr
 
     return (
         <div className="text-slate-500 flex flex-col items-center justify-center h-full text-center p-4">
-            <CubeIcon className="text-slate-300 dark:text-slate-700 mb-4" />
+            <WesAILogoIcon className="text-slate-300 dark:text-slate-700 mb-4" />
             <h3 className="text-lg font-semibold text-slate-600 dark:text-slate-400">Your AI Co-pilot for the Web</h3>
             <p className="max-w-xs text-slate-500 mb-6">Start by describing a component, or try an example:</p>
             <div className="flex flex-col gap-2 w-full max-w-sm">
@@ -111,7 +111,7 @@ const ErrorDisplay: React.FC<{ error: string }> = ({ error }) => {
             <div className="text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/50 p-4 rounded-lg">
                 <div className="flex justify-between items-start">
                     <div className="flex">
-                        <AlertTriangleIcon/>
+                        <AlertTriangleIcon className="text-red-500 dark:text-red-400 mr-3 h-6 w-6 flex-shrink-0"/>
                         <div>
                             <p className="font-bold text-red-800 dark:text-red-300">Generation Error</p>
                             <p className="text-sm mt-1">{error}</p>
@@ -122,7 +122,7 @@ const ErrorDisplay: React.FC<{ error: string }> = ({ error }) => {
                         className="ml-4 flex-shrink-0 flex items-center gap-1.5 text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors p-1.5 rounded-md hover:bg-slate-400/20 disabled:opacity-50"
                         disabled={isCopied}
                     >
-                        {isCopied ? <CheckIcon className="text-green-500"/> : <CopyIcon />}
+                        {isCopied ? <CheckIcon className="text-green-500 w-4 h-4"/> : <CopyIcon className="w-4 h-4" />}
                         {isCopied ? 'Copied' : 'Copy'}
                     </button>
                 </div>
@@ -145,6 +145,7 @@ type Tab = 'preview' | 'code';
 
 const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, error, theme, setPrompt }) => {
   const [activeTab, setActiveTab] = useState<Tab>('preview');
+  const [isAllCopied, setIsAllCopied] = useState(false);
 
   const srcDoc = useMemo(() => {
     if (!response) return '';
@@ -171,6 +172,23 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
       </html>
     `;
   }, [response, theme]);
+  
+  const handleCopyAll = useCallback(() => {
+    if (!response) return;
+    const allCode = `<!-- HTML -->\n${response.html}\n\n/* CSS */\n${response.css}\n\n// JavaScript\n${response.js}`;
+    navigator.clipboard.writeText(allCode).then(() => {
+        setIsAllCopied(true);
+        setTimeout(() => setIsAllCopied(false), 2000);
+    });
+  }, [response]);
+
+  useEffect(() => {
+    // When a new response comes in, reset the copy all button
+    if (response) {
+        setIsAllCopied(false);
+    }
+  }, [response]);
+
 
   const renderContent = () => {
     if (isLoading) {
@@ -221,8 +239,21 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
 
   return (
     <div className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg flex flex-col h-full">
-        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 bg-slate-200/50 dark:bg-slate-900/50 p-2 rounded-t-lg">
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-200 px-2">Output</h2>
+        <div className="flex-shrink-0 flex items-center justify-between border-b border-slate-200 dark:border-slate-700 bg-slate-200/50 dark:bg-slate-900/50 p-2 rounded-t-lg">
+            <div className="flex items-center gap-2">
+                 <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-200 px-2">Output</h2>
+                 {response && activeTab === 'code' && (
+                    <button
+                        onClick={handleCopyAll}
+                        className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors p-1.5 rounded-md hover:bg-slate-300/50 dark:hover:bg-slate-700/50 disabled:opacity-50"
+                        disabled={isAllCopied}
+                        aria-label="Copy all code"
+                    >
+                        {isAllCopied ? <CheckIcon className="text-green-500 w-4 h-4" /> : <CopyAllIcon className="w-4 h-4" />}
+                        {isAllCopied ? 'Copied All' : 'Copy All'}
+                    </button>
+                )}
+            </div>
             {response && (
                 <nav className="flex items-center gap-1 bg-slate-300/50 dark:bg-slate-800/50 p-1 rounded-lg">
                     <TabButton tab="preview" label="Preview" />
@@ -230,7 +261,7 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
                 </nav>
             )}
       </div>
-      <div key={contentKey} className="flex-grow relative animate-fade-in">
+      <div key={contentKey} className="flex-grow relative animate-fade-in min-h-0">
         {renderContent()}
       </div>
     </div>

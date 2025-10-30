@@ -23,13 +23,13 @@ const Header: React.FC<HeaderProps> = ({ theme, onToggleTheme, onHelpClick, onSe
         </div>
         <div className="flex items-center gap-4">
             <button onClick={onToggleTheme} className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors" aria-label="Toggle theme">
-                {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+                {theme === 'dark' ? <SunIcon className="w-6 h-6" /> : <MoonIcon className="w-6 h-6" />}
             </button>
             <button onClick={onHelpClick} className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors" aria-label="Open help and what's new">
-                <HelpIcon />
+                <HelpIcon className="w-6 h-6" />
             </button>
             <button onClick={onSettingsClick} className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors" aria-label="Open settings">
-                <SettingsIcon />
+                <SettingsIcon className="w-6 h-6" />
             </button>
         </div>
       </div>

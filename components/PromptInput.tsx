@@ -34,14 +34,14 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
             className="absolute top-3 right-3 p-1 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
             aria-label="Clear input"
           >
-            <CloseIcon />
+            <CloseIcon className="w-4 h-4" />
           </button>
         )}
       </div>
       <button
         onClick={handleGenerate}
         disabled={isLoading || !prompt.trim()}
-        className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-3 px-4 rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/40"
+        className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-3 px-4 rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/40 animate-gradient"
       >
         {isLoading ? (
           <>
@@ -53,7 +53,7 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
           </>
         ) : (
           <>
-            <SparkleIcon />
+            <SparkleIcon className="w-5 h-5" />
             Generate with WesAI
           </>
         )}

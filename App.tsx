@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useLayoutEffect, useRef, useEffect } from 'react';
 import Header from './components/Header';
 import PromptInput from './components/PromptInput';
@@ -25,7 +26,7 @@ const App: React.FC = () => {
   // --- Resizable Panel Logic ---
   const [dividerPosition, setDividerPosition] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
-  const mainContainerRef = useRef<HTMLElement>(null);
+  const mainContainerRef = useRef<HTMLDivElement>(null);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -100,17 +101,17 @@ const App: React.FC = () => {
   }, [prompt, isLoading]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-slate-900 transition-colors duration-300">
+    <div className="h-screen flex flex-col bg-white dark:bg-slate-900 transition-colors duration-300">
       <Header 
         theme={theme}
         onToggleTheme={toggleTheme}
         onHelpClick={() => setIsHelpOpen(true)}
         onSettingsClick={() => setIsSettingsOpen(true)}
       />
-      <main ref={mainContainerRef} className="flex-grow p-4 md:p-6 lg:p-8 flex flex-col overflow-hidden">
+      <main className="flex-grow p-4 md:p-6 lg:p-8 flex flex-col overflow-hidden">
         {/* Mobile Layout: Stacked */}
-        <div className="md:hidden flex flex-col gap-6">
-            <div className="w-full flex flex-col min-h-[400px]">
+        <div className="md:hidden flex flex-col gap-6 flex-grow">
+            <div className="w-full flex flex-col flex-1 min-h-0">
                <PromptInput 
                 prompt={prompt}
                 setPrompt={setPrompt}
@@ -118,7 +119,7 @@ const App: React.FC = () => {
                 isLoading={isLoading}
                />
             </div>
-            <div className="w-full flex flex-col min-h-[400px]">
+            <div className="w-full flex flex-col flex-1 min-h-0">
               <OutputDisplay
                 theme={theme}
                 response={response}
@@ -130,7 +131,7 @@ const App: React.FC = () => {
         </div>
         
         {/* Desktop Layout: Resizable */}
-        <div className="hidden md:flex flex-row w-full h-full flex-grow">
+        <div ref={mainContainerRef} className="hidden md:flex flex-row w-full flex-grow">
             <div className="flex flex-col h-full" style={{ width: `calc(${dividerPosition}% - 4px)` }}>
                <PromptInput 
                 prompt={prompt}
