@@ -33,6 +33,13 @@
     .animate-fade-in {
         animation: fadeIn 0.4s ease-out forwards;
     }
+    @keyframes pulse-glow {
+      0%, 100% { opacity: 0.7; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.05); }
+    }
+    .animate-pulse-glow {
+        animation: pulse-glow 2.5s infinite ease-in-out;
+    }
     pre, code {
         font-family: 'Roboto Mono', monospace;
     }
@@ -61,9 +68,25 @@
         background-size: 200% 200%;
         animation: gradient-animation 4s ease infinite;
     }
+    /* Subtle background pattern */
+    body {
+        --dot-bg: theme(colors.slate.200);
+        --dot-color: theme(colors.slate.400);
+        --dot-size: 1px;
+        --dot-space: 22px;
+        background:
+            linear-gradient(90deg, var(--dot-bg) calc(var(--dot-space) - var(--dot-size)), transparent 1%) center,
+            linear-gradient(var(--dot-bg) calc(var(--dot-space) - var(--dot-size)), transparent 1%) center,
+            var(--dot-color);
+        background-size: var(--dot-space) var(--dot-space);
+    }
+    .dark body {
+        --dot-bg: theme(colors.slate.950);
+        --dot-color: theme(colors.slate.900);
+    }
 </style>
 </head>
-<body class="font-sans">
+<body class="font-sans bg-slate-100 dark:bg-slate-950">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
 </body>

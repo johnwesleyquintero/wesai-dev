@@ -1,7 +1,7 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef, useLayoutEffect } from 'react';
 import LoadingSpinner from './LoadingSpinner';
 import { CodeOutput } from '../copilot/agent';
-import { CopyIcon, CheckIcon, WesAILogoIcon, AlertTriangleIcon, EyeIcon, CodeIcon } from './Icons';
+import { CopyIcon, CheckIcon, AlertTriangleIcon, EyeIcon, CodeIcon, InitialStateLogoIcon } from './Icons';
 
 type Theme = 'light' | 'dark';
 type ActiveTab = 'preview' | 'code';
@@ -95,14 +95,14 @@ const CodeBlock: React.FC<{ code: string }> = ({ code }) => {
 
 const InitialState: React.FC<{ setPrompt: (prompt: string) => void }> = ({ setPrompt }) => {
     const examples = [
-        "A responsive login form with a 'remember me' checkbox.",
-        "A pricing card with 3 tiers, highlighting the 'Pro' plan.",
-        "A testimonial slider with avatar images and quotes.",
+        "A modern landing page for a SaaS product with a hero section, feature list, and a footer.",
+        "A mini-app that generates creative writing prompts based on a selected genre.",
+        "A simple to-do list app with the ability to add and complete tasks.",
     ];
 
     return (
         <div className="text-slate-500 flex flex-col items-center justify-center h-full text-center p-4 animate-fade-in">
-            <WesAILogoIcon className="text-slate-300 dark:text-slate-700 mb-6 w-48 h-12" />
+            <InitialStateLogoIcon className="w-24 h-24 mb-6" />
             <h3 className="text-lg font-semibold text-slate-600 dark:text-slate-400">Your AI Co-pilot for the Web</h3>
             <p className="max-w-md text-slate-500 mb-8">Start by describing a component, or try an example:</p>
             <div className="flex flex-col gap-3 w-full max-w-sm">
@@ -110,7 +110,7 @@ const InitialState: React.FC<{ setPrompt: (prompt: string) => void }> = ({ setPr
                      <button
                         key={i}
                         onClick={() => setPrompt(example)}
-                        className="text-left p-3 bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700/80 rounded-lg text-sm text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 transition-all duration-200 transform hover:scale-[1.03] border border-slate-200 dark:border-slate-700/50 shadow-sm hover:shadow-md"
+                        className="text-left p-3 bg-white/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-700/80 rounded-lg text-sm text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 transition-all duration-200 transform hover:scale-[1.03] border border-slate-200 dark:border-slate-700/50 shadow-sm hover:shadow-md"
                     >
                         {example}
                     </button>
@@ -196,6 +196,21 @@ interface OutputDisplayProps {
 const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, error, setPrompt, theme }) => {
   const [activeTab, setActiveTab] = useState<ActiveTab>('preview');
   const [sandboxError, setSandboxError] = useState<string | null>(null);
+  
+  const tabsRef = useRef<(HTMLButtonElement | null)[]>([]);
+  const [gliderStyle, setGliderStyle] = useState({});
+
+  useLayoutEffect(() => {
+    const activeTabIndex = activeTab === 'preview' ? 0 : 1;
+    const activeTabEl = tabsRef.current[activeTabIndex];
+    if (activeTabEl) {
+      setGliderStyle({
+        width: activeTabEl.offsetWidth,
+        transform: `translateX(${activeTabEl.offsetLeft}px)`,
+      });
+    }
+  }, [activeTab, response]);
+
 
   useEffect(() => {
     // When a new response comes in, switch to the preview tab and clear old errors
@@ -233,21 +248,29 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
   const contentKey = isLoading ? 'loading' : error ? 'error' : response ? `${activeTab}-${response.react.length}` : 'initial';
 
   return (
-    <div className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-lg flex flex-col h-full">
-        <div className="flex-shrink-0 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 p-2 rounded-t-lg">
+    <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border border-slate-200 dark:border-slate-800 rounded-lg flex flex-col h-full shadow-lg">
+        <div className="flex-shrink-0 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-slate-100/80 dark:bg-slate-900/80 p-2 rounded-t-lg">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-200 px-2">Output</h2>
             {response && !isLoading && !error && (
-                <div className="flex items-center gap-1 bg-slate-200 dark:bg-slate-800 p-1 rounded-md">
+                <div className="relative flex items-center gap-1 bg-slate-200 dark:bg-slate-800 p-1 rounded-md">
+                     <div
+                        className="absolute bg-white dark:bg-slate-700 shadow-sm rounded-md h-[calc(100%-8px)] transition-all duration-300 ease-out"
+                        style={gliderStyle}
+                     />
                      <button 
+                        // FIX: The ref callback function must not return a value. Using a block statement `{}` ensures an implicit `undefined` return.
+                        ref={el => { tabsRef.current[0] = el; }}
                         onClick={() => setActiveTab('preview')}
-                        className={`flex items-center gap-2 px-3 py-1 text-sm font-medium rounded-md transition-colors ${activeTab === 'preview' ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-300/50 dark:hover:bg-slate-700/50'}`}
+                        className={`relative z-10 flex items-center gap-2 px-3 py-1 text-sm font-medium rounded-md transition-colors ${activeTab === 'preview' ? 'text-indigo-600 dark:text-white' : 'text-slate-600 dark:text-slate-400'}`}
                      >
                         <EyeIcon className="w-4 h-4" />
                         Preview
                      </button>
                      <button 
+                        // FIX: The ref callback function must not return a value. Using a block statement `{}` ensures an implicit `undefined` return.
+                        ref={el => { tabsRef.current[1] = el; }}
                         onClick={() => setActiveTab('code')}
-                        className={`flex items-center gap-2 px-3 py-1 text-sm font-medium rounded-md transition-colors ${activeTab === 'code' ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-300/50 dark:hover:bg-slate-700/50'}`}
+                        className={`relative z-10 flex items-center gap-2 px-3 py-1 text-sm font-medium rounded-md transition-colors ${activeTab === 'code' ? 'text-indigo-600 dark:text-white' : 'text-slate-600 dark:text-slate-400'}`}
                      >
                         <CodeIcon className="w-4 h-4" />
                         Code

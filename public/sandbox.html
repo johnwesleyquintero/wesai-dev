@@ -15,11 +15,17 @@
         background-color: transparent;
         font-family: 'Inter', sans-serif;
         margin: 0;
-        padding: 1.5rem; /* Add some padding so components aren't against the edge */
+        padding: 1rem;
       }
-      /* Ensure body takes up full height for centering */
+      /* Ensure body takes up full height and center content */
       html, body, #root {
           height: 100%;
+          box-sizing: border-box;
+      }
+      #root {
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
     </style>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>

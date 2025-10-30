@@ -2,7 +2,6 @@ import React, { useState, useCallback, useLayoutEffect, useRef, useEffect } from
 import Header from './components/Header';
 import PromptInput from './components/PromptInput';
 import OutputDisplay from './components/OutputDisplay';
-import SettingsModal from './components/SettingsModal';
 import HelpModal from './components/HelpModal';
 import { brainstormIdea } from './services/geminiService';
 import { CodeOutput } from './copilot/agent';
@@ -14,7 +13,7 @@ const App: React.FC = () => {
   const [response, setResponse] = useState<CodeOutput | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
+  // FIX: The settings modal and its state are removed as API key management is no longer part of the UI.
   const [isHelpOpen, setIsHelpOpen] = useState<boolean>(false);
   const [theme, setTheme] = useState<Theme>(() => {
     const savedTheme = localStorage.getItem('theme') as Theme | null;
@@ -100,11 +99,10 @@ const App: React.FC = () => {
   }, [prompt, isLoading]);
 
   return (
-    <div className="h-screen flex flex-col bg-slate-100 dark:bg-slate-950 transition-colors duration-300">
+    <div className="h-screen flex flex-col bg-transparent transition-colors duration-300">
       <Header 
         theme={theme}
         onToggleTheme={toggleTheme}
-        onSettingsClick={() => setIsSettingsOpen(true)}
         onHelpClick={() => setIsHelpOpen(true)}
       />
       <main className="flex-grow p-4 md:p-6 lg:p-8 flex flex-col overflow-hidden">
@@ -156,13 +154,10 @@ const App: React.FC = () => {
             </div>
         </div>
       </main>
-      <footer className="text-center py-4 text-slate-500 dark:text-slate-500 text-xs border-t border-slate-200 dark:border-slate-800">
+      <footer className="text-center py-4 text-slate-500 dark:text-slate-500 text-xs border-t border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-950">
         © 2025 WesAI.Dev | Powered by Google Gemini.
       </footer>
-      <SettingsModal
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-      />
+      {/* FIX: SettingsModal is removed as API key management is no longer needed in the UI. */}
       <HelpModal
         isOpen={isHelpOpen}
         onClose={() => setIsHelpOpen(false)}
