@@ -87,7 +87,7 @@ const CodeBlock: React.FC<{ code: string }> = ({ code }) => {
                     {isCopied ? 'Copied!' : 'Copy'}
                 </button>
             </div>
-            <pre className="flex-1 bg-slate-50 dark:bg-slate-800 p-4 text-sm text-slate-800 dark:text-slate-300 whitespace-pre-wrap overflow-auto"><code>{code}</code></pre>
+            <pre className="flex-1 bg-slate-50 dark:bg-slate-800 p-4 text-sm text-slate-800 dark:text-slate-300 whitespace-pre overflow-auto"><code>{code}</code></pre>
         </div>
     );
 };
@@ -102,15 +102,15 @@ const InitialState: React.FC<{ setPrompt: (prompt: string) => void }> = ({ setPr
 
     return (
         <div className="text-slate-500 flex flex-col items-center justify-center h-full text-center p-4 animate-fade-in">
-            <WesAILogoIcon className="text-slate-300 dark:text-slate-700 mb-4" />
+            <WesAILogoIcon className="text-slate-300 dark:text-slate-700 mb-6 w-48 h-12" />
             <h3 className="text-lg font-semibold text-slate-600 dark:text-slate-400">Your AI Co-pilot for the Web</h3>
-            <p className="max-w-xs text-slate-500 mb-6">Start by describing a component, or try an example:</p>
-            <div className="flex flex-col gap-2 w-full max-w-sm">
+            <p className="max-w-md text-slate-500 mb-8">Start by describing a component, or try an example:</p>
+            <div className="flex flex-col gap-3 w-full max-w-sm">
                 {examples.map((example, i) => (
                      <button
                         key={i}
                         onClick={() => setPrompt(example)}
-                        className="text-left p-3 bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700/80 rounded-lg text-sm text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 transition-all duration-200 transform hover:scale-[1.03] border border-slate-200 dark:border-slate-700/50"
+                        className="text-left p-3 bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700/80 rounded-lg text-sm text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 transition-all duration-200 transform hover:scale-[1.03] border border-slate-200 dark:border-slate-700/50 shadow-sm hover:shadow-md"
                     >
                         {example}
                     </button>

@@ -23,12 +23,12 @@ export interface CodeOutput {
 
 class CopilotAgent {
     public async generate(prompt: string): Promise<CodeOutput> {
+        const apiKey = localStorage.getItem('gemini_api_key');
+        if (!apiKey) {
+            throw new Error("API key not found. Please add it in the settings (click the gear icon).");
+        }
+
         try {
-            const apiKey = localStorage.getItem('gemini_api_key');
-            if (!apiKey) {
-                throw new Error("Gemini API key not found. Please add your key in the settings menu (click the gear icon).");
-            }
-            
             const ai = new GoogleGenAI({ apiKey });
 
             const response = await ai.models.generateContent({
@@ -48,7 +48,7 @@ class CopilotAgent {
             });
             
             const jsonString = response.text.trim();
-            if (!jsonString.startsWith('{') || !jsonString.endsWith('}')) {
+             if (!jsonString.startsWith('{') || !jsonString.endsWith('}')) {
                 throw new Error("The AI returned an invalid response format. Please try refining your prompt or try again.");
             }
             return JSON.parse(jsonString) as CodeOutput;
@@ -57,7 +57,7 @@ class CopilotAgent {
             console.error("Error generating content with CopilotAgent:", error);
             if (error instanceof Error) {
                 if (error.message.includes('API key not valid')) {
-                     throw new Error('Your API key is invalid. Please check it in the settings menu or generate a new one from Google AI Studio.');
+                     throw new Error('The API key is invalid. Please check it in the settings.');
                 }
                  if (error.message.includes('fetch')) {
                     throw new Error('A network error occurred. Please check your connection and try again.')

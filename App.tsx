@@ -2,8 +2,8 @@ import React, { useState, useCallback, useLayoutEffect, useRef, useEffect } from
 import Header from './components/Header';
 import PromptInput from './components/PromptInput';
 import OutputDisplay from './components/OutputDisplay';
-import HelpModal from './components/HelpModal';
 import SettingsModal from './components/SettingsModal';
+import HelpModal from './components/HelpModal';
 import { brainstormIdea } from './services/geminiService';
 import { CodeOutput } from './copilot/agent';
 
@@ -14,8 +14,8 @@ const App: React.FC = () => {
   const [response, setResponse] = useState<CodeOutput | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [isHelpOpen, setIsHelpOpen] = useState<boolean>(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
+  const [isHelpOpen, setIsHelpOpen] = useState<boolean>(false);
   const [theme, setTheme] = useState<Theme>(() => {
     const savedTheme = localStorage.getItem('theme') as Theme | null;
     if (savedTheme) return savedTheme;
@@ -104,8 +104,8 @@ const App: React.FC = () => {
       <Header 
         theme={theme}
         onToggleTheme={toggleTheme}
-        onHelpClick={() => setIsHelpOpen(true)}
         onSettingsClick={() => setIsSettingsOpen(true)}
+        onHelpClick={() => setIsHelpOpen(true)}
       />
       <main className="flex-grow p-4 md:p-6 lg:p-8 flex flex-col overflow-hidden">
         {/* Mobile Layout: Stacked */}
@@ -159,13 +159,13 @@ const App: React.FC = () => {
       <footer className="text-center py-4 text-slate-500 dark:text-slate-500 text-xs border-t border-slate-200 dark:border-slate-800">
         Powered by Google Gemini. Your personal AI partner for building the future.
       </footer>
-      <HelpModal
-        isOpen={isHelpOpen}
-        onClose={() => setIsHelpOpen(false)}
-      />
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
+      />
+      <HelpModal
+        isOpen={isHelpOpen}
+        onClose={() => setIsHelpOpen(false)}
       />
     </div>
   );

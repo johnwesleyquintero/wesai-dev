@@ -1,15 +1,14 @@
-
 import React from 'react';
 import { HelpIcon, SunIcon, MoonIcon, SettingsIcon } from './Icons';
 
 interface HeaderProps {
     theme: 'light' | 'dark';
     onToggleTheme: () => void;
-    onHelpClick: () => void;
     onSettingsClick: () => void;
+    onHelpClick: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ theme, onToggleTheme, onHelpClick, onSettingsClick }) => {
+const Header: React.FC<HeaderProps> = ({ theme, onToggleTheme, onSettingsClick, onHelpClick }) => {
   return (
     <header className="py-4 px-4 sm:px-6 lg:px-8 border-b border-slate-200 dark:border-slate-800">
       <div className="flex justify-between items-center">
