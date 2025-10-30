@@ -6,7 +6,7 @@
     <title>WesAI.Dev</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
 <script>
     tailwind.config = {
@@ -30,6 +30,24 @@
     }
     .animate-fade-in {
         animation: fadeIn 0.4s ease-out forwards;
+    }
+    pre, code {
+        font-family: 'Roboto Mono', monospace;
+    }
+    /* Custom scrollbar for better aesthetics in code blocks */
+    pre::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    pre::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    pre::-webkit-scrollbar-thumb {
+        background-color: rgba(100, 116, 139, 0.5); /* slate-500 with opacity */
+        border-radius: 4px;
+    }
+    pre::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(71, 85, 105, 0.7); /* slate-600 with opacity */
     }
 </style>
 </head>

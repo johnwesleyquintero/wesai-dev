@@ -1,36 +1,7 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import LoadingSpinner from './LoadingSpinner';
 import { CodeOutput } from '../copilot/agent';
-
-// --- ICONS ---
-const CopyIcon: React.FC<{ className?: string }> = ({ className }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-        <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
-        <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-    </svg>
-);
-
-const CheckIcon: React.FC<{ className?: string }> = ({ className }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={className}>
-        <path d="M20 6 9 17l-5-5" />
-    </svg>
-);
-
-const CubeIcon: React.FC<{className?: string}> = ({className}) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
-        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-        <line x1="12" y1="22.08" x2="12" y2="12"></line>
-    </svg>
-);
-
-const AlertTriangleIcon: React.FC = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-500 dark:text-red-400 mr-3 h-6 w-6">
-        <path d="m21.73 18-8-14a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
-        <path d="M12 9v4"/>
-        <path d="M12 17h.01"/>
-    </svg>
-);
+import { CopyIcon, CheckIcon, CubeIcon, AlertTriangleIcon } from './Icons';
 
 
 // --- SUB-COMPONENTS ---
@@ -53,8 +24,8 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ language, code }) => {
     if (!code) return null;
 
     return (
-        <div className="mb-4 last:mb-0">
-            <div className="flex justify-between items-center bg-slate-200 dark:bg-slate-900 px-4 py-2 rounded-t-md border-b border-slate-300 dark:border-slate-700">
+        <div className="mb-4 last:mb-0 bg-slate-100 dark:bg-slate-900/70 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700/50">
+            <div className="flex justify-between items-center bg-slate-200/80 dark:bg-slate-900 px-4 py-2 border-b border-slate-300/80 dark:border-slate-700/50">
                 <h3 className="text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">{language}</h3>
                 <button
                     onClick={handleCopy}
@@ -65,18 +36,66 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ language, code }) => {
                     {isCopied ? 'Copied!' : 'Copy'}
                 </button>
             </div>
-            <pre className="bg-slate-100 dark:bg-slate-800 p-4 rounded-b-md text-sm text-slate-800 dark:text-slate-300 whitespace-pre-wrap overflow-x-auto"><code>{code}</code></pre>
+            <pre className="bg-slate-50 dark:bg-slate-800 p-4 text-sm text-slate-800 dark:text-slate-300 whitespace-pre-wrap overflow-x-auto"><code>{code}</code></pre>
         </div>
     );
 };
 
-const InitialState: React.FC = () => (
-    <div className="text-slate-500 flex flex-col items-center justify-center h-full text-center p-4">
-        <CubeIcon className="text-slate-300 dark:text-slate-700 mb-4" />
-        <h3 className="text-lg font-semibold text-slate-600 dark:text-slate-400">From Prompt to Prototype</h3>
-        <p className="max-w-xs text-slate-500">Your AI-Powered Dev Scratchpad & Brainstorming Partner.</p>
+const InitialState: React.FC<{ setPrompt: (prompt: string) => void }> = ({ setPrompt }) => {
+    const examples = [
+        "A responsive login form with a 'remember me' checkbox.",
+        "A pricing card with 3 tiers, highlighting the 'Pro' plan.",
+        "A testimonial slider with avatar images and quotes.",
+    ];
+
+    return (
+        <div className="text-slate-500 flex flex-col items-center justify-center h-full text-center p-4">
+            <CubeIcon className="text-slate-300 dark:text-slate-700 mb-4" />
+            <h3 className="text-lg font-semibold text-slate-600 dark:text-slate-400">Your AI Co-pilot for the Web</h3>
+            <p className="max-w-xs text-slate-500 mb-6">Start by describing a component, or try an example:</p>
+            <div className="flex flex-col gap-2 w-full max-w-sm">
+                {examples.map((example, i) => (
+                    <button
+                        key={i}
+                        onClick={() => setPrompt(example)}
+                        className="text-left p-2.5 bg-slate-200/50 dark:bg-slate-800/50 hover:bg-slate-200 dark:hover:bg-slate-700/80 rounded-md transition-colors text-sm text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+                    >
+                        {example}
+                    </button>
+                ))}
+            </div>
+        </div>
+    );
+};
+
+
+const LoadingState: React.FC = () => {
+  const [message, setMessage] = useState('WesAI is warming up...');
+  
+  useEffect(() => {
+    const messages = [
+        "Analyzing your request...", 
+        "Architecting the component...", 
+        "Generating HTML...", 
+        "Styling with CSS...", 
+        "Adding JavaScript interactivity..."
+    ];
+    let index = 0;
+    const intervalId = setInterval(() => {
+      setMessage(messages[index]);
+      index = (index + 1) % messages.length;
+    }, 2000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+  return (
+    <div className="flex flex-col justify-center items-center h-full text-center p-4">
+      <LoadingSpinner />
+      <p className="mt-4 text-slate-600 dark:text-slate-400">{message}</p>
     </div>
-);
+  );
+};
 
 
 // --- MAIN COMPONENT ---
@@ -85,24 +104,28 @@ interface OutputDisplayProps {
   isLoading: boolean;
   error: string | null;
   theme: 'light' | 'dark';
+  setPrompt: (prompt: string) => void;
 }
 
 type Tab = 'preview' | 'code';
 
-const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, error, theme }) => {
+const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, error, theme, setPrompt }) => {
   const [activeTab, setActiveTab] = useState<Tab>('preview');
 
   const srcDoc = useMemo(() => {
     if (!response) return '';
-    const bodyColor = theme === 'dark' ? '#E2E8F0' : '#111827';
     return `
       <html>
         <head>
           <style>
+            :root {
+              --text-color: ${theme === 'dark' ? '#E2E8F0' : '#111827'};
+              --bg-color: transparent;
+            }
             body { 
               font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
-              color: ${bodyColor};
-              background-color: transparent;
+              color: var(--text-color);
+              background-color: var(--bg-color);
             }
             ${response.css}
           </style>
@@ -117,19 +140,37 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
 
   const renderContent = () => {
     if (isLoading) {
-        return (
-            <div className="flex justify-center items-center h-full bg-slate-100/50 dark:bg-slate-800/50">
-                <LoadingSpinner />
-            </div>
-        );
+        return <LoadingState />;
     }
     if (error) {
+      const [isCopied, setIsCopied] = useState(false);
+      const handleCopyError = useCallback(() => {
+        navigator.clipboard.writeText(error).then(() => {
+            setIsCopied(true);
+            setTimeout(() => setIsCopied(false), 2000);
+        });
+      }, [error]);
+
       return (
-        <div className="text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/50 p-4 rounded-md m-4 flex items-start">
-            <AlertTriangleIcon/>
-            <div>
-                <p className="font-bold text-red-800 dark:text-red-300">Generation Error</p>
-                <p>{error}</p>
+        <div className="p-4">
+            <div className="text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/50 p-4 rounded-lg">
+                <div className="flex justify-between items-start">
+                    <div className="flex">
+                        <AlertTriangleIcon/>
+                        <div>
+                            <p className="font-bold text-red-800 dark:text-red-300">Generation Error</p>
+                            <p className="text-sm mt-1">{error}</p>
+                        </div>
+                    </div>
+                    <button
+                        onClick={handleCopyError}
+                        className="ml-4 flex-shrink-0 flex items-center gap-1.5 text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors p-1.5 rounded-md hover:bg-slate-400/20 disabled:opacity-50"
+                        disabled={isCopied}
+                    >
+                        {isCopied ? <CheckIcon className="text-green-500"/> : <CopyIcon />}
+                        {isCopied ? 'Copied' : 'Copy'}
+                    </button>
+                </div>
             </div>
         </div>
       );
@@ -156,7 +197,7 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
         </div>
       );
     }
-    return <InitialState />;
+    return <InitialState setPrompt={setPrompt} />;
   };
 
   const TabButton: React.FC<{ tab: Tab; label: string }> = ({ tab, label }) => (

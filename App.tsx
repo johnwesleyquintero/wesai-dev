@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useLayoutEffect } from 'react';
+import React, { useState, useCallback, useLayoutEffect, useRef, useEffect } from 'react';
 import Header from './components/Header';
 import PromptInput from './components/PromptInput';
 import OutputDisplay from './components/OutputDisplay';
@@ -19,6 +19,49 @@ const App: React.FC = () => {
     if (savedTheme) return savedTheme;
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   });
+
+  // --- Resizable Panel Logic ---
+  const [dividerPosition, setDividerPosition] = useState(50);
+  const [isDragging, setIsDragging] = useState(false);
+  const mainContainerRef = useRef<HTMLElement>(null);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (isDragging && mainContainerRef.current) {
+      const containerRect = mainContainerRef.current.getBoundingClientRect();
+      const newPosition = ((e.clientX - containerRect.left) / containerRect.width) * 100;
+      
+      // Constrain panel sizes
+      if (newPosition > 25 && newPosition < 75) {
+        setDividerPosition(newPosition);
+      }
+    }
+  }, [isDragging]);
+
+  useEffect(() => {
+    if (isDragging) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+    }
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, [isDragging, handleMouseMove, handleMouseUp]);
+  // --- End Resizable Panel Logic ---
+
 
   useLayoutEffect(() => {
     if (theme === 'dark') {
@@ -61,26 +104,57 @@ const App: React.FC = () => {
         onToggleTheme={toggleTheme}
         onHelpClick={() => setIsHelpOpen(true)}
       />
-      <main className="flex-grow p-4 md:p-6 lg:p-8 flex flex-col md:flex-row gap-6">
-        <div className="w-full md:w-1/2 flex flex-col min-h-[400px] md:min-h-0 md:h-[calc(100vh-180px)]">
-           <PromptInput 
-            prompt={prompt}
-            setPrompt={setPrompt}
-            handleGenerate={handleGenerate}
-            isLoading={isLoading}
-           />
+      <main ref={mainContainerRef} className="flex-grow p-4 md:p-6 lg:p-8 flex flex-col overflow-hidden">
+        {/* Mobile Layout: Stacked */}
+        <div className="md:hidden flex flex-col gap-6">
+            <div className="w-full flex flex-col min-h-[400px]">
+               <PromptInput 
+                prompt={prompt}
+                setPrompt={setPrompt}
+                handleGenerate={handleGenerate}
+                isLoading={isLoading}
+               />
+            </div>
+            <div className="w-full flex flex-col min-h-[400px]">
+              <OutputDisplay
+                theme={theme}
+                response={response}
+                isLoading={isLoading}
+                error={error}
+                setPrompt={setPrompt}
+              />
+            </div>
         </div>
-        <div className="w-full md:w-1/2 flex flex-col min-h-[400px] md:min-h-0 md:h-[calc(100vh-180px)]">
-          <OutputDisplay
-            theme={theme}
-            response={response}
-            isLoading={isLoading}
-            error={error}
-          />
+        
+        {/* Desktop Layout: Resizable */}
+        <div className="hidden md:flex flex-row w-full h-full flex-grow">
+            <div className="flex flex-col h-full" style={{ width: `calc(${dividerPosition}% - 4px)` }}>
+               <PromptInput 
+                prompt={prompt}
+                setPrompt={setPrompt}
+                handleGenerate={handleGenerate}
+                isLoading={isLoading}
+               />
+            </div>
+            <div 
+                onMouseDown={handleMouseDown}
+                className="w-2 cursor-col-resize flex-shrink-0 flex items-center justify-center group"
+            >
+                <div className="w-0.5 h-1/4 bg-slate-300 dark:bg-slate-700 rounded-full group-hover:bg-indigo-500 transition-colors duration-200"></div>
+            </div>
+            <div className="flex flex-col h-full" style={{ width: `calc(${100 - dividerPosition}% - 4px)` }}>
+              <OutputDisplay
+                theme={theme}
+                response={response}
+                isLoading={isLoading}
+                error={error}
+                setPrompt={setPrompt}
+              />
+            </div>
         </div>
       </main>
       <footer className="text-center py-4 text-slate-500 dark:text-slate-500 text-xs border-t border-slate-200 dark:border-slate-800">
-        Powered by Google Gemini. Built by WesAI for John Wesley Quintero.
+        Powered by Google Gemini. Your personal AI partner for building the future.
       </footer>
       <HelpModal
         isOpen={isHelpOpen}

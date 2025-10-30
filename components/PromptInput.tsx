@@ -1,4 +1,5 @@
 import React from 'react';
+import { SparkleIcon, CloseIcon } from './Icons';
 
 interface PromptInputProps {
   prompt: string;
@@ -6,17 +7,6 @@ interface PromptInputProps {
   handleGenerate: () => void;
   isLoading: boolean;
 }
-
-const SparkleIcon: React.FC = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12 3L9.5 8.5L4 11L9.5 13.5L12 19L14.5 13.5L20 11L14.5 8.5L12 3Z" />
-    <path d="M5 3v4" />
-    <path d="M19 17v4" />
-    <path d="M3 5h4" />
-    <path d="M17 19h4" />
-  </svg>
-);
-
 
 const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGenerate, isLoading }) => {
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -28,15 +18,26 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
   return (
     <div className="flex flex-col gap-4 flex-1 h-full">
       <label htmlFor="prompt-input" className="text-xl font-semibold text-slate-900 dark:text-slate-200">Describe a Component</label>
-      <textarea
-        id="prompt-input"
-        value={prompt}
-        onChange={(e) => setPrompt(e.target.value)}
-        onKeyDown={handleKeyDown}
-        placeholder="e.g., A responsive login form with a 'remember me' checkbox and a pulsing gradient on the submit button... (Cmd+Enter to generate)"
-        className="w-full flex-grow p-4 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 resize-none placeholder:text-slate-500 dark:placeholder:text-slate-500"
-        disabled={isLoading}
-      />
+      <div className="relative w-full flex-grow">
+        <textarea
+          id="prompt-input"
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="e.g., A responsive login form with a 'remember me' checkbox and a pulsing gradient on the submit button... (Cmd+Enter to generate)"
+          className="w-full h-full p-4 pr-10 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 resize-none placeholder:text-slate-500 dark:placeholder:text-slate-500"
+          disabled={isLoading}
+        />
+        {prompt && (
+          <button
+            onClick={() => setPrompt('')}
+            className="absolute top-3 right-3 p-1 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+            aria-label="Clear input"
+          >
+            <CloseIcon />
+          </button>
+        )}
+      </div>
       <button
         onClick={handleGenerate}
         disabled={isLoading || !prompt.trim()}

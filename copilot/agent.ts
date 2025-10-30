@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
 
 const SYSTEM_INSTRUCTION = `You are WesAI, an expert AI assistant and strategic partner to a senior software architect. Your role is to generate code for web components. When given a prompt describing a UI element, you must generate the necessary HTML, CSS, and JavaScript for it.
@@ -21,31 +22,22 @@ export interface CodeOutput {
 }
 
 class CopilotAgent {
-    private apiKeyPromise: Promise<string> | null = null;
+    private ai: GoogleGenAI | null = null;
 
-    private getApiKey(): Promise<string> {
-        if (!this.apiKeyPromise) {
-            this.apiKeyPromise = fetch('/api/get-key')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`Failed to fetch API key (status: ${response.status}). Ensure it's set in Vercel environment variables.`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.error || !data.apiKey) {
-                        throw new Error(data.error || "API key not found in response from server. Ensure it's set in Vercel.");
-                    }
-                    return data.apiKey;
-                });
+    private getAi(): GoogleGenAI {
+        if (!this.ai) {
+            const apiKey = process.env.API_KEY;
+            if (!apiKey) {
+                 throw new Error("API_KEY environment variable not available. Please configure it in your deployment environment.");
+            }
+            this.ai = new GoogleGenAI({ apiKey });
         }
-        return this.apiKeyPromise;
+        return this.ai;
     }
 
     public async generate(prompt: string): Promise<CodeOutput> {
         try {
-            const apiKey = await this.getApiKey();
-            const ai = new GoogleGenAI({ apiKey });
+            const ai = this.getAi();
 
             const response = await ai.models.generateContent({
                 model: 'gemini-2.5-pro',
@@ -69,15 +61,16 @@ class CopilotAgent {
             return JSON.parse(jsonString) as CodeOutput;
         } catch (error) {
             console.error("Error generating content with CopilotAgent:", error);
-            // In case of an error (e.g., network failure), clear the promise to allow a retry on the next call.
-            this.apiKeyPromise = null;
             if (error instanceof Error) {
                 if (error.message.includes('API key not valid')) {
-                     throw new Error('The API key provided by the server is invalid. Please check your Vercel project settings.');
+                     throw new Error('The provided API key is invalid. Please check your project settings.');
                 }
-                throw error; // Re-throw the original error to be displayed in the UI.
+                 if (error.message.includes('fetch')) {
+                    throw new Error('A network error occurred. Please check your connection and try again.')
+                }
+                throw error;
             }
-            throw new Error("An unknown error occurred within the CopilotAgent.");
+            throw new Error("An unknown error occurred while generating the component.");
         }
     }
 }
