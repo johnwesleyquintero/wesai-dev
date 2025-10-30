@@ -1,4 +1,3 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 
 const SYSTEM_INSTRUCTION = `You are WesAI, an expert AI assistant and strategic partner to a senior software architect. Your role is to generate code for web components. When given a prompt describing a UI element, you must generate the necessary HTML, CSS, and JavaScript for it.
@@ -24,20 +23,38 @@ export interface CodeOutput {
 class CopilotAgent {
     private ai: GoogleGenAI | null = null;
 
-    private getAi(): GoogleGenAI {
-        if (!this.ai) {
-            const apiKey = process.env.API_KEY;
-            if (!apiKey) {
-                 throw new Error("API_KEY environment variable not available. Please configure it in your deployment environment.");
-            }
-            this.ai = new GoogleGenAI({ apiKey });
+    private async getAi(): Promise<GoogleGenAI> {
+        if (this.ai) {
+            return this.ai;
         }
-        return this.ai;
+
+        try {
+            const response = await fetch('/api/get-key');
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || `Failed to fetch API key (status: ${response.status}).`);
+            }
+            const { apiKey } = await response.json();
+
+            if (!apiKey) {
+                throw new Error("API key not received from the server.");
+            }
+
+            this.ai = new GoogleGenAI({ apiKey });
+            return this.ai;
+
+        } catch (error) {
+            console.error("Error initializing Gemini client:", error);
+            if (error instanceof Error) {
+                throw new Error(`Could not connect to the AI service. Please check server configuration. Details: ${error.message}`);
+            }
+            throw new Error("An unknown error occurred while setting up the AI service.");
+        }
     }
 
     public async generate(prompt: string): Promise<CodeOutput> {
         try {
-            const ai = this.getAi();
+            const ai = await this.getAi();
 
             const response = await ai.models.generateContent({
                 model: 'gemini-2.5-pro',
