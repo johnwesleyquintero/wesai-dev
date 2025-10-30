@@ -97,6 +97,40 @@ const LoadingState: React.FC = () => {
   );
 };
 
+const ErrorDisplay: React.FC<{ error: string }> = ({ error }) => {
+    const [isCopied, setIsCopied] = useState(false);
+    const handleCopyError = useCallback(() => {
+      navigator.clipboard.writeText(error).then(() => {
+          setIsCopied(true);
+          setTimeout(() => setIsCopied(false), 2000);
+      });
+    }, [error]);
+
+    return (
+        <div className="p-4">
+            <div className="text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/50 p-4 rounded-lg">
+                <div className="flex justify-between items-start">
+                    <div className="flex">
+                        <AlertTriangleIcon/>
+                        <div>
+                            <p className="font-bold text-red-800 dark:text-red-300">Generation Error</p>
+                            <p className="text-sm mt-1">{error}</p>
+                        </div>
+                    </div>
+                    <button
+                        onClick={handleCopyError}
+                        className="ml-4 flex-shrink-0 flex items-center gap-1.5 text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors p-1.5 rounded-md hover:bg-slate-400/20 disabled:opacity-50"
+                        disabled={isCopied}
+                    >
+                        {isCopied ? <CheckIcon className="text-green-500"/> : <CopyIcon />}
+                        {isCopied ? 'Copied' : 'Copy'}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 
 // --- MAIN COMPONENT ---
 interface OutputDisplayProps {
@@ -143,37 +177,7 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
         return <LoadingState />;
     }
     if (error) {
-      const [isCopied, setIsCopied] = useState(false);
-      const handleCopyError = useCallback(() => {
-        navigator.clipboard.writeText(error).then(() => {
-            setIsCopied(true);
-            setTimeout(() => setIsCopied(false), 2000);
-        });
-      }, [error]);
-
-      return (
-        <div className="p-4">
-            <div className="text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/50 p-4 rounded-lg">
-                <div className="flex justify-between items-start">
-                    <div className="flex">
-                        <AlertTriangleIcon/>
-                        <div>
-                            <p className="font-bold text-red-800 dark:text-red-300">Generation Error</p>
-                            <p className="text-sm mt-1">{error}</p>
-                        </div>
-                    </div>
-                    <button
-                        onClick={handleCopyError}
-                        className="ml-4 flex-shrink-0 flex items-center gap-1.5 text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors p-1.5 rounded-md hover:bg-slate-400/20 disabled:opacity-50"
-                        disabled={isCopied}
-                    >
-                        {isCopied ? <CheckIcon className="text-green-500"/> : <CopyIcon />}
-                        {isCopied ? 'Copied' : 'Copy'}
-                    </button>
-                </div>
-            </div>
-        </div>
-      );
+      return <ErrorDisplay error={error} />;
     }
     if (response) {
       return (
