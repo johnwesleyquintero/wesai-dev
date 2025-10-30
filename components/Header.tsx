@@ -1,14 +1,15 @@
 
 import React from 'react';
-import { HelpIcon, SunIcon, MoonIcon } from './Icons';
+import { HelpIcon, SunIcon, MoonIcon, SettingsIcon } from './Icons';
 
 interface HeaderProps {
     theme: 'light' | 'dark';
     onToggleTheme: () => void;
     onHelpClick: () => void;
+    onSettingsClick: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ theme, onToggleTheme, onHelpClick }) => {
+const Header: React.FC<HeaderProps> = ({ theme, onToggleTheme, onHelpClick, onSettingsClick }) => {
   return (
     <header className="py-4 px-4 sm:px-6 lg:px-8 border-b border-slate-200 dark:border-slate-800">
       <div className="flex justify-between items-center">
@@ -26,6 +27,9 @@ const Header: React.FC<HeaderProps> = ({ theme, onToggleTheme, onHelpClick }) =>
             </button>
             <button onClick={onHelpClick} className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors" aria-label="Open help and what's new">
                 <HelpIcon />
+            </button>
+            <button onClick={onSettingsClick} className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors" aria-label="Open settings">
+                <SettingsIcon />
             </button>
         </div>
       </div>

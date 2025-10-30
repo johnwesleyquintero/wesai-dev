@@ -3,6 +3,7 @@ import Header from './components/Header';
 import PromptInput from './components/PromptInput';
 import OutputDisplay from './components/OutputDisplay';
 import HelpModal from './components/HelpModal';
+import SettingsModal from './components/SettingsModal';
 import { brainstormIdea } from './services/geminiService';
 import { CodeOutput } from './copilot/agent';
 
@@ -14,6 +15,7 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isHelpOpen, setIsHelpOpen] = useState<boolean>(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
   const [theme, setTheme] = useState<Theme>(() => {
     const savedTheme = localStorage.getItem('theme') as Theme | null;
     if (savedTheme) return savedTheme;
@@ -103,6 +105,7 @@ const App: React.FC = () => {
         theme={theme}
         onToggleTheme={toggleTheme}
         onHelpClick={() => setIsHelpOpen(true)}
+        onSettingsClick={() => setIsSettingsOpen(true)}
       />
       <main ref={mainContainerRef} className="flex-grow p-4 md:p-6 lg:p-8 flex flex-col overflow-hidden">
         {/* Mobile Layout: Stacked */}
@@ -159,6 +162,10 @@ const App: React.FC = () => {
       <HelpModal
         isOpen={isHelpOpen}
         onClose={() => setIsHelpOpen(false)}
+      />
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
       />
     </div>
   );
