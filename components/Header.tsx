@@ -7,11 +7,21 @@ const SettingsIcon: React.FC<{ className?: string }> = ({ className }) => (
     </svg>
 );
 
+const HelpIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        <circle cx="12" cy="12" r="10"></circle>
+        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+        <path d="M12 17h.01"></path>
+    </svg>
+);
+
+
 interface HeaderProps {
     onSettingsClick: () => void;
+    onHelpClick: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onSettingsClick }) => {
+const Header: React.FC<HeaderProps> = ({ onSettingsClick, onHelpClick }) => {
   return (
     <header className="relative py-6 px-4 sm:px-6 lg:px-8 text-center border-b border-slate-700">
       <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
@@ -20,7 +30,10 @@ const Header: React.FC<HeaderProps> = ({ onSettingsClick }) => {
       <p className="mt-2 text-md text-slate-400">
         Your AI-Powered Dev Scratchpad & Brainstorming Partner
       </p>
-      <div className="absolute top-0 right-0 h-full flex items-center pr-4 sm:pr-6 lg:pr-8">
+      <div className="absolute top-0 right-0 h-full flex items-center pr-4 sm:pr-6 lg:pr-8 gap-4">
+          <button onClick={onHelpClick} className="text-slate-400 hover:text-white transition-colors" aria-label="Open help and what's new">
+              <HelpIcon />
+          </button>
           <button onClick={onSettingsClick} className="text-slate-400 hover:text-white transition-colors" aria-label="Open settings">
               <SettingsIcon />
           </button>

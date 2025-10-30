@@ -3,6 +3,7 @@ import Header from './components/Header';
 import PromptInput from './components/PromptInput';
 import OutputDisplay from './components/OutputDisplay';
 import SettingsModal from './components/SettingsModal';
+import HelpModal from './components/HelpModal';
 import { brainstormIdea } from './services/geminiService';
 import { CodeOutput } from './copilot/agent';
 
@@ -12,6 +13,7 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
+  const [isHelpOpen, setIsHelpOpen] = useState<boolean>(false);
 
   const handleGenerate = useCallback(async () => {
     if (!prompt.trim() || isLoading) return;
@@ -36,7 +38,10 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-900">
-      <Header onSettingsClick={() => setIsSettingsOpen(true)} />
+      <Header 
+        onSettingsClick={() => setIsSettingsOpen(true)}
+        onHelpClick={() => setIsHelpOpen(true)}
+      />
       <main className="flex-grow p-6 lg:p-10 flex flex-col md:flex-row gap-8">
         <div className="w-full md:w-1/2 flex flex-col min-h-[400px] md:min-h-0 md:h-[calc(100vh-180px)]">
            <PromptInput 
@@ -60,6 +65,10 @@ const App: React.FC = () => {
       <SettingsModal 
         isOpen={isSettingsOpen} 
         onClose={() => setIsSettingsOpen(false)} 
+      />
+      <HelpModal
+        isOpen={isHelpOpen}
+        onClose={() => setIsHelpOpen(false)}
       />
     </div>
   );
