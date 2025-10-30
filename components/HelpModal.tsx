@@ -43,10 +43,10 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
             <div>
                 <h3 className="text-lg font-semibold text-indigo-600 dark:text-indigo-400 mb-3 border-b border-slate-200 dark:border-slate-700 pb-2">What's New</h3>
                 <ul className="space-y-2 list-disc list-inside text-sm">
+                    <li><span className="font-semibold">React-First Generation:</span> WesAI now generates complete, self-contained React components (.tsx) instead of separate HTML/CSS/JS.</li>
+                    <li><span className="font-semibold">Robust Sandbox Preview:</span> Live previews are now rendered in a secure, isolated iframe for better performance and error handling.</li>
+                    <li><span className="font-semibold">Resizable Panels:</span> On desktop, you can now drag the divider between the input and output panels to resize them to your liking.</li>
                     <li><span className="font-semibold">UI/UX Overhaul:</span> Refreshed the entire interface with a cleaner header, improved spacing, and more polished components for a professional feel.</li>
-                    <li><span className="font-semibold">Bring Your Own Key:</span> Configure your own Google Gemini API key via the new Settings panel (gear icon).</li>
-                    <li><span className="font-semibold">Light/Dark Mode:</span> You can now toggle the UI theme using the sun/moon icon in the header.</li>
-                    <li><span className="font-semibold">Help Center:</span> Added this helpful modal to answer common questions and announce updates.</li>
                 </ul>
             </div>
 
@@ -60,7 +60,7 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
                     </div>
                      <div>
                         <h4 className="font-semibold text-slate-800 dark:text-slate-200 mb-1">How does it work?</h4>
-                        <p>This app uses the Google Gemini large language model to interpret your prompt and generate HTML, CSS, and JavaScript code. You can preview the result instantly and copy the code to use in your projects.</p>
+                        <p>This app uses the Google Gemini large language model to interpret your prompt and generate a self-contained React component. You can preview the result instantly and copy the code to use in your projects.</p>
                     </div>
                 </div>
             </div>

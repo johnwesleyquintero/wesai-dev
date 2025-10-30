@@ -6,9 +6,9 @@ WesAI.Dev is an AI-powered scratchpad for developers to quickly brainstorm, arch
 
 ## Key Features
 
-- **Component Generation:** Describe a UI component in plain English, and WesAI.Dev will generate the HTML, CSS, and JavaScript for it.
-- **Live Preview:** Instantly see a live, interactive preview of the generated component.
-- **Code Access:** Easily view and copy the underlying code for use in your own projects.
+- **Component Generation:** Describe a UI component in plain English, and WesAI.Dev will generate a self-contained React component for it.
+- **Live Preview:** Instantly see a live, interactive preview of the generated component in a secure sandbox.
+- **Code Access:** Easily view and copy the underlying React (.tsx) code for use in your own projects.
 - **Bring Your Own Key:** Securely use your own Google Gemini API key, stored only in your browser's local storage.
 - **Modern UI/UX:** A clean, developer-focused interface designed for productivity.
 
@@ -22,13 +22,13 @@ The frontend is built with React and TypeScript, providing a robust and type-saf
 
 1.  **Set API Key:** Click the gear icon in the header to open the settings modal. Enter your Google Gemini API key. You can get a key for free from [Google AI Studio](https://aistudio.google.com/app/apikey).
 2.  **Describe a Component:**
-    - In the "Describe a Component" text area, write a detailed description of the UI element you want to create.
+    - In the "Input" text area, write a detailed description of the UI element you want to create.
     - **Example:** _"A responsive pricing card with three tiers: Basic, Pro, and Enterprise. Each card should show the plan name, price, a list of features, and a call-to-action button. The Pro plan should be highlighted."_
 3.  **Generate:**
     - Press the "Generate with WesAI" button or use the keyboard shortcut `Cmd/Ctrl + Enter`.
 4.  **Review:**
     - The output panel will show a live **Preview** of your component.
-    - Click the **Code** tab to view and copy the generated HTML, CSS, and JavaScript.
+    - Click the **Code** tab to view and copy the generated React component (.tsx) code.
 
 ---
 
