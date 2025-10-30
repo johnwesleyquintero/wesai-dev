@@ -21,18 +21,25 @@ export interface CodeOutput {
 }
 
 class CopilotAgent {
-    private ai: GoogleGenAI;
-
-    constructor(apiKey: string) {
-        if (!apiKey) {
-            throw new Error("API_KEY is not available. The agent cannot be initialized.");
+    
+    private getApiKey(): string {
+        const userApiKey = localStorage.getItem('gemini_api_key');
+        if (userApiKey) {
+            return userApiKey;
         }
-        this.ai = new GoogleGenAI({ apiKey });
+        return process.env.API_KEY || '';
     }
 
     public async generate(prompt: string): Promise<CodeOutput> {
+        const apiKey = this.getApiKey();
+        if (!apiKey) {
+            throw new Error("Gemini API key not found. Please set it in the settings panel.");
+        }
+
+        const ai = new GoogleGenAI({ apiKey });
+
         try {
-            const response = await this.ai.models.generateContent({
+            const response = await ai.models.generateContent({
                 model: 'gemini-2.5-pro',
                 contents: prompt,
                 config: {
@@ -51,11 +58,13 @@ class CopilotAgent {
             });
             
             const jsonString = response.text.trim();
-            // The response should be a JSON string, parse it to return the object.
             return JSON.parse(jsonString) as CodeOutput;
         } catch (error) {
             console.error("Error generating content with CopilotAgent:", error);
             if (error instanceof Error) {
+                if (error.message.includes('API key not valid')) {
+                     throw new Error('The provided API key is invalid. Please check it in the settings.');
+                }
                 throw new Error(`Agent failed to generate response: ${error.message}`);
             }
             throw new Error("An unknown error occurred within the CopilotAgent.");
@@ -63,8 +72,6 @@ class CopilotAgent {
     }
 }
 
-// Create a singleton instance of the agent to be used throughout the application.
-// This ensures we don't re-initialize the agent on every request.
-const agent = new CopilotAgent(process.env.API_KEY || '');
+const agent = new CopilotAgent();
 
 export default agent;
