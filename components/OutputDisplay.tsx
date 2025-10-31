@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { CodeOutput } from '../copilot/agent';
@@ -106,7 +107,7 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
       }
       return (
         <div className="bg-slate-50 dark:bg-slate-800/50 rounded-b-md h-full flex flex-col">
-          <CodeBlock code={response.react} />
+          <CodeBlock code={response.react} prompt={prompt} />
         </div>
       );
     }
