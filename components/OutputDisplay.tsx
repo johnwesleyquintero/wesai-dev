@@ -1,6 +1,5 @@
 
 import React, { useState, useCallback, useEffect, useRef, useLayoutEffect } from 'react';
-import LoadingSpinner from './LoadingSpinner';
 import { CodeOutput } from '../copilot/agent';
 import { CopyIcon, CheckIcon, AlertTriangleIcon, EyeIcon, CodeIcon, InitialStateLogoIcon, LandingPageIcon, WritingAppIcon, TodoListIcon } from './Icons';
 import { quickStartPrompts, PromptTemplate } from '../copilot/prompts';
@@ -123,34 +122,11 @@ const InitialState: React.FC<{ setPrompt: (prompt: string) => void }> = ({ setPr
     );
 };
 
-
-const LoadingState: React.FC = () => {
-  const [message, setMessage] = useState('WesAI is warming up...');
-  
-  useEffect(() => {
-    const messages = [
-        "Analyzing your request...", 
-        "Architecting the component...", 
-        "Writing React code...",
-        "Applying modern styles...",
-        "Finalizing the component..."
-    ];
-    let index = 0;
-    const intervalId = setInterval(() => {
-      setMessage(messages[index]);
-      index = (index + 1) % messages.length;
-    }, 2000);
-
-    return () => clearInterval(intervalId);
-  }, []);
-
-  return (
-    <div className="flex flex-col justify-center items-center h-full text-center p-4">
-      <LoadingSpinner />
-      <p className="mt-4 text-slate-600 dark:text-slate-400">{message}</p>
+const SkeletonContent: React.FC = () => (
+    <div className="w-full h-full p-4 animate-pulse">
+        <div className="w-full h-full bg-slate-200 dark:bg-slate-800 rounded-lg"></div>
     </div>
-  );
-};
+);
 
 const ErrorDisplay: React.FC<{ error: string; title: string; }> = ({ error, title }) => {
     const [isCopied, setIsCopied] = useState(false);
@@ -222,7 +198,7 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
   }, [response]);
   
   const renderContent = () => {
-    if (isLoading) return <LoadingState />;
+    if (isLoading) return <SkeletonContent />;
     if (error) return <ErrorDisplay error={error} title="Generation Error" />;
     if (response) {
       if (activeTab === 'preview') {
@@ -243,6 +219,12 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
     <div className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-lg flex flex-col h-full shadow-lg">
         <div className="flex-shrink-0 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-slate-100/80 dark:bg-slate-900/80 p-2 rounded-t-lg">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-200 px-2">Output</h2>
+            {isLoading && (
+                <div className="flex items-center gap-1 bg-slate-200 dark:bg-slate-800 p-1 rounded-md animate-pulse">
+                    <div className="h-7 w-24 bg-slate-300 dark:bg-slate-700 rounded-md"></div>
+                    <div className="h-7 w-20 bg-slate-300 dark:bg-slate-700 rounded-md"></div>
+                </div>
+            )}
             {response && !isLoading && !error && (
                 <div className="relative flex items-center gap-1 bg-slate-200 dark:bg-slate-800 p-1 rounded-md">
                      <div
