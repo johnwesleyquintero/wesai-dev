@@ -184,7 +184,7 @@ const App: React.FC = () => {
             className="hidden md:flex w-4 cursor-col-resize flex-shrink-0 items-center justify-center group"
         >
             <div className={`w-0.5 h-16 bg-slate-300 dark:bg-slate-700 rounded-full transition-all duration-300 relative ${isDragging ? 'bg-indigo-500 scale-x-150 shadow-[0_0_12px_2px_theme(colors.indigo.500)]' : 'group-hover:bg-indigo-500/60 group-hover:scale-x-125'}`}>
-               <GripVerticalIcon className="absolute text-slate-500 dark:text-slate-400 w-4 h-4 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-40 group-hover:opacity-100 transition-opacity" />
+               <GripVerticalIcon className="absolute text-slate-500 dark:text-slate-400 w-5 h-5 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-60 group-hover:opacity-100 transition-all duration-200" />
             </div>
         </div>
         
@@ -198,6 +198,7 @@ const App: React.FC = () => {
             error={error}
             setPrompt={setPrompt}
             theme={theme}
+            prompt={prompt}
           />
         </div>
       </main>

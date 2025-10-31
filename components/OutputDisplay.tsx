@@ -147,7 +147,7 @@ const LOADING_MESSAGES = [
     "Generating brilliance..."
 ];
 
-const LoadingState: React.FC = () => {
+const LoadingState: React.FC<{ prompt: string }> = ({ prompt }) => {
     const [message, setMessage] = useState(LOADING_MESSAGES[0]);
 
     useEffect(() => {
@@ -162,6 +162,14 @@ const LoadingState: React.FC = () => {
 
     return (
         <div className="flex flex-col items-center justify-center h-full text-center p-4">
+             {prompt && (
+                <div className="w-full max-w-xl mb-8 p-3 bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg">
+                    <p className="text-sm text-slate-600 dark:text-slate-400 text-left">
+                        <span className="font-semibold text-slate-700 dark:text-slate-300">Generating:</span>
+                        <span className="line-clamp-2 ml-1">{prompt}</span>
+                    </p>
+                </div>
+            )}
             <WesAILogoSpinnerIcon className="w-24 h-24" />
             <p className="mt-6 text-lg font-medium text-slate-600 dark:text-slate-400 transition-all duration-500 animate-fade-in">{message}</p>
         </div>
@@ -211,9 +219,10 @@ interface OutputDisplayProps {
   error: string | null;
   setPrompt: (prompt: string) => void;
   theme: Theme;
+  prompt: string;
 }
 
-const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, error, setPrompt, theme }) => {
+const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, error, setPrompt, theme, prompt }) => {
   const [activeTab, setActiveTab] = useState<ActiveTab>('preview');
   const [previewError, setPreviewError] = useState<string | null>(null);
   
@@ -266,7 +275,7 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
                 <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-200 px-2">Output</h2>
             </div>
             <div className="flex-grow relative min-h-0">
-                <LoadingState />
+                <LoadingState prompt={prompt} />
             </div>
         </div>
     );
@@ -300,14 +309,18 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
   return (
     <div className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-lg flex flex-col h-full shadow-md">
         <div className="flex-shrink-0 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-slate-100/80 dark:bg-slate-900/80 p-2 rounded-t-lg">
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-200 px-2">Output</h2>
+            <h2 id="output-heading" className="text-lg font-semibold text-slate-900 dark:text-slate-200 px-2">Output</h2>
             {response && !error && (
-                <div className="relative flex items-center gap-1 bg-slate-200 dark:bg-slate-800 p-1 rounded-md">
+                <div role="tablist" aria-labelledby="output-heading" className="relative flex items-center gap-1 bg-slate-200 dark:bg-slate-800 p-1 rounded-md">
                      <div
                         className="absolute bg-white dark:bg-slate-700 shadow-sm rounded-md h-[calc(100%-8px)] transition-all duration-300 ease-out"
                         style={gliderStyle}
                      />
-                     <button 
+                     <button
+                        id="tab-preview"
+                        role="tab"
+                        aria-controls="tabpanel-output"
+                        aria-selected={activeTab === 'preview'}
                         ref={el => { tabsRef.current[0] = el; }}
                         onClick={() => setActiveTab('preview')}
                         className={`relative z-10 flex items-center gap-2 px-3 py-1 text-sm font-medium rounded-md transition-colors ${activeTab === 'preview' ? 'text-indigo-600 dark:text-white' : 'text-slate-600 dark:text-slate-400'}`}
@@ -315,7 +328,11 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
                         <EyeIcon className="w-4 h-4" />
                         Preview
                      </button>
-                     <button 
+                     <button
+                        id="tab-code"
+                        role="tab"
+                        aria-controls="tabpanel-output"
+                        aria-selected={activeTab === 'code'}
                         ref={el => { tabsRef.current[1] = el; }}
                         onClick={() => setActiveTab('code')}
                         className={`relative z-10 flex items-center gap-2 px-3 py-1 text-sm font-medium rounded-md transition-colors ${activeTab === 'code' ? 'text-indigo-600 dark:text-white' : 'text-slate-600 dark:text-slate-400'}`}
@@ -326,7 +343,13 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
                 </div>
             )}
       </div>
-      <div key={contentKey} className="flex-grow relative animate-fade-in min-h-0">
+      <div 
+        key={contentKey} 
+        id="tabpanel-output"
+        role="tabpanel"
+        aria-labelledby={activeTab === 'preview' ? 'tab-preview' : 'tab-code'}
+        className="flex-grow relative animate-fade-in min-h-0"
+      >
         {renderContent()}
       </div>
     </div>
