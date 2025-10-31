@@ -1,5 +1,5 @@
 import React from 'react';
-import { SparkleIcon, CloseIcon, CubeIcon } from './Icons';
+import { SparkleIcon, CloseIcon, CubeIcon, LandingPageIcon, WritingAppIcon, TodoListIcon } from './Icons';
 
 interface PromptInputProps {
   prompt: string;
@@ -19,18 +19,21 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
   const quickStartPrompts = [
     {
       title: "Modern Landing Page",
-      description: "A hero section, feature list, and a footer for a SaaS product.",
-      prompt: "A modern landing page for a SaaS product with a hero section, feature list, and a footer."
+      description: "A hero section, feature list, and a footer.",
+      prompt: "A modern landing page for a SaaS product with a hero section, feature list, and a footer.",
+      icon: <LandingPageIcon className="w-5 h-5 text-indigo-500 dark:text-indigo-400" />
     },
     {
       title: "Creative Writing App",
-      description: "A mini-app that generates writing prompts based on a selected genre.",
-      prompt: "A mini-app that generates creative writing prompts based on a selected genre."
+      description: "Generates writing prompts based on a genre.",
+      prompt: "A mini-app that generates creative writing prompts based on a selected genre.",
+      icon: <WritingAppIcon className="w-5 h-5 text-purple-500 dark:text-purple-400" />
     },
     {
       title: "Simple To-Do List",
-      description: "A clean to-do list app with the ability to add and complete tasks.",
-      prompt: "A simple to-do list app with the ability to add and complete tasks."
+      description: "Add, complete, and manage daily tasks.",
+      prompt: "A simple to-do list app with the ability to add and complete tasks.",
+      icon: <TodoListIcon className="w-5 h-5 text-sky-500 dark:text-sky-400" />
     },
   ];
 
@@ -71,10 +74,13 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
                          <button 
                             key={p.title} 
                             onClick={() => setPrompt(p.prompt)} 
-                            className="text-left p-3 bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700/80 rounded-lg text-slate-600 dark:text-slate-300 transition-all duration-200 border border-slate-200 dark:border-slate-700/50 transform hover:scale-[1.03] hover:shadow-lg"
+                            className="text-left p-3 bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700/80 rounded-lg text-slate-600 dark:text-slate-300 transition-all duration-200 border border-slate-200 dark:border-slate-700/50 transform hover:scale-[1.03] hover:shadow-lg flex items-start gap-3"
                          >
-                            <span className="font-semibold text-xs text-slate-800 dark:text-slate-100">{p.title}</span>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{p.description}</p>
+                            <div className="flex-shrink-0 mt-0.5">{p.icon}</div>
+                            <div>
+                                <span className="font-semibold text-xs text-slate-800 dark:text-slate-100">{p.title}</span>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{p.description}</p>
+                            </div>
                         </button>
                     ))}
                 </div>

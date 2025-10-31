@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect, useRef, useLayoutEffect } from 'react';
 import LoadingSpinner from './LoadingSpinner';
 import { CodeOutput } from '../copilot/agent';
-import { CopyIcon, CheckIcon, AlertTriangleIcon, EyeIcon, CodeIcon, InitialStateLogoIcon } from './Icons';
+import { CopyIcon, CheckIcon, AlertTriangleIcon, EyeIcon, CodeIcon, InitialStateLogoIcon, LandingPageIcon, WritingAppIcon, TodoListIcon } from './Icons';
 
 type Theme = 'light' | 'dark';
 type ActiveTab = 'preview' | 'code';
@@ -95,24 +95,43 @@ const CodeBlock: React.FC<{ code: string }> = ({ code }) => {
 
 const InitialState: React.FC<{ setPrompt: (prompt: string) => void }> = ({ setPrompt }) => {
     const examples = [
-        "A modern landing page for a SaaS product with a hero section, feature list, and a footer.",
-        "A mini-app that generates creative writing prompts based on a selected genre.",
-        "A simple to-do list app with the ability to add and complete tasks.",
+        {
+          title: "Modern Landing Page",
+          description: "For a new SaaS product.",
+          prompt: "A modern landing page for a SaaS product with a hero section, feature list, and a footer.",
+          icon: <LandingPageIcon className="w-6 h-6 text-indigo-500 dark:text-indigo-400" />
+        },
+        {
+          title: "Creative Writing App",
+          description: "Generate writing prompts.",
+          prompt: "A mini-app that generates creative writing prompts based on a selected genre.",
+          icon: <WritingAppIcon className="w-6 h-6 text-purple-500 dark:text-purple-400" />
+        },
+        {
+          title: "Simple To-Do List",
+          description: "Add and complete tasks.",
+          prompt: "A simple to-do list app with the ability to add and complete tasks.",
+          icon: <TodoListIcon className="w-6 h-6 text-sky-500 dark:text-sky-400" />
+        },
     ];
 
     return (
         <div className="text-slate-500 flex flex-col items-center justify-center h-full text-center p-4 animate-fade-in">
             <InitialStateLogoIcon className="w-24 h-24 mb-6" />
-            <h3 className="text-lg font-semibold text-slate-600 dark:text-slate-400">Your AI Co-pilot for the Web</h3>
-            <p className="max-w-md text-slate-500 mb-8">Start by describing a component, or try an example:</p>
-            <div className="flex flex-col gap-3 w-full max-w-sm">
-                {examples.map((example, i) => (
+            <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-300">Your AI Co-pilot for the Web</h3>
+            <p className="max-w-md text-slate-500 dark:text-slate-400 mb-8">Describe a component, or get started with an example:</p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-2xl">
+                {examples.map((example) => (
                      <button
-                        key={i}
-                        onClick={() => setPrompt(example)}
-                        className="text-left p-3 bg-white/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-700/80 rounded-lg text-sm text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 transition-all duration-200 transform hover:scale-[1.03] border border-slate-200 dark:border-slate-700/50 shadow-sm hover:shadow-md"
+                        key={example.title}
+                        onClick={() => setPrompt(example.prompt)}
+                        className="text-center p-4 bg-white/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 transition-all duration-200 transform hover:-translate-y-1 border border-slate-200 dark:border-slate-700/50 shadow-sm hover:shadow-xl hover:shadow-indigo-500/10 flex flex-col items-center gap-3"
                     >
-                        {example}
+                        {example.icon}
+                        <div className="flex flex-col">
+                            <span className="font-semibold text-sm text-slate-800 dark:text-slate-100">{example.title}</span>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{example.description}</p>
+                        </div>
                     </button>
                 ))}
             </div>
@@ -248,7 +267,7 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
   const contentKey = isLoading ? 'loading' : error ? 'error' : response ? `${activeTab}-${response.react.length}` : 'initial';
 
   return (
-    <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border border-slate-200 dark:border-slate-800 rounded-lg flex flex-col h-full shadow-lg">
+    <div className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-lg flex flex-col h-full shadow-lg">
         <div className="flex-shrink-0 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-slate-100/80 dark:bg-slate-900/80 p-2 rounded-t-lg">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-200 px-2">Output</h2>
             {response && !isLoading && !error && (

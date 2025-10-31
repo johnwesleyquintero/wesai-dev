@@ -38,7 +38,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
       aria-modal="true"
     >
       <div
-        className="bg-white dark:bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-md border border-slate-200 dark:border-slate-700"
+        className="bg-white dark:bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-md border border-slate-200 dark:border-slate-700 animate-scale-in"
         onClick={e => e.stopPropagation()}
       >
         <div className="flex justify-between items-center mb-6">
