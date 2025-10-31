@@ -111,15 +111,29 @@ export const InitialStateLogoIcon: React.FC<{className?: string}> = ({className}
 
 
 export const WesAILogoSpinnerIcon: React.FC<{className?: string}> = ({className}) => (
-    <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" className={className}>
-        <defs>
-            <linearGradient id="spinnerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" style={{stopColor: '#4f46e5'}}/>
-                <stop offset="100%" style={{stopColor: '#06b6d4'}}/>
-            </linearGradient>
-        </defs>
-        <path d="M8 10 L12 22 L16 12 L20 22 L24 10" stroke="url(#spinnerGrad)" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-glow"/>
-    </svg>
+    <div className={`relative ${className} flex items-center justify-center`}>
+        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" className="absolute w-full h-full animate-spin-slow">
+            <circle 
+                cx="16" cy="16" r="14" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2.5" 
+                strokeDasharray="60 100" // Creates a gap in the circle
+                className="text-slate-300 dark:text-slate-700"
+                strokeLinecap="round"
+            />
+        </svg>
+         <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" className="w-[75%] h-[75%]">
+            <defs>
+                <linearGradient id="spinnerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style={{stopColor: '#4f46e5'}}/>
+                    <stop offset="100%" style={{stopColor: '#06b6d4'}}/>
+                </linearGradient>
+            </defs>
+            {/* The static 'W' logo */}
+            <path d="M8 10 L12 22 L16 12 L20 22 L24 10" stroke="url(#spinnerGrad)" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" className="opacity-40"/>
+        </svg>
+    </div>
 );
 
 
