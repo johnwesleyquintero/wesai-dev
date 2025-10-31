@@ -3,7 +3,6 @@ import React, { useState, useCallback, useLayoutEffect, useRef, useEffect } from
 import Header from './components/Header';
 import PromptInput from './components/PromptInput';
 import OutputDisplay from './components/OutputDisplay';
-import SettingsModal from './components/SettingsModal';
 import HelpModal from './components/HelpModal';
 import { brainstormIdea } from './services/geminiService';
 import { CodeOutput } from './copilot/agent';
@@ -15,7 +14,6 @@ const App: React.FC = () => {
   const [response, setResponse] = useState<CodeOutput | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
   const [isHelpOpen, setIsHelpOpen] = useState<boolean>(false);
   const [theme, setTheme] = useState<Theme>(() => {
     const savedTheme = localStorage.getItem('theme') as Theme | null;
@@ -75,15 +73,6 @@ const App: React.FC = () => {
     localStorage.setItem('theme', theme);
   }, [theme]);
 
-  // Check for API key on initial load
-  useEffect(() => {
-    const apiKey = localStorage.getItem('gemini-api-key');
-    if (!apiKey) {
-      setIsSettingsOpen(true);
-    }
-  }, []);
-
-
   const toggleTheme = () => {
     setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
   };
@@ -114,7 +103,6 @@ const App: React.FC = () => {
       <Header 
         theme={theme}
         onToggleTheme={toggleTheme}
-        onSettingsClick={() => setIsSettingsOpen(true)}
         onHelpClick={() => setIsHelpOpen(true)}
       />
       <main className="flex-grow p-4 md:p-6 lg:p-8 flex flex-col overflow-hidden">
@@ -153,7 +141,7 @@ const App: React.FC = () => {
                 onMouseDown={handleMouseDown}
                 className="w-3 cursor-col-resize flex-shrink-0 flex items-center justify-center group"
             >
-                <div className={`w-0.5 h-16 bg-slate-300 dark:bg-slate-700 rounded-full transition-all duration-300 ${isDragging ? 'bg-indigo-500 scale-x-150 shadow-[0_0_12px_2px_theme(colors.indigo.500)]' : 'group-hover:bg-indigo-500/60'}`}></div>
+                <div className={`w-0.5 h-16 bg-slate-300 dark:bg-slate-700 rounded-full transition-all duration-300 ${isDragging ? 'bg-indigo-500 scale-x-150 shadow-[0_0_12px_2px_theme(colors.indigo.500)]' : 'group-hover:bg-indigo-500/60 group-hover:scale-x-125'}`}></div>
             </div>
             <div className="flex flex-col h-full" style={{ width: `calc(100% - ${dividerPosition}% - 12px)` }}>
               <OutputDisplay
@@ -169,10 +157,6 @@ const App: React.FC = () => {
       <footer className="text-center py-4 text-slate-500 dark:text-slate-500 text-xs border-t border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-950">
         © 2025 WesAI.Dev | Powered by <a href="https://ai.google.dev/" target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:underline">Google Gemini</a>.
       </footer>
-      <SettingsModal
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-      />
       <HelpModal
         isOpen={isHelpOpen}
         onClose={() => setIsHelpOpen(false)}

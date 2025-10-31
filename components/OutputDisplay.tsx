@@ -1,6 +1,7 @@
+
 import React, { useState, useCallback, useEffect, useRef, useLayoutEffect } from 'react';
 import { CodeOutput } from '../copilot/agent';
-import { CopyIcon, CheckIcon, AlertTriangleIcon, EyeIcon, CodeIcon, InitialStateLogoIcon, LandingPageIcon, WritingAppIcon, TodoListIcon } from './Icons';
+import { CopyIcon, CheckIcon, AlertTriangleIcon, EyeIcon, CodeIcon, InitialStateLogoIcon, LandingPageIcon, WritingAppIcon, TodoListIcon, WesAILogoSpinnerIcon } from './Icons';
 import { quickStartPrompts, PromptTemplate } from '../copilot/prompts';
 
 type Theme = 'light' | 'dark';
@@ -68,14 +69,19 @@ const CodeBlock: React.FC<{ code: string }> = ({ code }) => {
         <div className={`bg-slate-100 dark:bg-slate-900/70 rounded-lg overflow-hidden border flex-1 flex flex-col min-h-0 transition-all duration-300 ${isCopied ? 'border-green-500/50 ring-2 ring-green-500/20' : 'border-slate-200 dark:border-slate-700/50'}`}>
             <div className="flex justify-between items-center bg-slate-200/80 dark:bg-slate-900 px-4 py-2 border-b border-inherit">
                 <h3 className="text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">React Component (.tsx)</h3>
-                <button
-                    onClick={handleCopy}
-                    className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors disabled:opacity-50"
-                    disabled={isCopied}
-                >
-                    {isCopied ? <CheckIcon className="text-green-500 w-4 h-4" /> : <CopyIcon className="w-4 h-4" />}
-                    {isCopied ? 'Copied!' : 'Copy'}
-                </button>
+                <div className="relative group">
+                    <button
+                        onClick={handleCopy}
+                        className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors disabled:opacity-50"
+                        disabled={isCopied}
+                    >
+                        {isCopied ? <CheckIcon className="text-green-500 w-4 h-4" /> : <CopyIcon className="w-4 h-4" />}
+                        {isCopied ? 'Copied!' : 'Copy'}
+                    </button>
+                    <div className="absolute bottom-full mb-2 right-0 whitespace-nowrap rounded-md bg-slate-800 dark:bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                        {isCopied ? 'Copied!' : 'Copy Code'}
+                    </div>
+                </div>
             </div>
             <pre className="flex-1 bg-slate-50 dark:bg-slate-800 p-4 text-sm text-slate-800 dark:text-slate-300 whitespace-pre overflow-auto"><code>{code}</code></pre>
         </div>
@@ -121,20 +127,33 @@ const InitialState: React.FC<{ setPrompt: (prompt: string) => void }> = ({ setPr
     );
 };
 
-const SkeletonLoader: React.FC = () => (
-  <div className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-lg flex flex-col h-full shadow-lg animate-pulse">
-    <div className="flex-shrink-0 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-slate-100/80 dark:bg-slate-900/80 p-2 rounded-t-lg">
-      <div className="h-7 bg-slate-300 dark:bg-slate-700 rounded w-24 ml-2"></div>
-      <div className="flex items-center gap-1 bg-slate-200 dark:bg-slate-800 p-1 rounded-md">
-        <div className="h-7 w-24 bg-slate-300 dark:bg-slate-700 rounded-md"></div>
-        <div className="h-7 w-20 bg-slate-300 dark:bg-slate-700 rounded-md"></div>
-      </div>
-    </div>
-    <div className="flex-grow p-4">
-      <div className="w-full h-full bg-slate-200 dark:bg-slate-700 rounded-lg"></div>
-    </div>
-  </div>
-);
+const LOADING_MESSAGES = [
+    "WesAI is thinking...",
+    "Architecting your component...",
+    "Polishing the pixels...",
+    "Generating brilliance..."
+];
+
+const LoadingState: React.FC = () => {
+    const [message, setMessage] = useState(LOADING_MESSAGES[0]);
+
+    useEffect(() => {
+        let index = 0;
+        const interval = setInterval(() => {
+            index = (index + 1) % LOADING_MESSAGES.length;
+            setMessage(LOADING_MESSAGES[index]);
+        }, 2000);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    return (
+        <div className="flex flex-col items-center justify-center h-full text-center p-4">
+            <WesAILogoSpinnerIcon className="w-24 h-24" />
+            <p className="mt-6 text-lg font-medium text-slate-600 dark:text-slate-400 transition-all duration-500 animate-fade-in">{message}</p>
+        </div>
+    );
+};
 
 
 const ErrorDisplay: React.FC<{ error: string; title: string; }> = ({ error, title }) => {
@@ -154,7 +173,7 @@ const ErrorDisplay: React.FC<{ error: string; title: string; }> = ({ error, titl
                         <AlertTriangleIcon className="text-red-500 dark:text-red-400 mr-3 h-6 w-6 flex-shrink-0"/>
                         <div>
                             <p className="font-bold text-red-800 dark:text-red-300">{title}</p>
-                            <p className="text-sm mt-1">{error}</p>
+                            <p className="text-sm mt-1 whitespace-pre-wrap">{error}</p>
                         </div>
                     </div>
                     <button
@@ -183,6 +202,7 @@ interface OutputDisplayProps {
 
 const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, error, setPrompt, theme }) => {
   const [activeTab, setActiveTab] = useState<ActiveTab>('preview');
+  const [previewError, setPreviewError] = useState<string | null>(null);
   
   const tabsRef = useRef<(HTMLButtonElement | null)[]>([]);
   const [gliderStyle, setGliderStyle] = useState({});
@@ -199,21 +219,58 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
   }, [activeTab, response]);
 
 
+  // When a new response comes in, switch to the preview tab and listen for sandbox errors
   useEffect(() => {
-    // When a new response comes in, switch to the preview tab
     if (response) {
       setActiveTab('preview');
     }
+    
+    if (!response) return;
+
+    const handleMessage = (event: MessageEvent) => {
+        if (event.data.type === 'RENDER_ERROR' && event.data.payload.message) {
+            setPreviewError(event.data.payload.message);
+        }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => {
+        window.removeEventListener('message', handleMessage);
+    };
   }, [response]);
+
+  // Reset preview error on new generation
+  useEffect(() => {
+    if (isLoading) {
+        setPreviewError(null);
+    }
+  }, [isLoading]);
   
   if (isLoading) {
-    return <SkeletonLoader />;
+    return (
+        <div className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-lg flex flex-col h-full shadow-lg">
+            <div className="flex-shrink-0 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-slate-100/80 dark:bg-slate-900/80 p-2 rounded-t-lg">
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-200 px-2">Output</h2>
+            </div>
+            <div className="flex-grow relative min-h-0">
+                <LoadingState />
+            </div>
+        </div>
+    );
   }
   
   const renderContent = () => {
     if (error) return <ErrorDisplay error={error} title="Generation Error" />;
     if (response) {
       if (activeTab === 'preview') {
+          if (previewError) {
+            return (
+                <ErrorDisplay 
+                    error={`The generated code could not be rendered. Check the 'Code' tab for details.\n\nDetails: ${previewError}`}
+                    title="Preview Error" 
+                />
+            );
+          }
           return <PreviewPanel code={response.react} theme={theme} />;
       }
       return (
@@ -225,7 +282,7 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
     return <InitialState setPrompt={setPrompt} />;
   };
 
-  const contentKey = error ? 'error' : response ? `${activeTab}-${response.react.length}` : 'initial';
+  const contentKey = error ? 'error' : response ? `${activeTab}-${response.react.length}-${previewError}` : 'initial';
 
   return (
     <div className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-lg flex flex-col h-full shadow-lg">

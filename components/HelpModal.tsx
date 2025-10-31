@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { CloseIcon, SettingsIcon } from './Icons';
+import { CloseIcon } from './Icons';
 
 interface HelpModalProps {
   isOpen: boolean;
@@ -56,7 +57,7 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
                 <div className="space-y-4 text-sm">
                     <div>
                         <h4 className="font-semibold text-slate-800 dark:text-slate-200 mb-1">How do I use this app?</h4>
-                        <p>First, add your Google Gemini API key by clicking the gear icon (<SettingsIcon className="w-4 h-4 inline-block -mt-1"/>) in the header. Then, simply type a description of a web component you want to create in the text area. Be as descriptive as possible! Finally, click "Generate" or press <code className="bg-slate-200 dark:bg-slate-700 px-1.5 py-0.5 rounded">Cmd/Ctrl + Enter</code>. Your component will appear in the output panel.</p>
+                        <p>Simply type a description of a web component you want to create in the text area. Be as descriptive as possible! Finally, click "Generate" or press <code className="bg-slate-200 dark:bg-slate-700 px-1.5 py-0.5 rounded">Cmd/Ctrl + Enter</code>. Your component will appear in the output panel.</p>
                     </div>
                      <div>
                         <h4 className="font-semibold text-slate-800 dark:text-slate-200 mb-1">How does it work?</h4>

@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
 
 const SYSTEM_INSTRUCTION = `You are WesAI, an expert AI assistant and strategic partner to a senior software architect. Your mission is to generate production-quality, visually stunning, and fully functional web components based on user prompts. The aesthetic should be modern, clean, and professional, akin to the quality seen on sites like Bolt.new.
@@ -78,13 +79,8 @@ export interface CodeOutput {
 
 class CopilotAgent {
     public async generate(prompt: string): Promise<CodeOutput> {
-        const apiKey = localStorage.getItem('gemini-api-key');
-        if (!apiKey) {
-            throw new Error("API key not found. Please set your Gemini API key in the settings.");
-        }
-
         try {
-            const ai = new GoogleGenAI({ apiKey });
+            const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
             const response = await ai.models.generateContent({
                 // Using gemini-2.5-flash for faster responses, improving UX for a prototyping tool.
@@ -112,12 +108,10 @@ class CopilotAgent {
         } catch (error) {
             console.error("Error generating content with CopilotAgent:", error);
             if (error instanceof Error) {
-                if (error.message.includes('API key not valid')) {
-                     throw new Error('The API key is invalid. Please check your key in the settings.');
-                }
                  if (error.message.includes('fetch')) {
                     throw new Error('A network error occurred. Please check your connection and try again.')
                 }
+                // Re-throw other errors to be caught by the UI
                 throw error;
             }
             throw new Error("An unknown error occurred while generating the component.");
