@@ -16,6 +16,7 @@ const GenerationHeader: React.FC<GenerationHeaderProps> = ({ prompt, response, o
   const { addToast } = useToast();
   const { isActionDone: isPromptCopied, trigger: triggerPromptCopied } = useActionFeedback();
   const { isActionDone: isShared, trigger: triggerShared } = useActionFeedback();
+  const isShareApiAvailable = typeof navigator !== 'undefined' && !!navigator.share;
 
   const handleReusePrompt = useCallback(() => {
     if (prompt) {
@@ -106,12 +107,12 @@ const GenerationHeader: React.FC<GenerationHeaderProps> = ({ prompt, response, o
           onClick={handleShare}
           disabled={isShared}
           className="p-1.5 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-700/70 transition-colors duration-200 disabled:text-green-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900"
-          aria-label="Share this generation"
+          aria-label={isShareApiAvailable ? "Share this generation" : "Copy shareable link"}
         >
           {isShared ? <CheckIcon className="w-4 h-4" /> : <ShareIcon className="w-4 h-4" />}
         </button>
         <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-800 dark:bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 group-hover:opacity-100 transition-all pointer-events-none">
-          {isShared ? 'Link Copied!' : 'Share'}
+          {isShared ? 'Link Copied!' : (isShareApiAvailable ? 'Share' : 'Copy Share Link')}
         </div>
       </div>
     </div>

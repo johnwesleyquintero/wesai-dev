@@ -99,23 +99,16 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ code, prompt }) => {
                 </div>
             </div>
             <div className="flex-1 overflow-auto text-sm">
-                 <div className="flex items-start">
-                    <div aria-hidden="true" className="sticky top-0 left-0 z-10 select-none text-right px-4 text-slate-500 dark:text-slate-600 bg-inherit" style={{ lineHeight: '1.6', paddingTop: '0.5rem', paddingBottom: '0.5rem' }}>
-                        {highlightedLines.map((_, index) => (
-                            <div key={index}>{index + 1}</div>
-                        ))}
-                    </div>
-                    <pre className={`flex-1 !m-0 !p-0 ${isLineWrapEnabled ? 'whitespace-pre-wrap break-words' : ''}`}><code className="language-tsx hljs">
+                 <pre className={`flex-1 !m-0 !p-0 ${isLineWrapEnabled ? 'whitespace-pre-wrap break-words' : ''}`}>
+                    <code className="language-tsx hljs">
                        {highlightedLines.map((line, index) => (
-                            <div
-                                key={index}
-                                className="px-4 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition-colors duration-100"
-                                dangerouslySetInnerHTML={{ __html: line || '&nbsp;' }}
-                                style={{ lineHeight: '1.6' }}
-                            />
+                            <div key={index} className="line-container">
+                                <span aria-hidden="true" className="line-number-cell"></span>
+                                <span className="line-content-cell" dangerouslySetInnerHTML={{ __html: line || '&nbsp;' }} />
+                            </div>
                         ))}
-                    </code></pre>
-                 </div>
+                    </code>
+                </pre>
             </div>
         </div>
     );

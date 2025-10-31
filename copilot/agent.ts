@@ -1,4 +1,5 @@
 
+
 import { GoogleGenAI, Type } from "@google/genai";
 
 const SYSTEM_INSTRUCTION = `You are WesAI, an expert AI assistant and strategic partner to a senior software architect. Your mission is to generate production-quality, visually stunning, and fully functional web components based on user prompts. The aesthetic should be modern, clean, and professional, akin to the quality seen on sites like Bolt.new.
@@ -115,10 +116,26 @@ class CopilotAgent {
         } catch (error) {
             console.error("Error generating content with CopilotAgent:", error);
             if (error instanceof Error) {
-                 if (error.message.includes('fetch')) {
-                    throw new Error('A network error occurred. Please check your connection and try again.')
+                const errorMessage = error.message.toLowerCase();
+                if (errorMessage.includes('api key not valid')) {
+                    throw new Error("Invalid API Key. Please ensure your key is configured correctly and has access to the Gemini API.");
                 }
-                // Re-throw other errors to be caught by the UI
+                if (errorMessage.includes('quota')) {
+                    throw new Error("API quota exceeded. Please check your project billing or try again later.");
+                }
+                if (errorMessage.includes('safety') || errorMessage.includes('blocked')) {
+                     throw new Error("The response was blocked due to safety policies. Please adjust your prompt and try again.");
+                }
+                if (errorMessage.includes('fetch')) {
+                    throw new Error('A network error occurred. Please check your connection and try again.');
+                }
+                // A more generic API error fallback
+                if (error.message.includes('Google')) { // Catches errors from the SDK
+                    // Clean up the prefix for a cleaner message
+                    const cleanMessage = error.message.replace(/\[.*?\]\s*/, '');
+                    throw new Error(`An API error occurred: ${cleanMessage}`);
+                }
+                // Re-throw other unexpected errors
                 throw error;
             }
             throw new Error("An unknown error occurred while generating the component.");
