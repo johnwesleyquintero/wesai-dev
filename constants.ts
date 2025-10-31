@@ -1,0 +1,4 @@
+export const PANEL_MIN_SIZE_PERCENT = 25;
+export const PANEL_MAX_SIZE_PERCENT = 75;
+export const PANEL_DEFAULT_SIZE_PERCENT = 50;
+export const RESET_ANIMATION_DURATION_MS = 300;

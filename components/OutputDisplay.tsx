@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useRef, useLayoutEffect } from 'react';
 import { CodeOutput } from '../copilot/agent';
-import { CopyIcon, CheckIcon, AlertTriangleIcon, EyeIcon, CodeIcon, InitialStateLogoIcon, WesAILogoSpinnerIcon } from './Icons';
+import { CopyIcon, CheckIcon, AlertTriangleIcon, EyeIcon, CodeIcon, InitialStateLogoIcon, WesAILogoSpinnerIcon, RotateCcwIcon } from './Icons';
 import { quickStartPrompts, PromptTemplate } from '../copilot/prompts';
 import { getPromptIcon } from './promptUtils';
 
@@ -236,6 +236,7 @@ interface OutputDisplayProps {
 const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, error, setPrompt, theme, prompt }) => {
   const [activeTab, setActiveTab] = useState<ActiveTab>('preview');
   const [previewError, setPreviewError] = useState<string | null>(null);
+  const [isPromptCopied, setIsPromptCopied] = useState(false);
   
   const tabsRef = useRef<(HTMLButtonElement | null)[]>([]);
   const [gliderStyle, setGliderStyle] = useState({});
@@ -250,6 +251,14 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
       });
     }
   }, [activeTab, response]);
+
+  const handleCopyPrompt = useCallback(() => {
+    if (prompt) {
+        setPrompt(prompt);
+        setIsPromptCopied(true);
+        setTimeout(() => setIsPromptCopied(false), 2000);
+    }
+  }, [prompt, setPrompt]);
 
 
   // When a new response comes in, switch to the preview tab and listen for sandbox errors
@@ -320,7 +329,23 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
   return (
     <div className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-lg flex flex-col h-full shadow-md">
         <div className="flex-shrink-0 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-slate-100/80 dark:bg-slate-900/80 p-2 rounded-t-lg">
-            <h2 id="output-heading" className="text-lg font-semibold text-slate-900 dark:text-slate-200 px-2">Output</h2>
+            <div className="flex items-center gap-2">
+                <h2 id="output-heading" className="text-lg font-semibold text-slate-900 dark:text-slate-200 px-2">Output</h2>
+                {response && !error && (
+                    <div className="relative group">
+                        <button
+                            onClick={handleCopyPrompt}
+                            className="p-1.5 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-700/70 transition-colors duration-200"
+                            aria-label="Reuse this prompt"
+                        >
+                            {isPromptCopied ? <CheckIcon className="w-4 h-4 text-green-500" /> : <RotateCcwIcon className="w-4 h-4" />}
+                        </button>
+                        <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-800 dark:bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 group-hover:opacity-100 transition-all pointer-events-none">
+                            {isPromptCopied ? 'Copied to Input!' : 'Reuse Prompt'}
+                        </div>
+                    </div>
+                )}
+            </div>
             {response && !error && (
                 <div role="tablist" aria-labelledby="output-heading" className="relative flex items-center gap-1 bg-slate-200 dark:bg-slate-800 p-1 rounded-md">
                      <div
