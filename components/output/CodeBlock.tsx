@@ -30,7 +30,7 @@ const CodeBlock: React.FC<{ code: string }> = ({ code }) => {
 
     return (
         <div className={`rounded-lg overflow-hidden border flex-1 flex flex-col min-h-0 transition-all duration-300 ${isCopied ? 'bg-green-400/10 dark:bg-green-500/10 border-green-500/50' : 'bg-slate-100 dark:bg-slate-900/70 border-slate-200 dark:border-slate-700/50'}`}>
-            <div className="flex justify-between items-center bg-slate-200/50 dark:bg-slate-800/50 px-4 py-2 border-b border-inherit">
+            <div className="flex justify-between items-center bg-slate-200/50 dark:bg-slate-800/50 px-4 py-2">
                 <h3 className="text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">React Component (.tsx)</h3>
                 <div className="relative group">
                     <button
@@ -55,9 +55,9 @@ const CodeBlock: React.FC<{ code: string }> = ({ code }) => {
                     </div>
                 </div>
             </div>
-            <div className="flex-1 overflow-auto text-sm">
+            <div className="flex-1 overflow-auto text-sm border-t border-inherit">
                  <div className="flex items-start">
-                    <div aria-hidden="true" className="sticky top-0 left-0 z-10 select-none text-right px-4 text-slate-500 dark:text-slate-600 bg-slate-200/50 dark:bg-slate-800/50 border-r border-slate-200 dark:border-slate-700/50" style={{ lineHeight: '1.6', paddingTop: '0.5rem', paddingBottom: '0.5rem' }}>
+                    <div aria-hidden="true" className="sticky top-0 left-0 z-10 select-none text-right px-4 text-slate-500 dark:text-slate-600 bg-slate-200/50 dark:bg-slate-800/50" style={{ lineHeight: '1.6', paddingTop: '0.5rem', paddingBottom: '0.5rem' }}>
                         {lines.map((_, index) => (
                             <div key={index}>{index + 1}</div>
                         ))}
