@@ -1,6 +1,7 @@
 
 
 
+
 import React, { useRef, useEffect, useState } from 'react';
 import { SparkleIcon, CloseIcon, CubeIcon } from './Icons';
 import QuickStartPrompts from './QuickStartPrompts';
@@ -49,11 +50,23 @@ const ProTip: React.FC<{ tip: ProTipData }> = ({ tip }) => {
 
 const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGenerate, isLoading, isHighlighting }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [proTip, setProTip] = useState<ProTipData | null>(null);
+  const [proTipIndex, setProTipIndex] = useState(0);
+  const [isTipVisible, setIsTipVisible] = useState(true);
   
   useEffect(() => {
     // Select a random pro tip on component mount
-    setProTip(PRO_TIPS[Math.floor(Math.random() * PRO_TIPS.length)]);
+    setProTipIndex(Math.floor(Math.random() * PRO_TIPS.length));
+
+    // Cycle through pro tips
+    const tipInterval = setInterval(() => {
+        setIsTipVisible(false);
+        setTimeout(() => {
+            setProTipIndex(prevIndex => (prevIndex + 1) % PRO_TIPS.length);
+            setIsTipVisible(true);
+        }, 300); // Wait for fade-out to complete
+    }, 5000); // Change tip every 5 seconds
+
+    return () => clearInterval(tipInterval);
   }, []);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -75,7 +88,7 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
   }, [prompt]);
 
   return (
-    <div className={`bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 rounded-lg flex flex-col h-full shadow-md transition-opacity duration-300 ${isLoading ? 'opacity-70 pointer-events-none' : ''}`}>
+    <div className={`bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border border-slate-200 dark:border-slate-800 ring-1 ring-black/5 dark:ring-white/10 rounded-lg flex flex-col h-full shadow-md transition-opacity duration-300 ${isLoading ? 'opacity-70 pointer-events-none' : ''}`}>
         <div className="flex-shrink-0 flex items-center justify-between border-b border-slate-200 dark:border-slate-700 p-2 pl-4">
              <div className="flex items-center gap-2">
                 <CubeIcon className="w-5 h-5 text-slate-500 dark:text-slate-400"/>
@@ -112,7 +125,9 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
                 </div>
             </div>
             <div className="mt-auto flex-shrink-0 space-y-3 pt-4">
-                {proTip && <ProTip tip={proTip} />}
+                <div className={`transition-opacity duration-300 ${isTipVisible ? 'opacity-100' : 'opacity-0'}`}>
+                    <ProTip tip={PRO_TIPS[proTipIndex]} />
+                </div>
                 <button
                     onClick={handleGenerate}
                     disabled={isLoading || !prompt.trim()}

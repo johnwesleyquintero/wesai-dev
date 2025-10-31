@@ -1,6 +1,8 @@
 
 
 
+
+
 import React, { useCallback } from 'react';
 import { useToast } from '../../contexts/ToastContext';
 import { CodeOutput } from '../../copilot/agent';
@@ -70,10 +72,12 @@ const GenerationHeader: React.FC<GenerationHeaderProps> = ({ prompt, response, o
   }, [prompt, response, addToast, triggerShared]);
 
   return (
-    <div className="flex items-center gap-1.5 border-l border-slate-300 dark:border-slate-700 pl-2 min-w-0">
-      <p className="text-sm text-slate-500 dark:text-slate-400 whitespace-nowrap fade-out-right" title={prompt}>
-        {prompt}
-      </p>
+    <div className="flex items-center gap-2 border-l border-slate-300 dark:border-slate-700 pl-3 min-w-0">
+      <div className="bg-slate-200/70 dark:bg-slate-800/70 rounded-full px-2.5 py-1 min-w-0">
+        <p className="text-sm text-slate-600 dark:text-slate-400 whitespace-nowrap overflow-hidden text-ellipsis" title={prompt}>
+            {prompt}
+        </p>
+      </div>
       <div className="relative group flex-shrink-0">
         <button
           onClick={handleCopyPrompt}
