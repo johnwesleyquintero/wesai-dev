@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect, useRef, useLayoutEffect } from 'react';
 import { CodeOutput } from '../copilot/agent';
 import { CopyIcon, CheckIcon, AlertTriangleIcon, EyeIcon, CodeIcon, InitialStateLogoIcon, LandingPageIcon, WritingAppIcon, TodoListIcon } from './Icons';
@@ -122,11 +121,21 @@ const InitialState: React.FC<{ setPrompt: (prompt: string) => void }> = ({ setPr
     );
 };
 
-const SkeletonContent: React.FC = () => (
-    <div className="w-full h-full p-4 animate-pulse">
-        <div className="w-full h-full bg-slate-200 dark:bg-slate-800 rounded-lg"></div>
+const SkeletonLoader: React.FC = () => (
+  <div className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-lg flex flex-col h-full shadow-lg animate-pulse">
+    <div className="flex-shrink-0 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-slate-100/80 dark:bg-slate-900/80 p-2 rounded-t-lg">
+      <div className="h-7 bg-slate-300 dark:bg-slate-700 rounded w-24 ml-2"></div>
+      <div className="flex items-center gap-1 bg-slate-200 dark:bg-slate-800 p-1 rounded-md">
+        <div className="h-7 w-24 bg-slate-300 dark:bg-slate-700 rounded-md"></div>
+        <div className="h-7 w-20 bg-slate-300 dark:bg-slate-700 rounded-md"></div>
+      </div>
     </div>
+    <div className="flex-grow p-4">
+      <div className="w-full h-full bg-slate-200 dark:bg-slate-700 rounded-lg"></div>
+    </div>
+  </div>
 );
+
 
 const ErrorDisplay: React.FC<{ error: string; title: string; }> = ({ error, title }) => {
     const [isCopied, setIsCopied] = useState(false);
@@ -197,8 +206,11 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
     }
   }, [response]);
   
+  if (isLoading) {
+    return <SkeletonLoader />;
+  }
+  
   const renderContent = () => {
-    if (isLoading) return <SkeletonContent />;
     if (error) return <ErrorDisplay error={error} title="Generation Error" />;
     if (response) {
       if (activeTab === 'preview') {
@@ -213,19 +225,13 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
     return <InitialState setPrompt={setPrompt} />;
   };
 
-  const contentKey = isLoading ? 'loading' : error ? 'error' : response ? `${activeTab}-${response.react.length}` : 'initial';
+  const contentKey = error ? 'error' : response ? `${activeTab}-${response.react.length}` : 'initial';
 
   return (
     <div className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-lg flex flex-col h-full shadow-lg">
         <div className="flex-shrink-0 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-slate-100/80 dark:bg-slate-900/80 p-2 rounded-t-lg">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-200 px-2">Output</h2>
-            {isLoading && (
-                <div className="flex items-center gap-1 bg-slate-200 dark:bg-slate-800 p-1 rounded-md animate-pulse">
-                    <div className="h-7 w-24 bg-slate-300 dark:bg-slate-700 rounded-md"></div>
-                    <div className="h-7 w-20 bg-slate-300 dark:bg-slate-700 rounded-md"></div>
-                </div>
-            )}
-            {response && !isLoading && !error && (
+            {response && !error && (
                 <div className="relative flex items-center gap-1 bg-slate-200 dark:bg-slate-800 p-1 rounded-md">
                      <div
                         className="absolute bg-white dark:bg-slate-700 shadow-sm rounded-md h-[calc(100%-8px)] transition-all duration-300 ease-out"
