@@ -91,7 +91,7 @@ export const CloseIcon: React.FC<{ className?: string }> = ({ className }) => (
 );
 
 export const WesAILogoIcon: React.FC<{className?: string}> = ({className}) => (
-    <svg viewBox="0 0 160 35" xmlns="http://www.w3.org/2000/svg" className={className} preserveAspectRatio="xMinYMid meet">
+    <svg viewBox="0 0 165 35" xmlns="http://www.w3.org/2000/svg" className={className} preserveAspectRatio="xMinYMid meet">
         <defs>
             <linearGradient id="logoHeaderGrad" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stopColor="#4f46e5" />
@@ -99,7 +99,7 @@ export const WesAILogoIcon: React.FC<{className?: string}> = ({className}) => (
             </linearGradient>
         </defs>
         <text 
-            fontFamily="Manrope, sans-serif" 
+            fontFamily="Inter, sans-serif" 
             fontSize="30" 
             fontWeight="800" 
             fill="currentColor"

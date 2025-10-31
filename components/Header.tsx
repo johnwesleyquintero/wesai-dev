@@ -12,7 +12,7 @@ const Header: React.FC<HeaderProps> = ({ theme, onToggleTheme, onSettingsClick, 
   return (
     <header className="py-3 px-4 sm:px-6 lg:px-8 border-b border-slate-900/10 dark:border-white/10 bg-slate-100/80 dark:bg-slate-950/80 backdrop-blur-lg sticky top-0 z-10 shadow-sm shadow-slate-900/5 dark:shadow-black/50">
       <div className="flex justify-between items-center">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 min-w-0">
             <WesAILogoIcon className="h-8 w-auto text-slate-900 dark:text-white" />
         </div>
         <div className="flex items-center gap-2">

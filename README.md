@@ -14,7 +14,7 @@ WesAI.Dev is an AI-powered scratchpad for developers to quickly brainstorm, arch
 
 ## How It Works
 
-This application is powered by an AI agent that utilizes the [Google Gemini API](https://ai.google.dev/). It uses the `gemini-2.5-pro` model with a structured JSON output schema to ensure reliable and well-formed code generation. You provide your own Gemini API key, which is stored locally and used for all requests.
+This application is powered by an AI agent that utilizes the [Google Gemini API](https://ai.google.dev/). It uses the `gemini-2.5-flash` model with a structured JSON output schema to ensure reliable and well-formed code generation. You provide your own Gemini API key, which is stored locally and used for all requests.
 
 The frontend is built with React and TypeScript, providing a robust and type-safe development experience.
 
