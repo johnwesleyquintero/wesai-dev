@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect, useRef, useLayoutEffect } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { CodeOutput } from '../copilot/agent';
-import { CopyIcon, CheckIcon, EyeIcon, CodeIcon, RotateCcwIcon } from './Icons';
+import { CopyIcon, CheckIcon, EyeIcon, CodeIcon, RotateCcwIcon, CubeIcon } from './Icons';
 import CodeBlock from './output/CodeBlock';
 import ErrorDisplay from './output/ErrorDisplay';
 import InitialState from './output/InitialState';
@@ -94,8 +94,9 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
     return (
         <div className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-lg flex flex-col h-full shadow-md">
             <div className="flex-shrink-0 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-slate-100/80 dark:bg-slate-900/80 p-2 rounded-t-lg">
-                <div className="flex items-center gap-2">
-                  <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-200 px-2">Output</h2>
+                <div className="flex items-center gap-2 pl-2">
+                  <CubeIcon className="w-5 h-5 text-slate-500 dark:text-slate-400"/>
+                  <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-200">Output</h2>
                   <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse-indicator"></div>
                 </div>
             </div>
@@ -134,8 +135,9 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
   return (
     <div className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-lg flex flex-col h-full shadow-md">
         <div className="flex-shrink-0 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-slate-100/80 dark:bg-slate-900/80 p-2 rounded-t-lg">
-            <div className="flex items-center gap-2 min-w-0">
-                <h2 id="output-heading" className="text-lg font-semibold text-slate-900 dark:text-slate-200 px-2 flex-shrink-0">Output</h2>
+            <div className="flex items-center gap-2 min-w-0 pl-2">
+                <CubeIcon className="w-5 h-5 text-slate-500 dark:text-slate-400"/>
+                <h2 id="output-heading" className="text-lg font-semibold text-slate-900 dark:text-slate-200 flex-shrink-0">Output</h2>
                 {response && !error && (
                     <div className="flex items-center gap-1.5 border-l border-slate-300 dark:border-slate-700 pl-2 min-w-0">
                         <p className="text-sm text-slate-500 dark:text-slate-400 whitespace-nowrap fade-out-right" title={prompt}>

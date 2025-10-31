@@ -29,13 +29,13 @@
               },
               keyframes: {
                 'indeterminate-progress': {
-                  '0%': { transform: 'translateX(-50%) scaleX(0)' },
-                  '50%': { transform: 'translateX(0) scaleX(1)' },
-                  '100%': { transform: 'translateX(50%) scaleX(0)' },
+                  '0%': { transform: 'translateX(-100%)', opacity: '0.75' },
+                  '50%': { opacity: '1' },
+                  '100%': { transform: 'translateX(400%)', opacity: '0.75' },
                 },
               },
               animation: {
-                'indeterminate-progress': 'indeterminate-progress 1.5s infinite ease-in-out',
+                'indeterminate-progress': 'indeterminate-progress 1.8s infinite cubic-bezier(0.4, 0, 0.2, 1)',
               },
             },
           },
@@ -174,23 +174,11 @@
     .hljs {
         background: none;
     }
-    /* Code block line highlighting for readability */
+    /* Removed striped background style to support line-by-line rendering */
     pre code.hljs {
         line-height: 1.6;
-        background-image: linear-gradient(
-            transparent 50%,
-            rgba(0, 0, 0, 0.04) 50%
-        );
-        background-size: 100% 3.2em; /* line-height * 2 */
-        background-origin: content-box;
         padding-top: 0.5rem;
         padding-bottom: 0.5rem;
-    }
-    .dark pre code.hljs {
-         background-image: linear-gradient(
-            transparent 50%,
-            rgba(255, 255, 255, 0.03) 50%
-        );
     }
     .animate-indeterminate-progress {
         transform-origin: 0% 50%;

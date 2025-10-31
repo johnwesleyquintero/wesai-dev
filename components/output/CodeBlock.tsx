@@ -1,15 +1,17 @@
 
 
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { CopyIcon, CheckIcon } from '../Icons';
 
 const CodeBlock: React.FC<{ code: string }> = ({ code }) => {
     const [isCopied, setIsCopied] = useState(false);
-    const codeRef = useRef<HTMLElement>(null);
-    const [lines, setLines] = useState<string[]>([]);
 
-    useEffect(() => {
-        setLines(code.split('\n'));
+    const highlightedLines = useMemo(() => {
+        if (!code || !window.hljs) return [];
+        // Highlight the entire block at once for correct syntax context
+        const highlightedCode = window.hljs.highlight(code, { language: 'tsx' }).value;
+        // Split the highlighted HTML into lines
+        return highlightedCode.split('\n');
     }, [code]);
 
     const handleCopy = useCallback(() => {
@@ -20,12 +22,6 @@ const CodeBlock: React.FC<{ code: string }> = ({ code }) => {
         });
     }, [code]);
     
-    useEffect(() => {
-        if (codeRef.current && window.hljs) {
-            window.hljs.highlightElement(codeRef.current);
-        }
-    }, [code]);
-
     if (!code) return null;
 
     // Use specific background colors that match the atom-one-light and atom-one-dark themes.
@@ -59,11 +55,20 @@ const CodeBlock: React.FC<{ code: string }> = ({ code }) => {
             <div className="flex-1 overflow-auto text-sm">
                  <div className="flex items-start">
                     <div aria-hidden="true" className="sticky top-0 left-0 z-10 select-none text-right px-4 text-slate-500 dark:text-slate-600 bg-inherit" style={{ lineHeight: '1.6', paddingTop: '0.5rem', paddingBottom: '0.5rem' }}>
-                        {lines.map((_, index) => (
+                        {highlightedLines.map((_, index) => (
                             <div key={index}>{index + 1}</div>
                         ))}
                     </div>
-                    <pre className="flex-1 whitespace-pre !m-0 !p-0"><code ref={codeRef} className="language-tsx">{code}</code></pre>
+                    <pre className="flex-1 !m-0 !p-0"><code className="language-tsx hljs">
+                       {highlightedLines.map((line, index) => (
+                            <div
+                                key={index}
+                                className="px-4 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition-colors duration-100"
+                                dangerouslySetInnerHTML={{ __html: line || '&nbsp;' }}
+                                style={{ lineHeight: '1.6' }}
+                            />
+                        ))}
+                    </code></pre>
                  </div>
             </div>
         </div>

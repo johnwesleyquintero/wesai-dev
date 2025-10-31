@@ -1,6 +1,6 @@
 
 import React, { useRef, useEffect } from 'react';
-import { CloseIcon } from './Icons';
+import { CloseIcon, CheckCircleIcon } from './Icons';
 
 interface HelpModalProps {
   isOpen: boolean;
@@ -53,6 +53,13 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
+  const whatsNewItems = [
+    { text: 'React-First Generation:', description: "WesAI now generates complete, self-contained React components (.tsx) instead of separate HTML/CSS/JS." },
+    { text: 'Robust Sandbox Preview:', description: "Live previews are now rendered in a secure, isolated iframe for better performance and error handling." },
+    { text: 'Resizable Panels:', description: "On desktop, you can now drag the divider between the input and output panels to resize them to your liking." },
+    { text: 'UI/UX Overhaul:', description: "Refreshed the entire interface with a cleaner header, improved spacing, and more polished components for a professional feel." },
+  ];
+
   return (
     <div
       className="fixed inset-0 bg-slate-500/50 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in transition-opacity duration-300"
@@ -82,13 +89,17 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
         <div className="space-y-8 text-slate-700 dark:text-slate-300">
             {/* What's New Section */}
             <div>
-                <h3 className="text-lg font-semibold text-indigo-600 dark:text-indigo-400 mb-3 border-b border-slate-200 dark:border-slate-700 pb-2">What's New</h3>
-                <ul className="space-y-2 list-disc list-inside text-sm">
-                    <li><span className="font-semibold">React-First Generation:</span> WesAI now generates complete, self-contained React components (.tsx) instead of separate HTML/CSS/JS.</li>
-                    <li><span className="font-semibold">Robust Sandbox Preview:</span> Live previews are now rendered in a secure, isolated iframe for better performance and error handling.</li>
-                    <li><span className="font-semibold">Resizable Panels:</span> On desktop, you can now drag the divider between the input and output panels to resize them to your liking.</li>
-                    <li><span className="font-semibold">UI/UX Overhaul:</span> Refreshed the entire interface with a cleaner header, improved spacing, and more polished components for a professional feel.</li>
-                </ul>
+                <h3 className="text-lg font-semibold text-indigo-600 dark:text-indigo-400 mb-4 border-b border-slate-200 dark:border-slate-700 pb-2">What's New</h3>
+                <div className="space-y-3 text-sm">
+                    {whatsNewItems.map((item, index) => (
+                        <div key={index} className="flex items-start gap-3">
+                            <CheckCircleIcon className="w-5 h-5 text-indigo-500 dark:text-indigo-400 mt-0.5 flex-shrink-0" />
+                            <span>
+                                <span className="font-semibold text-slate-800 dark:text-slate-200">{item.text}</span> {item.description}
+                            </span>
+                        </div>
+                    ))}
+                </div>
             </div>
 
             {/* Help Center Section */}
