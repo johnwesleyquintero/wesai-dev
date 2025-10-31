@@ -125,7 +125,7 @@ const InitialState: React.FC<{ setPrompt: (prompt: string) => void }> = ({ setPr
                      <button
                         key={example.title}
                         onClick={() => setPrompt(example.prompt)}
-                        className="text-center p-4 bg-white/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 transition-all duration-200 transform hover:-translate-y-1 border border-slate-200 dark:border-slate-700/50 shadow-sm hover:shadow-xl hover:shadow-indigo-500/10 flex flex-col items-center gap-3"
+                        className="text-center p-4 bg-white/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 transition-all duration-200 transform hover:-translate-y-1 border border-slate-200 dark:border-slate-700/50 hover:border-slate-300 dark:hover:border-slate-600 shadow-sm hover:shadow-xl hover:shadow-indigo-500/20 flex flex-col items-center gap-3"
                     >
                         {example.icon}
                         <div className="flex flex-col">

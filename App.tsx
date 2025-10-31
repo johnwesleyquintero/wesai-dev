@@ -150,11 +150,11 @@ const App: React.FC = () => {
             </div>
             <div 
                 onMouseDown={handleMouseDown}
-                className="w-2 cursor-col-resize flex-shrink-0 flex items-center justify-center group"
+                className="w-3 cursor-col-resize flex-shrink-0 flex items-center justify-center group"
             >
-                <div className={`w-1 h-20 bg-slate-300 dark:bg-slate-700 rounded-full transition-all duration-300 ${isDragging ? 'bg-indigo-500 scale-x-150 shadow-[0_0_12px_2px_theme(colors.indigo.500)]' : 'group-hover:bg-indigo-500/50 group-hover:shadow-[0_0_8px_theme(colors.indigo.500)]'}`}></div>
+                <div className={`w-0.5 h-16 bg-slate-300 dark:bg-slate-700 rounded-full transition-all duration-300 ${isDragging ? 'bg-indigo-500 scale-x-150 shadow-[0_0_12px_2px_theme(colors.indigo.500)]' : 'group-hover:bg-indigo-500/60'}`}></div>
             </div>
-            <div className="flex flex-col h-full" style={{ width: `calc(100% - ${dividerPosition}% - 8px)` }}>
+            <div className="flex flex-col h-full" style={{ width: `calc(100% - ${dividerPosition}% - 12px)` }}>
               <OutputDisplay
                 response={response}
                 isLoading={isLoading}
