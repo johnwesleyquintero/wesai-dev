@@ -49,14 +49,14 @@ const Header: React.FC<HeaderProps> = ({ onHelpClick, onResetClick }) => {
                     onMouseLeave={handleResetMouseLeave}
                     className={`p-2 rounded-full transition-all duration-200 hover:scale-110 ${
                         isResetConfirming 
-                        ? 'bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900' 
+                        ? 'bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900 ring-1 ring-red-300 dark:ring-red-700' 
                         : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800/70'
                     }`} 
                     aria-label={isResetConfirming ? "Confirm new session" : "Start new session"}
                 >
                     {isResetConfirming ? <CheckIcon className="w-5 h-5" /> : <RotateCcwIcon className="w-5 h-5" />}
                 </button>
-                <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-800 dark:bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all pointer-events-none transform translate-y-0 group-hover:-translate-y-1 duration-200">
+                <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-800 dark:bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 group-focus:opacity-100 group-focus:scale-100 transition-all pointer-events-none transform translate-y-0 group-hover:-translate-y-1 group-focus:-translate-y-1 duration-200">
                     {isResetConfirming ? 'Are you sure?' : 'New Session'}
                 </div>
             </div>
@@ -67,7 +67,7 @@ const Header: React.FC<HeaderProps> = ({ onHelpClick, onResetClick }) => {
                 <button onClick={toggleTheme} className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800/70 transition-all duration-200 hover:scale-110" aria-label="Toggle theme">
                     {theme === 'dark' ? <SunIcon className="w-6 h-6" /> : <MoonIcon className="w-6 h-6" />}
                 </button>
-                <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-800 dark:bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all pointer-events-none transform translate-y-0 group-hover:-translate-y-1 duration-200">
+                <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-800 dark:bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 group-focus:opacity-100 group-focus:scale-100 transition-all pointer-events-none transform translate-y-0 group-hover:-translate-y-1 group-focus:-translate-y-1 duration-200">
                     {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
                 </div>
             </div>
@@ -75,7 +75,7 @@ const Header: React.FC<HeaderProps> = ({ onHelpClick, onResetClick }) => {
                 <button onClick={onHelpClick} className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800/70 transition-all duration-200 hover:scale-110" aria-label="Open help and what's new">
                     <HelpIcon className="w-6 h-6" />
                 </button>
-                 <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-800 dark:bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all pointer-events-none transform translate-y-0 group-hover:-translate-y-1 duration-200">
+                 <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-800 dark:bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 group-focus:opacity-100 group-focus:scale-100 transition-all pointer-events-none transform translate-y-0 group-hover:-translate-y-1 group-focus:-translate-y-1 duration-200">
                     Help & Info
                 </div>
             </div>
