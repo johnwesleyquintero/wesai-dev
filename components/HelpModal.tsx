@@ -68,7 +68,7 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
     >
       <div
         ref={modalRef}
-        className="bg-white dark:bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-lg border border-slate-200 dark:border-slate-700 max-h-[80vh] overflow-y-auto animate-scale-in"
+        className="bg-white dark:bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-lg border border-slate-200 dark:border-slate-700 max-h-[80vh] overflow-y-auto animate-scale-in custom-scrollbar"
         onClick={e => e.stopPropagation()}
       >
         <div className="flex justify-between items-center mb-6 sticky top-0 bg-white dark:bg-slate-800 py-2 -mt-2">

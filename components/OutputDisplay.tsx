@@ -2,8 +2,9 @@
 
 import React, { useState, useCallback, useEffect, useRef, useLayoutEffect } from 'react';
 import { CodeOutput } from '../copilot/agent';
-import { CopyIcon, CheckIcon, AlertTriangleIcon, EyeIcon, CodeIcon, InitialStateLogoIcon, LandingPageIcon, WritingAppIcon, TodoListIcon, WesAILogoSpinnerIcon } from './Icons';
+import { CopyIcon, CheckIcon, AlertTriangleIcon, EyeIcon, CodeIcon, InitialStateLogoIcon, WesAILogoSpinnerIcon } from './Icons';
 import { quickStartPrompts, PromptTemplate } from '../copilot/prompts';
+import { getPromptIcon } from './promptUtils';
 
 type Theme = 'light' | 'dark';
 type ActiveTab = 'preview' | 'code';
@@ -109,7 +110,7 @@ const CodeBlock: React.FC<{ code: string }> = ({ code }) => {
             </div>
             <div className="flex-1 overflow-auto text-sm">
                  <div className="flex items-start">
-                    <div aria-hidden="true" className="sticky top-0 select-none text-right pr-4 text-slate-500 dark:text-slate-600" style={{ lineHeight: '1.6', paddingTop: '0.5rem', paddingBottom: '0.5rem' }}>
+                    <div aria-hidden="true" className="sticky top-0 left-0 z-10 select-none text-right px-4 text-slate-500 dark:text-slate-600 bg-slate-200/50 dark:bg-slate-800/50 border-r border-slate-200 dark:border-slate-700/50" style={{ lineHeight: '1.6', paddingTop: '0.5rem', paddingBottom: '0.5rem' }}>
                         {lines.map((_, index) => (
                             <div key={index}>{index + 1}</div>
                         ))}
@@ -123,19 +124,6 @@ const CodeBlock: React.FC<{ code: string }> = ({ code }) => {
 
 
 const InitialState: React.FC<{ setPrompt: (prompt: string) => void }> = ({ setPrompt }) => {
-    const getIcon = (key: PromptTemplate['key']) => {
-        switch (key) {
-            case 'landing-page':
-                return <LandingPageIcon className="w-6 h-6 text-indigo-500 dark:text-indigo-400" />;
-            case 'writing-app':
-                return <WritingAppIcon className="w-6 h-6 text-purple-500 dark:text-purple-400" />;
-            case 'todo-list':
-                return <TodoListIcon className="w-6 h-6 text-sky-500 dark:text-sky-400" />;
-            default:
-                return null;
-        }
-    }
-
     return (
         <div className="text-slate-500 flex flex-col items-center justify-center h-full text-center p-4 animate-fade-in">
             <InitialStateLogoIcon className="w-24 h-24 mb-6" />
@@ -148,7 +136,7 @@ const InitialState: React.FC<{ setPrompt: (prompt: string) => void }> = ({ setPr
                         onClick={() => setPrompt(example.prompt)}
                         className="text-center p-4 bg-white/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 transition-all duration-200 transform hover:-translate-y-1 border border-slate-200 dark:border-slate-700/50 hover:border-slate-300 dark:hover:border-slate-600 shadow-sm hover:shadow-xl hover:shadow-indigo-500/20 flex flex-col items-center gap-3"
                     >
-                        {getIcon(example.key)}
+                        {getPromptIcon(example.key, 'w-6 h-6')}
                         <div className="flex flex-col">
                             <span className="font-semibold text-sm text-slate-800 dark:text-slate-100">{example.title}</span>
                             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{example.description}</p>

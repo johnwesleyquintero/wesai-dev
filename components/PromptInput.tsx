@@ -1,8 +1,9 @@
 
 
 import React, { useRef, useEffect } from 'react';
-import { SparkleIcon, CloseIcon, CubeIcon, LandingPageIcon, WritingAppIcon, TodoListIcon } from './Icons';
-import { quickStartPrompts, PromptTemplate } from '../copilot/prompts';
+import { SparkleIcon, CloseIcon, CubeIcon } from './Icons';
+import { quickStartPrompts } from '../copilot/prompts';
+import { getPromptIcon } from './promptUtils';
 
 interface PromptInputProps {
   prompt: string;
@@ -31,20 +32,6 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
       textarea.style.height = `${scrollHeight}px`;
     }
   }, [prompt]);
-
-  const getIcon = (key: PromptTemplate['key']) => {
-    switch (key) {
-        case 'landing-page':
-            return <LandingPageIcon className="w-5 h-5 text-indigo-500 dark:text-indigo-400" />;
-        case 'writing-app':
-            return <WritingAppIcon className="w-5 h-5 text-purple-500 dark:text-purple-400" />;
-        case 'todo-list':
-            return <TodoListIcon className="w-5 h-5 text-sky-500 dark:text-sky-400" />;
-        default:
-            return null;
-    }
-  };
-  
 
   return (
     <div className={`bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 rounded-lg flex flex-col h-full shadow-md transition-opacity duration-300 ${isLoading ? 'opacity-70 pointer-events-none' : ''}`}>
@@ -87,7 +74,7 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
                             onClick={() => setPrompt(p.prompt)} 
                             className="text-left p-3 bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700/80 rounded-lg text-slate-600 dark:text-slate-300 transition-all duration-200 border border-slate-200 dark:border-slate-700/50 transform hover:scale-[1.03] hover:shadow-lg hover:border-indigo-400/50 dark:hover:border-indigo-500/50 flex items-start gap-3"
                          >
-                            <div className="flex-shrink-0 mt-0.5">{getIcon(p.key)}</div>
+                            <div className="flex-shrink-0 mt-0.5">{getPromptIcon(p.key, 'w-5 h-5')}</div>
                             <div>
                                 <span className="font-semibold text-xs text-slate-800 dark:text-slate-100">{p.title}</span>
                                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{p.description}</p>
