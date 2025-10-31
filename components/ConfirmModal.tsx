@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect } from 'react';
 import { CloseIcon, AlertTriangleIcon } from './Icons';
 
@@ -35,8 +34,8 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({ isOpen, onClose, onConfirm,
   if (!isOpen) return null;
 
   const confirmButtonClasses = {
-    default: "bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold hover:opacity-90 transform hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/40 animate-gradient",
-    destructive: "bg-red-600 hover:bg-red-700 text-white font-bold transform hover:-translate-y-0.5 hover:shadow-lg hover:shadow-red-500/40"
+    default: "bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold hover:opacity-90 transform hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/40 animate-gradient focus-visible:ring-indigo-500",
+    destructive: "bg-red-600 hover:bg-red-700 text-white font-bold transform hover:-translate-y-0.5 hover:shadow-lg hover:shadow-red-500/40 focus-visible:ring-red-500"
   };
 
   return (
@@ -65,7 +64,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({ isOpen, onClose, onConfirm,
         <div className="mt-6 flex justify-end space-x-3">
             <button
                 onClick={onClose}
-                className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+                className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-800"
             >
                 Cancel
             </button>
@@ -74,7 +73,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({ isOpen, onClose, onConfirm,
                     onConfirm();
                     onClose();
                 }}
-                className={`py-2 px-4 rounded-lg transition-all duration-300 ${confirmButtonClasses[confirmVariant]}`}
+                className={`py-2 px-4 rounded-lg transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-800 ${confirmButtonClasses[confirmVariant]}`}
             >
                 {confirmText}
             </button>

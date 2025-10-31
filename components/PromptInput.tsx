@@ -1,7 +1,3 @@
-
-
-
-
 import React, { useRef, useEffect, useState } from 'react';
 import { SparkleIcon, CloseIcon, CubeIcon } from './Icons';
 import QuickStartPrompts from './QuickStartPrompts';
@@ -30,6 +26,8 @@ const PRO_TIPS: ProTipData[] = [
   { parts: [{type: 'text', content: "WesAI is great for brainstorming variations. Try asking for 'another version'."}] },
   { parts: [{type: 'text', content: "Describe animations like 'a button that pulses on hover' for interactive results."}] },
 ];
+
+const PROMPT_MAX_LENGTH = 4000;
 
 const ProTip: React.FC<{ tip: ProTipData }> = ({ tip }) => {
   return (
@@ -106,13 +104,14 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
                   onKeyDown={handleKeyDown}
                   placeholder="e.g., A responsive login form with a 'remember me' checkbox and a pulsing gradient on the submit button..."
                   rows={3}
+                  maxLength={PROMPT_MAX_LENGTH}
                   className={`font-mono w-full p-4 pr-10 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 resize-none placeholder:text-slate-500 dark:placeholder:text-slate-500 focus:bg-white dark:focus:bg-slate-900/50 max-h-96 ${isHighlighting ? 'animate-pulse-indigo-glow' : ''}`}
                   disabled={isLoading}
                 />
                 {prompt && (
                 <button
                     onClick={() => setPrompt('')}
-                    className="absolute top-3 right-3 p-1 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                    className="absolute top-3 right-3 p-1 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1 dark:focus-visible:ring-offset-slate-800"
                     aria-label="Clear input"
                 >
                     <CloseIcon className="w-4 h-4" />
@@ -125,8 +124,13 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
                 </div>
             </div>
             <div className="mt-auto flex-shrink-0 space-y-3 pt-4">
-                <div className={`transition-opacity duration-300 ${isTipVisible ? 'opacity-100' : 'opacity-0'}`}>
-                    <ProTip tip={PRO_TIPS[proTipIndex]} />
+                <div className="flex justify-between items-center">
+                    <div className={`flex-1 transition-opacity duration-300 ${isTipVisible ? 'opacity-100' : 'opacity-0'}`}>
+                      <ProTip tip={PRO_TIPS[proTipIndex]} />
+                    </div>
+                    <div className={`text-right text-xs font-mono pr-1 transition-colors ${prompt.length > PROMPT_MAX_LENGTH ? 'text-red-500' : 'text-slate-500 dark:text-slate-400'}`}>
+                      {prompt.length} / {PROMPT_MAX_LENGTH}
+                    </div>
                 </div>
                 <button
                     onClick={handleGenerate}

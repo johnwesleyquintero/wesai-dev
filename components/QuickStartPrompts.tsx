@@ -1,5 +1,3 @@
-
-
 import React, { useState, useCallback } from 'react';
 import { quickStartPrompts, PromptTemplate } from '../copilot/prompts';
 import { getPromptIcon } from './promptUtils';
@@ -30,7 +28,7 @@ const QuickStartPrompts: React.FC<QuickStartPromptsProps> = ({ setPrompt, onProm
                     <button 
                         key={p.key} 
                         onClick={() => handlePromptClick(p)} 
-                        className="relative text-left p-3 bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700/80 rounded-lg text-slate-600 dark:text-slate-300 transition-all duration-200 border border-slate-200 dark:border-slate-700/50 transform hover:scale-[1.03] hover:shadow-lg hover:border-indigo-400/50 dark:hover:border-indigo-500/50 flex items-start gap-3 overflow-hidden"
+                        className="relative text-left p-3 bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700/80 rounded-lg text-slate-600 dark:text-slate-300 transition-all duration-200 border border-slate-200 dark:border-slate-700/50 transform hover:scale-[1.03] hover:shadow-lg hover:border-indigo-400/50 dark:hover:border-indigo-500/50 flex items-start gap-3 overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900"
                     >
                         <div className={`transition-opacity duration-300 ${copiedPromptKey === p.key ? 'opacity-0' : 'opacity-100'}`}>
                             <div className="flex items-start gap-3">
@@ -60,7 +58,7 @@ const QuickStartPrompts: React.FC<QuickStartPromptsProps> = ({ setPrompt, onProm
             <button
                 key={example.key}
                 onClick={() => handlePromptClick(example)}
-                className="relative text-center p-4 bg-white/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 transition-all duration-200 transform hover:-translate-y-1 border border-slate-200 dark:border-slate-700/50 hover:border-indigo-300/70 dark:hover:border-indigo-500/70 shadow-sm hover:shadow-2xl hover:shadow-indigo-500/25 flex flex-col items-center justify-center gap-3 overflow-hidden h-28"
+                className="relative text-center p-4 bg-white/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 transition-all duration-200 transform hover:-translate-y-1 border border-slate-200 dark:border-slate-700/50 hover:border-indigo-300/70 dark:hover:border-indigo-500/70 shadow-sm hover:shadow-2xl hover:shadow-indigo-500/25 flex flex-col items-center justify-center gap-3 overflow-hidden h-28 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900"
             >
                  <div className={`transition-opacity duration-300 flex flex-col items-center gap-3 ${copiedPromptKey === example.key ? 'opacity-0' : 'opacity-100'}`}>
                     {getPromptIcon(example.key, 'w-6 h-6')}

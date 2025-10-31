@@ -1,13 +1,10 @@
-
-
-
-
-
 import React, { useCallback } from 'react';
 import { useToast } from '../../contexts/ToastContext';
 import { CodeOutput } from '../../copilot/agent';
 import { CopyIcon, RotateCcwIcon, ShareIcon, CheckIcon } from '../Icons';
 import { useActionFeedback } from '../../hooks/useActionFeedback';
+
+declare const pako: any;
 
 interface GenerationHeaderProps {
   prompt: string;
@@ -40,7 +37,8 @@ const GenerationHeader: React.FC<GenerationHeaderProps> = ({ prompt, response, o
       try {
         const data = { prompt, react: response.react };
         const jsonString = JSON.stringify(data);
-        const encoded = btoa(jsonString);
+        const compressed = pako.deflate(jsonString, { to: 'string' });
+        const encoded = btoa(compressed);
         const url = new URL(window.location.href);
         url.hash = encodeURIComponent(encoded);
 
@@ -82,7 +80,7 @@ const GenerationHeader: React.FC<GenerationHeaderProps> = ({ prompt, response, o
         <button
           onClick={handleCopyPrompt}
           disabled={isPromptCopied}
-          className="p-1.5 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-700/70 transition-colors duration-200 disabled:text-green-500"
+          className="p-1.5 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-700/70 transition-colors duration-200 disabled:text-green-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900"
           aria-label="Copy this prompt"
         >
           {isPromptCopied ? <CheckIcon className="w-4 h-4" /> : <CopyIcon className="w-4 h-4" />}
@@ -94,7 +92,7 @@ const GenerationHeader: React.FC<GenerationHeaderProps> = ({ prompt, response, o
       <div className="relative group flex-shrink-0">
         <button
           onClick={handleReusePrompt}
-          className="p-1.5 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-700/70 transition-colors duration-200"
+          className="p-1.5 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-700/70 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900"
           aria-label="Reuse this prompt"
         >
           <RotateCcwIcon className="w-4 h-4" />
@@ -107,7 +105,7 @@ const GenerationHeader: React.FC<GenerationHeaderProps> = ({ prompt, response, o
         <button
           onClick={handleShare}
           disabled={isShared}
-          className="p-1.5 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-700/70 transition-colors duration-200 disabled:text-green-500"
+          className="p-1.5 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-700/70 transition-colors duration-200 disabled:text-green-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900"
           aria-label="Share this generation"
         >
           {isShared ? <CheckIcon className="w-4 h-4" /> : <ShareIcon className="w-4 h-4" />}

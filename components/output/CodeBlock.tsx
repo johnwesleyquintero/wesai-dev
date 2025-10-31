@@ -1,10 +1,6 @@
-
-
-
-
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useState } from 'react';
 import { useToast } from '../../contexts/ToastContext';
-import { CopyIcon, DownloadIcon, CheckIcon } from '../Icons';
+import { CopyIcon, DownloadIcon, CheckIcon, WrapTextIcon } from '../Icons';
 import { useActionFeedback } from '../../hooks/useActionFeedback';
 
 interface CodeBlockProps {
@@ -16,7 +12,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ code, prompt }) => {
     const { addToast } = useToast();
     const { isActionDone: isCopied, trigger: triggerCopied } = useActionFeedback();
     const { isActionDone: isDownloaded, trigger: triggerDownloaded } = useActionFeedback();
-
+    const [isLineWrapEnabled, setIsLineWrapEnabled] = useState(false);
 
     const highlightedLines = useMemo(() => {
         if (!code || !window.hljs) return [];
@@ -62,9 +58,22 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ code, prompt }) => {
                 <div className="flex items-center gap-2">
                     <div className="relative group">
                         <button
+                            onClick={() => setIsLineWrapEnabled(!isLineWrapEnabled)}
+                            className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors p-1 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-800"
+                        >
+                            <WrapTextIcon className="w-4 h-4" />
+                            {isLineWrapEnabled ? 'Unwrap' : 'Wrap'}
+                        </button>
+                        <div className="absolute bottom-full mb-2 right-0 whitespace-nowrap rounded-md bg-slate-800 dark:bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                            {isLineWrapEnabled ? 'Disable Line Wrapping' : 'Enable Line Wrapping'}
+                        </div>
+                    </div>
+                    <div className="w-px h-4 bg-slate-300 dark:bg-slate-600"></div>
+                    <div className="relative group">
+                        <button
                             onClick={handleDownload}
                             disabled={isDownloaded}
-                            className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors disabled:text-green-500"
+                            className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors disabled:text-green-500 p-1 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-800"
                         >
                             {isDownloaded ? <CheckIcon className="w-4 h-4" /> : <DownloadIcon className="w-4 h-4" />}
                             {isDownloaded ? 'Downloaded' : 'Download'}
@@ -78,7 +87,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ code, prompt }) => {
                         <button
                             onClick={handleCopy}
                             disabled={isCopied}
-                            className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors disabled:text-green-500"
+                            className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors disabled:text-green-500 p-1 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-800"
                         >
                             {isCopied ? <CheckIcon className="w-4 h-4" /> : <CopyIcon className="w-4 h-4" />}
                             {isCopied ? 'Copied' : 'Copy'}
@@ -96,7 +105,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ code, prompt }) => {
                             <div key={index}>{index + 1}</div>
                         ))}
                     </div>
-                    <pre className="flex-1 !m-0 !p-0"><code className="language-tsx hljs">
+                    <pre className={`flex-1 !m-0 !p-0 ${isLineWrapEnabled ? 'whitespace-pre-wrap break-words' : ''}`}><code className="language-tsx hljs">
                        {highlightedLines.map((line, index) => (
                             <div
                                 key={index}

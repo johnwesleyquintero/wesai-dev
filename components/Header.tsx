@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { HelpIcon, SunIcon, MoonIcon, WesAILogoIcon, RotateCcwIcon } from './Icons';
@@ -23,7 +22,7 @@ const Header: React.FC<HeaderProps> = ({ onHelpClick, onResetClick }) => {
             <div className="relative group">
                 <button 
                     onClick={onResetClick} 
-                    className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800/70 transition-all duration-200 hover:scale-110" 
+                    className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800/70 transition-all duration-200 hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950" 
                     aria-label="Start new session"
                 >
                     <RotateCcwIcon className="w-5 h-5" />
@@ -36,7 +35,7 @@ const Header: React.FC<HeaderProps> = ({ onHelpClick, onResetClick }) => {
             <div className="w-px h-6 bg-slate-200 dark:bg-slate-700"></div>
 
             <div className="relative group">
-                <button onClick={toggleTheme} className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800/70 transition-all duration-200 hover:scale-110" aria-label="Toggle theme">
+                <button onClick={toggleTheme} className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800/70 transition-all duration-200 hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950" aria-label="Toggle theme">
                     {theme === 'dark' ? <SunIcon className="w-6 h-6" /> : <MoonIcon className="w-6 h-6" />}
                 </button>
                 <div className={tooltipClasses}>
@@ -44,7 +43,7 @@ const Header: React.FC<HeaderProps> = ({ onHelpClick, onResetClick }) => {
                 </div>
             </div>
             <div className="relative group">
-                <button onClick={onHelpClick} className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800/70 transition-all duration-200 hover:scale-110" aria-label="Open help and what's new">
+                <button onClick={onHelpClick} className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800/70 transition-all duration-200 hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950" aria-label="Open help and what's new">
                     <HelpIcon className="w-6 h-6" />
                 </button>
                  <div className={tooltipClasses}>

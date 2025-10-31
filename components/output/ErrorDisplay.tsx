@@ -1,4 +1,3 @@
-
 import React, { useCallback } from 'react';
 import { useToast } from '../../contexts/ToastContext';
 import { AlertTriangleIcon, CopyIcon, CheckIcon, RotateCcwIcon } from '../Icons';
@@ -35,7 +34,7 @@ const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ error, title, onRetry }) =>
                     <button
                         onClick={handleCopyError}
                         disabled={isCopied}
-                        className="flex-shrink-0 flex items-center gap-1.5 text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors p-1.5 rounded-md hover:bg-slate-400/20 disabled:text-green-600 dark:disabled:text-green-500"
+                        className="flex-shrink-0 flex items-center gap-1.5 text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors p-1.5 rounded-md hover:bg-slate-400/20 disabled:text-green-600 dark:disabled:text-green-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-red-900/50"
                     >
                         {isCopied ? <CheckIcon className="w-4 h-4" /> : <CopyIcon className="w-4 h-4" />}
                         {isCopied ? 'Copied' : 'Copy'}
@@ -43,7 +42,7 @@ const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ error, title, onRetry }) =>
                     {onRetry && (
                          <button
                             onClick={onRetry}
-                            className="flex-shrink-0 flex items-center gap-1.5 text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors p-1.5 rounded-md hover:bg-slate-400/20"
+                            className="flex-shrink-0 flex items-center gap-1.5 text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors p-1.5 rounded-md hover:bg-slate-400/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-red-900/50"
                         >
                             <RotateCcwIcon className="w-4 h-4" />
                             Retry

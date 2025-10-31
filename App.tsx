@@ -1,5 +1,3 @@
-
-
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import Header from './components/Header';
 import PromptInput from './components/PromptInput';
@@ -12,6 +10,8 @@ import { GripVerticalIcon } from './components/Icons';
 import { PANEL_DEFAULT_SIZE_PERCENT, PANEL_MIN_SIZE_PERCENT, PANEL_MAX_SIZE_PERCENT, RESET_ANIMATION_DURATION_MS } from './constants';
 import usePersistentState from './hooks/usePersistentState';
 import { useResizablePanels } from './hooks/useResizablePanels';
+
+declare const pako: any;
 
 const App: React.FC = () => {
   const [prompt, setPrompt] = usePersistentState<string>('prompt', '');
@@ -77,7 +77,8 @@ const App: React.FC = () => {
         if (hash) {
             try {
                 const decodedString = atob(decodeURIComponent(hash));
-                const data = JSON.parse(decodedString);
+                const decompressed = pako.inflate(decodedString, { to: 'string' });
+                const data = JSON.parse(decompressed);
                 if (data.prompt && data.react) {
                     setPrompt(data.prompt);
                     setResponse({ react: data.react });
