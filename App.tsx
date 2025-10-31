@@ -65,10 +65,17 @@ const App: React.FC = () => {
 
 
   useLayoutEffect(() => {
+    const lightHljs = document.getElementById('hljs-light') as HTMLLinkElement | null;
+    const darkHljs = document.getElementById('hljs-dark') as HTMLLinkElement | null;
+
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
+      if (lightHljs) lightHljs.disabled = true;
+      if (darkHljs) darkHljs.disabled = false;
     } else {
       document.documentElement.classList.remove('dark');
+      if (lightHljs) lightHljs.disabled = false;
+      if (darkHljs) darkHljs.disabled = true;
     }
     localStorage.setItem('theme', theme);
   }, [theme]);

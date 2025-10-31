@@ -9,6 +9,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Changed font to Inter for a more modern UI feel -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <!-- Syntax Highlighting Themes -->
+    <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css">
+    <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" disabled>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -24,6 +27,7 @@
           },
         }
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script type="importmap">
     {
@@ -99,6 +103,10 @@
     .dark body {
         background-color: theme(colors.slate.950);
         background-image: radial-gradient(circle at top, hsl(222 47% 11%), theme(colors.slate.950));
+    }
+    /* Ensure hljs theme background takes priority */
+    .hljs {
+        background: none;
     }
 </style>
 </head>

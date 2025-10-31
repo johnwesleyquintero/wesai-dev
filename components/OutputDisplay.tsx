@@ -7,6 +7,12 @@ import { quickStartPrompts, PromptTemplate } from '../copilot/prompts';
 type Theme = 'light' | 'dark';
 type ActiveTab = 'preview' | 'code';
 
+// Add hljs to the window object for TypeScript
+declare global {
+    interface Window { hljs: any; }
+}
+
+
 // --- SUB-COMPONENTS ---
 
 const PreviewPanel: React.FC<{ code: string; theme: Theme; }> = ({ code, theme }) => {
@@ -54,6 +60,7 @@ const PreviewPanel: React.FC<{ code: string; theme: Theme; }> = ({ code, theme }
 
 const CodeBlock: React.FC<{ code: string }> = ({ code }) => {
     const [isCopied, setIsCopied] = useState(false);
+    const codeRef = useRef<HTMLElement>(null);
 
     const handleCopy = useCallback(() => {
         if (!code) return;
@@ -61,6 +68,12 @@ const CodeBlock: React.FC<{ code: string }> = ({ code }) => {
             setIsCopied(true);
             setTimeout(() => setIsCopied(false), 2000);
         });
+    }, [code]);
+    
+    useEffect(() => {
+        if (codeRef.current && window.hljs) {
+            window.hljs.highlightElement(codeRef.current);
+        }
     }, [code]);
 
     if (!code) return null;
@@ -83,7 +96,7 @@ const CodeBlock: React.FC<{ code: string }> = ({ code }) => {
                     </div>
                 </div>
             </div>
-            <pre className="flex-1 bg-slate-50 dark:bg-slate-800 p-4 text-sm text-slate-800 dark:text-slate-300 whitespace-pre overflow-auto"><code>{code}</code></pre>
+            <pre className="flex-1 text-sm whitespace-pre overflow-auto"><code ref={codeRef} className="language-tsx">{code}</code></pre>
         </div>
     );
 };
@@ -274,7 +287,7 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
           return <PreviewPanel code={response.react} theme={theme} />;
       }
       return (
-        <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-b-md h-full flex flex-col">
+        <div className="bg-slate-50 dark:bg-slate-800/50 rounded-b-md h-full flex flex-col">
           <CodeBlock code={response.react} />
         </div>
       );
