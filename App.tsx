@@ -12,8 +12,18 @@ import { GripVerticalIcon } from './components/Icons';
 type Theme = 'light' | 'dark';
 
 const App: React.FC = () => {
-  const [prompt, setPrompt] = useState<string>('');
-  const [response, setResponse] = useState<CodeOutput | null>(null);
+  const [prompt, setPrompt] = useState<string>(() => localStorage.getItem('prompt') || '');
+  const [response, setResponse] = useState<CodeOutput | null>(() => {
+    const savedResponse = localStorage.getItem('response');
+    if (savedResponse) {
+        try {
+            return JSON.parse(savedResponse);
+        } catch (e) {
+            return null;
+        }
+    }
+    return null;
+  });
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isHelpOpen, setIsHelpOpen] = useState<boolean>(false);
@@ -24,9 +34,30 @@ const App: React.FC = () => {
   });
 
   // --- Resizable Panel Logic ---
-  const [dividerPosition, setDividerPosition] = useState(50);
+  const [dividerPosition, setDividerPosition] = useState(() => {
+    const savedPosition = localStorage.getItem('dividerPosition');
+    return savedPosition ? parseFloat(savedPosition) : 50;
+  });
   const [isDragging, setIsDragging] = useState(false);
   const mainContainerRef = useRef<HTMLDivElement>(null);
+  
+  // --- State Persistence ---
+  useEffect(() => {
+    localStorage.setItem('prompt', prompt);
+  }, [prompt]);
+
+  useEffect(() => {
+    if (response) {
+      localStorage.setItem('response', JSON.stringify(response));
+    } else {
+      localStorage.removeItem('response');
+    }
+  }, [response]);
+
+  useEffect(() => {
+    localStorage.setItem('dividerPosition', dividerPosition.toString());
+  }, [dividerPosition]);
+
 
   // Apply panel widths via CSS custom properties
   useEffect(() => {
@@ -121,6 +152,8 @@ const App: React.FC = () => {
     setPrompt('');
     setResponse(null);
     setError(null);
+    localStorage.removeItem('prompt');
+    localStorage.removeItem('response');
   }, []);
 
   return (
