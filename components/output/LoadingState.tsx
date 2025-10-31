@@ -26,7 +26,7 @@ const LoadingState: React.FC<{ prompt: string }> = ({ prompt }) => {
         <div className="flex flex-col items-center justify-center h-full text-center p-4">
              {prompt && (
                 <div className="w-full max-w-xl mb-8 p-3 bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg">
-                    <p className="text-sm text-slate-600 dark:text-slate-400 text-left">
+                    <p className="text-sm text-slate-600 dark:text-slate-400 text-left" title={prompt}>
                         <span className="font-semibold text-slate-700 dark:text-slate-300">Generating:</span>
                         <span className="line-clamp-2 ml-1">{prompt}</span>
                     </p>

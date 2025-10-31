@@ -49,6 +49,19 @@ const App: React.FC = () => {
     }
   }, [theme]);
 
+  // --- Dynamic Document Title ---
+  useLayoutEffect(() => {
+    const baseTitle = 'WesAI.Dev';
+    if (isLoading) {
+      document.title = `Generating... | ${baseTitle}`;
+    } else if (response && prompt) {
+        const promptSnippet = prompt.length > 30 ? `${prompt.substring(0, 30)}...` : prompt;
+        document.title = `Preview: ${promptSnippet} | ${baseTitle}`;
+    } else {
+        document.title = baseTitle;
+    }
+  }, [isLoading, response, prompt]);
+
   const toggleTheme = () => {
     setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
   };
@@ -89,6 +102,7 @@ const App: React.FC = () => {
   const handleReusePrompt = useCallback((newPrompt: string) => {
     setPrompt(newPrompt);
     setIsPromptHighlighting(true);
+    document.getElementById('prompt-input')?.focus();
     // Duration should be slightly longer than the animation
     setTimeout(() => setIsPromptHighlighting(false), 900);
   }, [setPrompt]);
@@ -132,7 +146,7 @@ const App: React.FC = () => {
             aria-valuemax={PANEL_MAX_SIZE_PERCENT}
             className="hidden md:flex w-4 cursor-col-resize flex-shrink-0 items-center justify-center group focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950 rounded-full transition-colors duration-300 group-hover:bg-indigo-500/10 dark:group-hover:bg-indigo-500/20"
         >
-            <div className={`w-0.5 h-16 bg-slate-300 dark:bg-slate-700 rounded-full transition-all relative ${isDragging ? 'duration-75 bg-indigo-500 scale-x-150 shadow-[0_0_15px_3px_theme(colors.indigo.500)]' : 'duration-300 group-hover:bg-indigo-500/60 group-hover:scale-x-125 group-focus:bg-indigo-500/60 group-focus:scale-x-125'}`}>
+            <div className={`w-0.5 h-16 bg-slate-300 dark:bg-slate-700 rounded-full transition-all relative ${isDragging ? 'duration-75 bg-indigo-500 scale-x-150 shadow-[0_0_15px_3px_theme(colors.indigo.500)]' : 'duration-300 group-hover:bg-indigo-500/60 group-hover:scale-x-125 group-hover:shadow-[0_0_15px_3px_theme(colors.indigo.500/30)] group-focus:bg-indigo-500/60 group-focus:scale-x-125'}`}>
                <div className={`absolute bottom-full mb-2.5 -translate-x-1/2 left-1/2 bg-slate-800 text-white text-xs font-mono py-1 px-2.5 rounded-md shadow-lg transition-opacity duration-200 pointer-events-none ${isDragging ? 'opacity-100' : 'opacity-0'}`}>
                     {Math.round(dividerPosition)}%&nbsp;/&nbsp;{100 - Math.round(dividerPosition)}%
                </div>
