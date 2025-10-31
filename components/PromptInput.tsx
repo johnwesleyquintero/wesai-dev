@@ -100,25 +100,29 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
             </div>
              <div className={`flex-shrink-0 overflow-hidden`}>
                 <div className={`transition-[max-height,opacity,margin] duration-500 ease-in-out ${prompt ? 'max-h-0 opacity-0' : 'max-h-96 opacity-100 mt-0'}`}>
-                    <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Quick Start</p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-2">
-                        {quickStartPrompts.map((p) => (
-                            <button 
-                                key={p.title} 
-                                onClick={() => {
-                                    setPrompt(p.prompt);
-                                    textareaRef.current?.focus();
-                                }} 
-                                className="text-left p-3 bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700/80 rounded-lg text-slate-600 dark:text-slate-300 transition-all duration-200 border border-slate-200 dark:border-slate-700/50 transform hover:scale-[1.03] hover:shadow-lg hover:border-indigo-400/50 dark:hover:border-indigo-500/50 flex items-start gap-3"
-                            >
-                                <div className="flex-shrink-0 mt-0.5">{getPromptIcon(p.key, 'w-5 h-5')}</div>
-                                <div>
-                                    <span className="font-semibold text-xs text-slate-800 dark:text-slate-100">{p.title}</span>
-                                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{p.description}</p>
-                                </div>
-                            </button>
-                        ))}
-                    </div>
+                    {quickStartPrompts && quickStartPrompts.length > 0 && (
+                        <>
+                            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Quick Start</p>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-2">
+                                {quickStartPrompts.map((p) => (
+                                    <button 
+                                        key={p.title} 
+                                        onClick={() => {
+                                            setPrompt(p.prompt);
+                                            textareaRef.current?.focus();
+                                        }} 
+                                        className="text-left p-3 bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700/80 rounded-lg text-slate-600 dark:text-slate-300 transition-all duration-200 border border-slate-200 dark:border-slate-700/50 transform hover:scale-[1.03] hover:shadow-lg hover:border-indigo-400/50 dark:hover:border-indigo-500/50 flex items-start gap-3"
+                                    >
+                                        <div className="flex-shrink-0 mt-0.5">{getPromptIcon(p.key, 'w-5 h-5')}</div>
+                                        <div>
+                                            <span className="font-semibold text-xs text-slate-800 dark:text-slate-100">{p.title}</span>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{p.description}</p>
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
             <div className="mt-auto flex-shrink-0 space-y-3 pt-4">
@@ -130,7 +134,7 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
                 >
                     {isLoading ? (
                     <>
-                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>

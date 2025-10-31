@@ -14,13 +14,8 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
   useEffect(() => {
     if (isOpen) {
       previouslyFocusedElement.current = document.activeElement as HTMLElement;
-      const focusableElements = modalRef.current?.querySelectorAll<HTMLElement>(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-      );
-      if (focusableElements && focusableElements.length > 0) {
-        // Focus the last element (the "Got it" button) by default
-        focusableElements[focusableElements.length - 1].focus();
-      }
+      // Focus the modal container itself for better screen reader context.
+      modalRef.current?.focus();
     } else {
       previouslyFocusedElement.current?.focus();
     }
@@ -65,14 +60,16 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
       onKeyDown={handleKeyDown}
       role="dialog"
       aria-modal="true"
+      aria-labelledby="help-modal-title"
     >
       <div
         ref={modalRef}
-        className="bg-white dark:bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-lg border border-slate-200 dark:border-slate-700 max-h-[80vh] overflow-y-auto animate-scale-in custom-scrollbar"
+        tabIndex={-1}
+        className="bg-white dark:bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-lg border border-slate-200 dark:border-slate-700 max-h-[80vh] overflow-y-auto animate-scale-in custom-scrollbar focus:outline-none"
         onClick={e => e.stopPropagation()}
       >
         <div className="flex justify-between items-center mb-6 sticky top-0 bg-white dark:bg-slate-800 py-2 -mt-2">
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white">Help & What's New</h2>
+          <h2 id="help-modal-title" className="text-xl font-bold text-slate-900 dark:text-white">Help & What's New</h2>
           <button 
             onClick={onClose} 
             className="p-1 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
