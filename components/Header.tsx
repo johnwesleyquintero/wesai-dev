@@ -57,7 +57,7 @@ const Header: React.FC<HeaderProps> = ({ onHelpClick, onResetClick }) => {
                     {isResetConfirming ? <CheckIcon className="w-5 h-5" /> : <RotateCcwIcon className="w-5 h-5" />}
                 </button>
                 <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-800 dark:bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 group-focus:opacity-100 group-focus:scale-100 transition-all pointer-events-none transform translate-y-0 group-hover:-translate-y-1 group-focus:-translate-y-1 duration-200">
-                    {isResetConfirming ? 'Are you sure?' : 'New Session'}
+                    {isResetConfirming ? 'Confirm Reset?' : 'New Session'}
                 </div>
             </div>
 

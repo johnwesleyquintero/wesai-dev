@@ -192,8 +192,11 @@ export const RotateCcwIcon: React.FC<{ className?: string }> = ({ className }) =
 
 export const GripVerticalIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
-        <circle cx="12" cy="5" r="1.5" />
-        <circle cx="12" cy="12" r="1.5" />
-        <circle cx="12" cy="19" r="1.5" />
+        <circle cx="9" cy="5" r="1.5" />
+        <circle cx="15" cy="5" r="1.5" />
+        <circle cx="9" cy="12" r="1.5" />
+        <circle cx="15" cy="12" r="1.5" />
+        <circle cx="9" cy="19" r="1.5" />
+        <circle cx="15" cy="19" r="1.5" />
     </svg>
 );
