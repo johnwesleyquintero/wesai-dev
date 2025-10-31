@@ -43,6 +43,12 @@ export const useResizablePanels = (mainContainerRef: React.RefObject<HTMLDivElem
         } else if (e.key === 'ArrowRight') {
             e.preventDefault();
             setDividerPosition(prev => Math.min(PANEL_MAX_SIZE_PERCENT, prev + 1));
+        } else if (e.key === 'Home') {
+            e.preventDefault();
+            setDividerPosition(PANEL_MIN_SIZE_PERCENT);
+        } else if (e.key === 'End') {
+            e.preventDefault();
+            setDividerPosition(PANEL_MAX_SIZE_PERCENT);
         }
     }, [setDividerPosition]);
 

@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef, useLayoutEffect } from 'react';
+import { useTheme } from '../contexts/ThemeContext';
 import { CodeOutput } from '../copilot/agent';
 import { CopyIcon, CheckIcon, EyeIcon, CodeIcon, RotateCcwIcon } from './Icons';
 import CodeBlock from './output/CodeBlock';
@@ -7,7 +8,6 @@ import InitialState from './output/InitialState';
 import LoadingState from './output/LoadingState';
 import PreviewPanel from './output/PreviewPanel';
 
-type Theme = 'light' | 'dark';
 type ActiveTab = 'preview' | 'code';
 
 // Add hljs to the window object for TypeScript
@@ -22,11 +22,11 @@ interface OutputDisplayProps {
   error: string | null;
   setPrompt: (prompt: string) => void;
   onReusePrompt: (prompt: string) => void;
-  theme: Theme;
   prompt: string;
 }
 
-const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, error, setPrompt, onReusePrompt, theme, prompt }) => {
+const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, error, setPrompt, onReusePrompt, prompt }) => {
+  const { theme } = useTheme();
   const [activeTab, setActiveTab] = useState<ActiveTab>('preview');
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [isReuseCopied, setIsReuseCopied] = useState(false);

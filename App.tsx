@@ -10,17 +10,12 @@ import { PANEL_DEFAULT_SIZE_PERCENT, PANEL_MIN_SIZE_PERCENT, PANEL_MAX_SIZE_PERC
 import usePersistentState from './hooks/usePersistentState';
 import { useResizablePanels } from './hooks/useResizablePanels';
 
-type Theme = 'light' | 'dark';
-
 const App: React.FC = () => {
   const [prompt, setPrompt] = usePersistentState<string>('prompt', '');
   const [response, setResponse] = usePersistentState<CodeOutput | null>('response', null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isHelpOpen, setIsHelpOpen] = useState<boolean>(false);
-  const [theme, setTheme] = usePersistentState<Theme>('theme', 
-    window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-  );
   const [isResetting, setIsResetting] = useState<boolean>(false);
   const [isPromptHighlighting, setIsPromptHighlighting] = useState<boolean>(false);
 
@@ -34,21 +29,6 @@ const App: React.FC = () => {
       handleDividerKeyDown
   } = useResizablePanels(mainContainerRef);
 
-  useLayoutEffect(() => {
-    const lightHljs = document.getElementById('hljs-light') as HTMLLinkElement | null;
-    const darkHljs = document.getElementById('hljs-dark') as HTMLLinkElement | null;
-
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-      if (lightHljs) lightHljs.disabled = true;
-      if (darkHljs) darkHljs.disabled = false;
-    } else {
-      document.documentElement.classList.remove('dark');
-      if (lightHljs) lightHljs.disabled = false;
-      if (darkHljs) darkHljs.disabled = true;
-    }
-  }, [theme]);
-
   // --- Dynamic Document Title ---
   useLayoutEffect(() => {
     const baseTitle = 'WesAI.Dev';
@@ -61,10 +41,6 @@ const App: React.FC = () => {
         document.title = baseTitle;
     }
   }, [isLoading, response, prompt]);
-
-  const toggleTheme = () => {
-    setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
-  };
 
   const handleGenerate = useCallback(async () => {
     if (!prompt.trim() || isLoading) return;
@@ -111,8 +87,6 @@ const App: React.FC = () => {
   return (
     <div className="h-screen flex flex-col bg-transparent transition-colors duration-300">
       <Header 
-        theme={theme}
-        onToggleTheme={toggleTheme}
         onHelpClick={() => setIsHelpOpen(true)}
         onResetClick={handleReset}
       />
@@ -165,7 +139,6 @@ const App: React.FC = () => {
             error={error}
             setPrompt={setPrompt}
             onReusePrompt={handleReusePrompt}
-            theme={theme}
             prompt={prompt}
           />
         </div>
