@@ -1,6 +1,4 @@
-
-
-import React, { useState, useCallback, useLayoutEffect, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useLayoutEffect, useRef } from 'react';
 import Header from './components/Header';
 import PromptInput from './components/PromptInput';
 import OutputDisplay from './components/OutputDisplay';
@@ -9,123 +7,32 @@ import { brainstormIdea } from './services/geminiService';
 import { CodeOutput } from './copilot/agent';
 import { GripVerticalIcon } from './components/Icons';
 import { PANEL_DEFAULT_SIZE_PERCENT, PANEL_MIN_SIZE_PERCENT, PANEL_MAX_SIZE_PERCENT, RESET_ANIMATION_DURATION_MS } from './constants';
+import usePersistentState from './hooks/usePersistentState';
+import { useResizablePanels } from './hooks/useResizablePanels';
 
 type Theme = 'light' | 'dark';
 
 const App: React.FC = () => {
-  const [prompt, setPrompt] = useState<string>(() => localStorage.getItem('prompt') || '');
-  const [response, setResponse] = useState<CodeOutput | null>(() => {
-    const savedResponse = localStorage.getItem('response');
-    if (savedResponse) {
-        try {
-            return JSON.parse(savedResponse);
-        } catch (e) {
-            return null;
-        }
-    }
-    return null;
-  });
+  const [prompt, setPrompt] = usePersistentState<string>('prompt', '');
+  const [response, setResponse] = usePersistentState<CodeOutput | null>('response', null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isHelpOpen, setIsHelpOpen] = useState<boolean>(false);
-  const [theme, setTheme] = useState<Theme>(() => {
-    const savedTheme = localStorage.getItem('theme') as Theme | null;
-    if (savedTheme) return savedTheme;
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  });
+  const [theme, setTheme] = usePersistentState<Theme>('theme', 
+    window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  );
   const [isResetting, setIsResetting] = useState<boolean>(false);
+  const [isPromptHighlighting, setIsPromptHighlighting] = useState<boolean>(false);
 
   // --- Resizable Panel Logic ---
-  const [dividerPosition, setDividerPosition] = useState(() => {
-    const savedPosition = localStorage.getItem('dividerPosition');
-    return savedPosition ? parseFloat(savedPosition) : PANEL_DEFAULT_SIZE_PERCENT;
-  });
-  const [isDragging, setIsDragging] = useState(false);
   const mainContainerRef = useRef<HTMLDivElement>(null);
-  
-  // --- State Persistence ---
-  useEffect(() => {
-    localStorage.setItem('prompt', prompt);
-  }, [prompt]);
-
-  useEffect(() => {
-    if (response) {
-      localStorage.setItem('response', JSON.stringify(response));
-    } else {
-      localStorage.removeItem('response');
-    }
-  }, [response]);
-
-  useEffect(() => {
-    localStorage.setItem('dividerPosition', dividerPosition.toString());
-  }, [dividerPosition]);
-
-
-  // Apply panel widths via CSS custom properties
-  useEffect(() => {
-    if (mainContainerRef.current) {
-      // The divider is 1rem (16px) wide on desktop
-      mainContainerRef.current.style.setProperty('--panel-one-width', `${dividerPosition}%`);
-      mainContainerRef.current.style.setProperty('--panel-two-width', `calc(100% - ${dividerPosition}% - 1rem)`);
-    }
-  }, [dividerPosition]);
-
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleMouseUp = useCallback(() => {
-    setIsDragging(false);
-  }, []);
-
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (isDragging && mainContainerRef.current) {
-      const containerRect = mainContainerRef.current.getBoundingClientRect();
-      const newPosition = ((e.clientX - containerRect.left) / containerRect.width) * 100;
-      
-      // Constrain panel sizes
-      if (newPosition > PANEL_MIN_SIZE_PERCENT && newPosition < PANEL_MAX_SIZE_PERCENT) {
-        setDividerPosition(newPosition);
-      }
-    }
-  }, [isDragging]);
-
-  const handleDividerKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'ArrowLeft') {
-        e.preventDefault();
-        setDividerPosition(prev => Math.max(PANEL_MIN_SIZE_PERCENT, prev - 1));
-    } else if (e.key === 'ArrowRight') {
-        e.preventDefault();
-        setDividerPosition(prev => Math.min(PANEL_MAX_SIZE_PERCENT, prev + 1));
-    }
-  }, []);
-
-  useEffect(() => {
-    const previewIframe = document.querySelector('iframe[title="Component Preview"]') as HTMLIFrameElement | null;
-
-    if (isDragging) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
-      document.body.style.cursor = 'col-resize';
-      document.body.style.userSelect = 'none';
-      if (previewIframe) {
-        previewIframe.style.pointerEvents = 'none';
-      }
-    }
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
-      if (previewIframe) {
-        previewIframe.style.pointerEvents = 'auto';
-      }
-    };
-  }, [isDragging, handleMouseMove, handleMouseUp]);
-  // --- End Resizable Panel Logic ---
-
+  const {
+      dividerPosition,
+      setDividerPosition,
+      isDragging,
+      handleMouseDown,
+      handleDividerKeyDown
+  } = useResizablePanels(mainContainerRef);
 
   useLayoutEffect(() => {
     const lightHljs = document.getElementById('hljs-light') as HTMLLinkElement | null;
@@ -140,7 +47,6 @@ const App: React.FC = () => {
       if (lightHljs) lightHljs.disabled = false;
       if (darkHljs) darkHljs.disabled = true;
     }
-    localStorage.setItem('theme', theme);
   }, [theme]);
 
   const toggleTheme = () => {
@@ -166,7 +72,7 @@ const App: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [prompt, isLoading]);
+  }, [prompt, isLoading, setResponse]);
 
   const handleReset = useCallback(() => {
     setIsResetting(true);
@@ -175,12 +81,18 @@ const App: React.FC = () => {
       setResponse(null);
       setError(null);
       setDividerPosition(PANEL_DEFAULT_SIZE_PERCENT);
-      localStorage.removeItem('prompt');
-      localStorage.removeItem('response');
-      localStorage.removeItem('dividerPosition');
+      // usePersistentState will handle removing from localStorage
       setIsResetting(false);
     }, RESET_ANIMATION_DURATION_MS); // Match animation duration
-  }, []);
+  }, [setPrompt, setResponse, setDividerPosition]);
+  
+  const handleReusePrompt = useCallback((newPrompt: string) => {
+    setPrompt(newPrompt);
+    setIsPromptHighlighting(true);
+    // Duration should be slightly longer than the animation
+    setTimeout(() => setIsPromptHighlighting(false), 900);
+  }, [setPrompt]);
+
 
   return (
     <div className="h-screen flex flex-col bg-transparent transition-colors duration-300">
@@ -195,7 +107,7 @@ const App: React.FC = () => {
         {/* Unified Layout */}
         <div 
           id="prompt-panel"
-          className={`flex flex-col md:h-full md:min-h-0 ${isResetting ? 'animate-fade-out' : ''}`}
+          className={`flex flex-col md:h-full md:min-h-0 ${isResetting ? 'animate-fade-out' : ''} ${!isDragging ? 'transition-[width] duration-200 ease-out' : ''}`}
           style={{ width: 'var(--panel-one-width, 100%)' }}
         >
            <PromptInput 
@@ -203,6 +115,7 @@ const App: React.FC = () => {
             setPrompt={setPrompt}
             handleGenerate={handleGenerate}
             isLoading={isLoading}
+            isHighlighting={isPromptHighlighting}
            />
         </div>
         
@@ -214,6 +127,9 @@ const App: React.FC = () => {
             aria-orientation="vertical"
             aria-controls="prompt-panel output-panel"
             aria-label="Resize panels"
+            aria-valuenow={Math.round(dividerPosition)}
+            aria-valuemin={PANEL_MIN_SIZE_PERCENT}
+            aria-valuemax={PANEL_MAX_SIZE_PERCENT}
             className="hidden md:flex w-4 cursor-col-resize flex-shrink-0 items-center justify-center group focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950 rounded-full transition-colors duration-300 group-hover:bg-indigo-500/10 dark:group-hover:bg-indigo-500/20"
         >
             <div className={`w-0.5 h-16 bg-slate-300 dark:bg-slate-700 rounded-full transition-all relative ${isDragging ? 'duration-75 bg-indigo-500 scale-x-150 shadow-[0_0_15px_3px_theme(colors.indigo.500)]' : 'duration-300 group-hover:bg-indigo-500/60 group-hover:scale-x-125 group-focus:bg-indigo-500/60 group-focus:scale-x-125'}`}>
@@ -226,7 +142,7 @@ const App: React.FC = () => {
         
         <div 
           id="output-panel"
-          className={`flex flex-col md:h-full md:min-h-0 ${isResetting ? 'animate-fade-out' : ''}`}
+          className={`flex flex-col md:h-full md:min-h-0 ${isResetting ? 'animate-fade-out' : ''} ${!isDragging ? 'transition-[width] duration-200 ease-out' : ''}`}
           style={{ width: 'var(--panel-two-width, 100%)' }}
         >
           <OutputDisplay
@@ -234,6 +150,7 @@ const App: React.FC = () => {
             isLoading={isLoading}
             error={error}
             setPrompt={setPrompt}
+            onReusePrompt={handleReusePrompt}
             theme={theme}
             prompt={prompt}
           />

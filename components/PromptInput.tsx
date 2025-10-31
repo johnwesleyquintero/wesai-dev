@@ -1,6 +1,6 @@
 
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { SparkleIcon, CloseIcon, CubeIcon } from './Icons';
 import { quickStartPrompts } from '../copilot/prompts';
 import { getPromptIcon } from './promptUtils';
@@ -10,10 +10,43 @@ interface PromptInputProps {
   setPrompt: (prompt: string) => void;
   handleGenerate: () => void;
   isLoading: boolean;
+  isHighlighting: boolean;
 }
 
-const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGenerate, isLoading }) => {
+const PRO_TIPS = [
+  "Press <kbd>Cmd</kbd> + <kbd>Enter</kbd> to generate.",
+  "Be specific for better results. Try describing colors, layout, and state.",
+  "Need icons? Ask for 'inline SVGs' in your prompt for best results.",
+  "WesAI is great for brainstorming variations. Try asking for 'another version'.",
+  "Describe animations like 'a button that pulses on hover' for interactive results."
+];
+
+const ProTip: React.FC<{ tip: string }> = ({ tip }) => {
+  const parts = tip.split(/(\<kbd\>.*?\<\/kbd\>)/g);
+  return (
+    <p className="text-center text-xs text-slate-500 dark:text-slate-400">
+      Pro Tip: {parts.map((part, index) => {
+        if (part.startsWith('<kbd>')) {
+          return (
+            <kbd key={index} className="font-sans mx-0.5 px-1.5 py-0.5 border border-slate-300 dark:border-slate-600 bg-slate-200/50 dark:bg-slate-700/50 rounded-md">
+              {part.replace(/<\/?kbd>/g, '')}
+            </kbd>
+          );
+        }
+        return <React.Fragment key={index}>{part}</React.Fragment>;
+      })}
+    </p>
+  );
+};
+
+const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGenerate, isLoading, isHighlighting }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [proTip, setProTip] = useState<string>('');
+  
+  useEffect(() => {
+    // Select a random pro tip on component mount
+    setProTip(PRO_TIPS[Math.floor(Math.random() * PRO_TIPS.length)]);
+  }, []);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
@@ -50,9 +83,9 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="e.g., A responsive login form with a 'remember me' checkbox and a pulsing gradient on the submit button... (Cmd+Enter to generate)"
+                  placeholder="e.g., A responsive login form with a 'remember me' checkbox and a pulsing gradient on the submit button..."
                   rows={3}
-                  className="w-full p-4 pr-10 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 resize-none placeholder:text-slate-500 dark:placeholder:text-slate-500 focus:bg-white dark:focus:bg-slate-900/50 max-h-96"
+                  className={`w-full p-4 pr-10 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 resize-none placeholder:text-slate-500 dark:placeholder:text-slate-500 focus:bg-white dark:focus:bg-slate-900/50 max-h-96 ${isHighlighting ? 'animate-pulse-indigo-glow' : ''}`}
                   disabled={isLoading}
                 />
                 {prompt && (
@@ -65,28 +98,31 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
                 </button>
                 )}
             </div>
-             <div className="flex-shrink-0">
-                <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Quick Start</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-2">
-                    {quickStartPrompts.map((p) => (
-                         <button 
-                            key={p.title} 
-                            onClick={() => setPrompt(p.prompt)} 
-                            className="text-left p-3 bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700/80 rounded-lg text-slate-600 dark:text-slate-300 transition-all duration-200 border border-slate-200 dark:border-slate-700/50 transform hover:scale-[1.03] hover:shadow-lg hover:border-indigo-400/50 dark:hover:border-indigo-500/50 flex items-start gap-3"
-                         >
-                            <div className="flex-shrink-0 mt-0.5">{getPromptIcon(p.key, 'w-5 h-5')}</div>
-                            <div>
-                                <span className="font-semibold text-xs text-slate-800 dark:text-slate-100">{p.title}</span>
-                                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{p.description}</p>
-                            </div>
-                        </button>
-                    ))}
+             <div className={`flex-shrink-0 overflow-hidden`}>
+                <div className={`transition-[max-height,opacity,margin] duration-500 ease-in-out ${prompt ? 'max-h-0 opacity-0' : 'max-h-96 opacity-100 mt-0'}`}>
+                    <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Quick Start</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-2">
+                        {quickStartPrompts.map((p) => (
+                            <button 
+                                key={p.title} 
+                                onClick={() => {
+                                    setPrompt(p.prompt);
+                                    textareaRef.current?.focus();
+                                }} 
+                                className="text-left p-3 bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700/80 rounded-lg text-slate-600 dark:text-slate-300 transition-all duration-200 border border-slate-200 dark:border-slate-700/50 transform hover:scale-[1.03] hover:shadow-lg hover:border-indigo-400/50 dark:hover:border-indigo-500/50 flex items-start gap-3"
+                            >
+                                <div className="flex-shrink-0 mt-0.5">{getPromptIcon(p.key, 'w-5 h-5')}</div>
+                                <div>
+                                    <span className="font-semibold text-xs text-slate-800 dark:text-slate-100">{p.title}</span>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{p.description}</p>
+                                </div>
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </div>
             <div className="mt-auto flex-shrink-0 space-y-3 pt-4">
-                <p className="text-center text-xs text-slate-500 dark:text-slate-400">
-                    Pro Tip: Press <kbd className="font-sans px-1.5 py-0.5 border border-slate-300 dark:border-slate-600 bg-slate-200/50 dark:bg-slate-700/50 rounded-md">Cmd</kbd> + <kbd className="font-sans px-1.5 py-0.5 border border-slate-300 dark:border-slate-600 bg-slate-200/50 dark:bg-slate-700/50 rounded-md">Enter</kbd> to generate.
-                </p>
+                {proTip && <ProTip tip={proTip} />}
                 <button
                     onClick={handleGenerate}
                     disabled={isLoading || !prompt.trim()}
