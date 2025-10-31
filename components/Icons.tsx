@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 
 // --- ICONS ---
@@ -131,7 +132,7 @@ export const WesAILogoSpinnerIcon: React.FC<{className?: string}> = ({className}
                 </linearGradient>
             </defs>
             {/* The static 'W' logo */}
-            <path d="M8 10 L12 22 L16 12 L20 22 L24 10" stroke="url(#spinnerGrad)" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" className="opacity-40"/>
+            <path d="M8 10 L12 22 L16 12 L20 22 L24 10" stroke="url(#spinnerGrad)" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-subtle"/>
         </svg>
     </div>
 );

@@ -1,4 +1,5 @@
 
+
 import React, { useState, useCallback, useEffect, useRef, useLayoutEffect } from 'react';
 import { CodeOutput } from '../copilot/agent';
 import { CopyIcon, CheckIcon, AlertTriangleIcon, EyeIcon, CodeIcon, InitialStateLogoIcon, LandingPageIcon, WritingAppIcon, TodoListIcon, WesAILogoSpinnerIcon } from './Icons';
@@ -32,19 +33,24 @@ const PreviewPanel: React.FC<{ code: string; theme: Theme; }> = ({ code, theme }
         };
     }, []);
     
-    // Post messages to the iframe when it's ready and when code/theme changes
+    // Decouple theme updates from code rendering to prevent unnecessary re-renders in the sandbox.
+    useEffect(() => {
+        if (isSandboxReady && iframeRef.current?.contentWindow) {
+            iframeRef.current.contentWindow.postMessage({
+                type: 'RENDER_CODE',
+                payload: { code }
+            }, '*');
+        }
+    }, [code, isSandboxReady]);
+
     useEffect(() => {
         if (isSandboxReady && iframeRef.current?.contentWindow) {
             iframeRef.current.contentWindow.postMessage({
                 type: 'SET_THEME',
                 payload: { theme }
             }, '*');
-            iframeRef.current.contentWindow.postMessage({
-                type: 'RENDER_CODE',
-                payload: { code }
-            }, '*');
         }
-    }, [code, theme, isSandboxReady]);
+    }, [theme, isSandboxReady]);
 
     return (
         <iframe
@@ -61,6 +67,11 @@ const PreviewPanel: React.FC<{ code: string; theme: Theme; }> = ({ code, theme }
 const CodeBlock: React.FC<{ code: string }> = ({ code }) => {
     const [isCopied, setIsCopied] = useState(false);
     const codeRef = useRef<HTMLElement>(null);
+    const [lines, setLines] = useState<string[]>([]);
+
+    useEffect(() => {
+        setLines(code.split('\n'));
+    }, [code]);
 
     const handleCopy = useCallback(() => {
         if (!code) return;
@@ -96,7 +107,16 @@ const CodeBlock: React.FC<{ code: string }> = ({ code }) => {
                     </div>
                 </div>
             </div>
-            <pre className="flex-1 text-sm whitespace-pre overflow-auto"><code ref={codeRef} className="language-tsx">{code}</code></pre>
+            <div className="flex-1 overflow-auto text-sm">
+                 <div className="flex items-start">
+                    <div aria-hidden="true" className="sticky top-0 select-none text-right pr-4 text-slate-500 dark:text-slate-600" style={{ lineHeight: '1.6', paddingTop: '0.5rem', paddingBottom: '0.5rem' }}>
+                        {lines.map((_, index) => (
+                            <div key={index}>{index + 1}</div>
+                        ))}
+                    </div>
+                    <pre className="flex-1 whitespace-pre !m-0 !p-0"><code ref={codeRef} className="language-tsx">{code}</code></pre>
+                 </div>
+            </div>
         </div>
     );
 };
@@ -168,6 +188,9 @@ const LoadingState: React.FC<{ prompt: string }> = ({ prompt }) => {
                         <span className="font-semibold text-slate-700 dark:text-slate-300">Generating:</span>
                         <span className="line-clamp-2 ml-1">{prompt}</span>
                     </p>
+                    <div className="mt-3 w-full h-1 bg-slate-200 dark:bg-slate-700/50 rounded-full overflow-hidden">
+                        <div className="w-full h-full bg-gradient-to-r from-indigo-500 to-purple-500 animate-indeterminate-progress"></div>
+                    </div>
                 </div>
             )}
             <WesAILogoSpinnerIcon className="w-24 h-24" />

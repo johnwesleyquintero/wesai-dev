@@ -32,6 +32,7 @@ const App: React.FC = () => {
     if (savedTheme) return savedTheme;
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   });
+  const [isResetting, setIsResetting] = useState<boolean>(false);
 
   // --- Resizable Panel Logic ---
   const [dividerPosition, setDividerPosition] = useState(() => {
@@ -90,18 +91,36 @@ const App: React.FC = () => {
     }
   }, [isDragging]);
 
+  const handleDividerKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        setDividerPosition(prev => Math.max(25, prev - 1));
+    } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        setDividerPosition(prev => Math.min(75, prev + 1));
+    }
+  }, []);
+
   useEffect(() => {
+    const previewIframe = document.querySelector('iframe[title="Component Preview"]') as HTMLIFrameElement | null;
+
     if (isDragging) {
       window.addEventListener('mousemove', handleMouseMove);
       window.addEventListener('mouseup', handleMouseUp);
       document.body.style.cursor = 'col-resize';
       document.body.style.userSelect = 'none';
+      if (previewIframe) {
+        previewIframe.style.pointerEvents = 'none';
+      }
     }
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
+      if (previewIframe) {
+        previewIframe.style.pointerEvents = 'auto';
+      }
     };
   }, [isDragging, handleMouseMove, handleMouseUp]);
   // --- End Resizable Panel Logic ---
@@ -149,11 +168,17 @@ const App: React.FC = () => {
   }, [prompt, isLoading]);
 
   const handleReset = useCallback(() => {
-    setPrompt('');
-    setResponse(null);
-    setError(null);
-    localStorage.removeItem('prompt');
-    localStorage.removeItem('response');
+    setIsResetting(true);
+    setTimeout(() => {
+      setPrompt('');
+      setResponse(null);
+      setError(null);
+      setDividerPosition(50);
+      localStorage.removeItem('prompt');
+      localStorage.removeItem('response');
+      localStorage.removeItem('dividerPosition');
+      setIsResetting(false);
+    }, 300); // Match animation duration
   }, []);
 
   return (
@@ -168,7 +193,8 @@ const App: React.FC = () => {
         
         {/* Unified Layout */}
         <div 
-          className="flex flex-col md:h-full md:min-h-0" 
+          id="prompt-panel"
+          className={`flex flex-col md:h-full md:min-h-0 ${isResetting ? 'animate-fade-out' : ''}`}
           style={{ width: 'var(--panel-one-width, 100%)' }}
         >
            <PromptInput 
@@ -181,15 +207,25 @@ const App: React.FC = () => {
         
         <div 
             onMouseDown={handleMouseDown}
-            className="hidden md:flex w-4 cursor-col-resize flex-shrink-0 items-center justify-center group"
+            onKeyDown={handleDividerKeyDown}
+            role="separator"
+            tabIndex={0}
+            aria-orientation="vertical"
+            aria-controls="prompt-panel output-panel"
+            aria-label="Resize panels"
+            className="hidden md:flex w-4 cursor-col-resize flex-shrink-0 items-center justify-center group focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950 rounded-full"
         >
-            <div className={`w-0.5 h-16 bg-slate-300 dark:bg-slate-700 rounded-full transition-all duration-300 relative ${isDragging ? 'bg-indigo-500 scale-x-150 shadow-[0_0_12px_2px_theme(colors.indigo.500)]' : 'group-hover:bg-indigo-500/60 group-hover:scale-x-125'}`}>
-               <GripVerticalIcon className="absolute text-slate-500 dark:text-slate-400 w-5 h-5 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-60 group-hover:opacity-100 transition-all duration-200" />
+            <div className={`w-0.5 h-16 bg-slate-300 dark:bg-slate-700 rounded-full transition-all relative ${isDragging ? 'duration-75 bg-indigo-500 scale-x-150 shadow-[0_0_15px_3px_theme(colors.indigo.500)]' : 'duration-300 group-hover:bg-indigo-500/60 group-hover:scale-x-125 group-focus:bg-indigo-500/60 group-focus:scale-x-125'}`}>
+               <div className={`absolute bottom-full mb-2.5 -translate-x-1/2 left-1/2 bg-slate-800 text-white text-xs font-mono py-1 px-2.5 rounded-md shadow-lg transition-opacity duration-200 pointer-events-none ${isDragging ? 'opacity-100' : 'opacity-0'}`}>
+                    {Math.round(dividerPosition)}%&nbsp;/&nbsp;{100 - Math.round(dividerPosition)}%
+               </div>
+               <GripVerticalIcon className={`absolute text-slate-500 dark:text-slate-400 w-5 h-5 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-80 group-hover:opacity-100 group-focus:opacity-100 group-active:text-indigo-600 dark:group-active:text-indigo-400 transition-all duration-200 ${isDragging ? 'text-indigo-600 dark:text-indigo-400' : ''}`} />
             </div>
         </div>
         
         <div 
-          className="flex flex-col md:h-full md:min-h-0" 
+          id="output-panel"
+          className={`flex flex-col md:h-full md:min-h-0 ${isResetting ? 'animate-fade-out' : ''}`}
           style={{ width: 'var(--panel-two-width, 100%)' }}
         >
           <OutputDisplay
@@ -202,8 +238,12 @@ const App: React.FC = () => {
           />
         </div>
       </main>
-      <footer className="text-center py-3 px-4 sm:px-6 lg:px-8 text-slate-500 dark:text-slate-500 text-xs bg-slate-100/80 dark:bg-slate-950/80 backdrop-blur-lg sticky bottom-0 z-10">
-        © 2024 WesAI.Dev | Powered by <a href="https://ai.google.dev/" target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:underline">Google Gemini</a>.
+      <footer className="text-center py-3 px-4 sm:px-6 lg:px-8 text-slate-500 dark:text-slate-500 text-xs bg-slate-100/80 dark:bg-slate-950/80 backdrop-blur-lg sticky bottom-0 z-10 flex flex-wrap justify-center items-center gap-x-2">
+        <span>© 2024 WesAI.Dev</span>
+        <span className="text-slate-400 dark:text-slate-600 hidden sm:inline">|</span>
+        <span>A <a href="https://jwq.dev" target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:underline">John Wesley Quintero</a> Project</span>
+        <span className="text-slate-400 dark:text-slate-600 hidden sm:inline">|</span>
+        <span>Powered by <a href="https://ai.google.dev/" target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:underline">Google Gemini</a>.</span>
       </footer>
       <HelpModal
         isOpen={isHelpOpen}
