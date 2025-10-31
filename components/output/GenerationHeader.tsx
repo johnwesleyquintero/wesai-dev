@@ -72,10 +72,13 @@ const GenerationHeader: React.FC<GenerationHeaderProps> = ({ prompt, response, o
 
   return (
     <div className="flex items-center gap-2 border-l border-slate-300 dark:border-slate-700 pl-3 min-w-0">
-      <div className="bg-slate-200/70 dark:bg-slate-800/70 rounded-full px-2.5 py-1 min-w-0">
-        <p className="text-sm text-slate-600 dark:text-slate-400 whitespace-nowrap overflow-hidden text-ellipsis" title={prompt}>
+      <div className="relative group bg-slate-200/70 dark:bg-slate-800/70 rounded-full px-2.5 py-1 min-w-0">
+        <p className="text-sm text-slate-600 dark:text-slate-400 whitespace-nowrap overflow-hidden text-ellipsis">
             {prompt}
         </p>
+        <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-max max-w-xs sm:max-w-sm md:max-w-md whitespace-normal break-words rounded-md bg-slate-800 dark:bg-slate-900 px-3 py-2 text-xs font-semibold text-white opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all pointer-events-none z-10 shadow-lg">
+          {prompt}
+        </div>
       </div>
       <div className="relative group flex-shrink-0">
         <button

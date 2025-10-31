@@ -105,7 +105,7 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
                   placeholder="e.g., A responsive login form with a 'remember me' checkbox and a pulsing gradient on the submit button..."
                   rows={3}
                   maxLength={PROMPT_MAX_LENGTH}
-                  className={`font-mono w-full p-4 pr-10 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 resize-none placeholder:text-slate-500 dark:placeholder:text-slate-500 focus:bg-white dark:focus:bg-slate-900/50 max-h-96 ${isHighlighting ? 'animate-pulse-indigo-glow' : ''}`}
+                  className={`font-mono w-full p-4 pr-10 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 resize-none placeholder:text-slate-500 dark:placeholder:text-slate-400 focus:bg-white dark:focus:bg-slate-900/50 max-h-96 ${isHighlighting ? 'animate-pulse-indigo-glow' : ''}`}
                   disabled={isLoading}
                 />
                 {prompt && (

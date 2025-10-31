@@ -47,7 +47,7 @@ export const CopyIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
 );
 
 export const CheckIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" {...props}>
         <path d="M20 6 9 17l-5-5" />
     </svg>
 );
@@ -119,7 +119,7 @@ export const InitialStateLogoIcon: React.FC<React.SVGProps<SVGSVGElement>> = (pr
                 <stop offset="100%" style={{stopColor: '#06b6d4'}}/>
             </linearGradient>
         </defs>
-        <path d="M8 10 L12 22 L16 12 L20 22 L24 10" stroke="url(#logoGrad)" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-glow"/>
+        <path d="M8 10 L12 22 L16 12 L20 22 L24 10" stroke="url(#logoGrad)" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-glow"/>
     </svg>
 );
 
@@ -145,7 +145,7 @@ export const WesAILogoSpinnerIcon: React.FC<{className?: string}> = ({className}
                 </linearGradient>
             </defs>
             {/* The static 'W' logo */}
-            <path d="M8 10 L12 22 L16 12 L20 22 L24 10" stroke="url(#spinnerGrad)" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-subtle"/>
+            <path d="M8 10 L12 22 L16 12 L20 22 L24 10" stroke="url(#spinnerGrad)" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-subtle"/>
         </svg>
     </div>
 );
