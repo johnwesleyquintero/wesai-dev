@@ -26,9 +26,10 @@ interface OutputDisplayProps {
   setPrompt: (prompt: string) => void;
   onReusePrompt: (prompt: string) => void;
   prompt: string;
+  onRetry?: () => void;
 }
 
-const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, error, setPrompt, onReusePrompt, prompt }) => {
+const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, error, setPrompt, onReusePrompt, prompt, onRetry }) => {
   const { theme } = useTheme();
   const [activeTab, setActiveTab] = useState<ActiveTab>('preview');
   const [previewError, setPreviewError] = useState<string | null>(null);
@@ -92,7 +93,7 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
   }
   
   const renderContent = () => {
-    if (error) return <ErrorDisplay error={error} title="Generation Error" />;
+    if (error) return <ErrorDisplay error={error} title="Generation Error" onRetry={onRetry} />;
     if (response) {
       if (activeTab === 'preview') {
           if (previewError) {

@@ -1,4 +1,5 @@
 
+
 import React, { useRef, useEffect } from 'react';
 import { CloseIcon, CheckCircleIcon } from './Icons';
 
@@ -59,6 +60,19 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
     { text: 'Resizable Panels:', description: "On desktop, you can now drag the divider between the input and output panels to resize them to your liking." },
     { text: 'UI/UX Overhaul:', description: "Refreshed the entire interface with a cleaner header, improved spacing, and more polished components for a professional feel." },
   ];
+  
+  const shortcuts = [
+    { keys: ['Cmd', 'Ctrl'], plus: true, final: 'Enter', description: 'Generate Component' },
+    { keys: ['←', '→'], description: 'Resize Panels (divider selected)' },
+    { keys: ['Home', 'End'], description: 'Set panel to min/max size' },
+    { keys: ['Esc'], description: 'Close this modal' },
+  ];
+  
+  const Key = ({ children }) => (
+    <kbd className="font-sans mx-0.5 px-1.5 py-0.5 border border-slate-300 dark:border-slate-600 bg-slate-200/50 dark:bg-slate-700/50 rounded-md">
+      {children}
+    </kbd>
+  );
 
   return (
     <div
@@ -97,6 +111,25 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
                             <span>
                                 <span className="font-semibold text-slate-800 dark:text-slate-200">{item.text}</span> {item.description}
                             </span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+            
+            {/* Keyboard Shortcuts Section */}
+            <div>
+                <h3 className="text-lg font-semibold text-indigo-600 dark:text-indigo-400 mb-4 border-b border-slate-200 dark:border-slate-700 pb-2">Keyboard Shortcuts</h3>
+                <div className="space-y-3 text-sm">
+                    {shortcuts.map((shortcut, index) => (
+                        <div key={index} className="flex justify-between items-center gap-4">
+                            <p className="text-slate-800 dark:text-slate-200">{shortcut.description}</p>
+                            <div className="flex-shrink-0">
+                                <Key>{shortcut.keys[0]}</Key>
+                                {shortcut.keys.length > 1 && <span className="mx-0.5 text-slate-400 dark:text-slate-500">/</span>}
+                                {shortcut.keys[1] && <Key>{shortcut.keys[1]}</Key>}
+                                {shortcut.plus && <span className="mx-0.5 text-slate-400 dark:text-slate-500">+</span>}
+                                {shortcut.final && <Key>{shortcut.final}</Key>}
+                            </div>
                         </div>
                     ))}
                 </div>

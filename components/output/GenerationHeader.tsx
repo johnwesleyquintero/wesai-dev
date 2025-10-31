@@ -1,7 +1,11 @@
 
-import React, { useState, useCallback } from 'react';
+
+
+import React, { useCallback } from 'react';
+import { useToast } from '../../contexts/ToastContext';
 import { CodeOutput } from '../../copilot/agent';
-import { CopyIcon, CheckIcon, RotateCcwIcon, ShareIcon } from '../Icons';
+import { CopyIcon, RotateCcwIcon, ShareIcon, CheckIcon } from '../Icons';
+import { useActionFeedback } from '../../hooks/useActionFeedback';
 
 interface GenerationHeaderProps {
   prompt: string;
@@ -10,45 +14,60 @@ interface GenerationHeaderProps {
 }
 
 const GenerationHeader: React.FC<GenerationHeaderProps> = ({ prompt, response, onReusePrompt }) => {
-  const [isReuseCopied, setIsReuseCopied] = useState(false);
-  const [isPromptCopied, setIsPromptCopied] = useState(false);
-  const [isShareLinkCopied, setIsShareLinkCopied] = useState(false);
+  const { addToast } = useToast();
+  const { isActionDone: isPromptCopied, trigger: triggerPromptCopied } = useActionFeedback();
+  const { isActionDone: isShared, trigger: triggerShared } = useActionFeedback();
 
   const handleReusePrompt = useCallback(() => {
     if (prompt) {
       onReusePrompt(prompt);
-      setIsReuseCopied(true);
-      setTimeout(() => setIsReuseCopied(false), 2000);
+      addToast('Prompt copied to input');
     }
-  }, [prompt, onReusePrompt]);
+  }, [prompt, onReusePrompt, addToast]);
 
   const handleCopyPrompt = useCallback(() => {
     if (prompt) {
       navigator.clipboard.writeText(prompt);
-      setIsPromptCopied(true);
-      setTimeout(() => setIsPromptCopied(false), 2000);
+      addToast('Prompt copied to clipboard');
+      triggerPromptCopied();
     }
-  }, [prompt]);
+  }, [prompt, addToast, triggerPromptCopied]);
 
-  const handleShare = useCallback(() => {
+  const handleShare = useCallback(async () => {
     if (prompt && response) {
       try {
         const data = { prompt, react: response.react };
         const jsonString = JSON.stringify(data);
         const encoded = btoa(jsonString);
-
         const url = new URL(window.location.href);
         url.hash = encodeURIComponent(encoded);
 
-        navigator.clipboard.writeText(url.toString()).then(() => {
-          setIsShareLinkCopied(true);
-          setTimeout(() => setIsShareLinkCopied(false), 2000);
-        });
+        const shareData = {
+          title: 'WesAI.Dev Generation',
+          text: `Check out this component I generated with WesAI: "${prompt}"`,
+          url: url.toString(),
+        };
+
+        // Use Web Share API if available (for mobile, etc.)
+        if (navigator.share) {
+          await navigator.share(shareData);
+          addToast('Shared successfully!');
+          triggerShared();
+        } else {
+          // Fallback to copying the link for desktop browsers
+          await navigator.clipboard.writeText(url.toString());
+          addToast('Shareable link copied!');
+          triggerShared();
+        }
       } catch (e) {
-        console.error("Failed to create share link:", e);
+        // Don't show an error if the user cancels the share sheet
+        if (e instanceof Error && e.name !== 'AbortError') {
+          console.error("Failed to share:", e);
+          addToast('Failed to create share link', 'error');
+        }
       }
     }
-  }, [prompt, response]);
+  }, [prompt, response, addToast, triggerShared]);
 
   return (
     <div className="flex items-center gap-1.5 border-l border-slate-300 dark:border-slate-700 pl-2 min-w-0">
@@ -58,10 +77,11 @@ const GenerationHeader: React.FC<GenerationHeaderProps> = ({ prompt, response, o
       <div className="relative group flex-shrink-0">
         <button
           onClick={handleCopyPrompt}
-          className="p-1.5 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-700/70 transition-colors duration-200"
+          disabled={isPromptCopied}
+          className="p-1.5 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-700/70 transition-colors duration-200 disabled:text-green-500"
           aria-label="Copy this prompt"
         >
-          {isPromptCopied ? <CheckIcon className="w-4 h-4 text-green-500 animate-scale-in" /> : <CopyIcon className="w-4 h-4" />}
+          {isPromptCopied ? <CheckIcon className="w-4 h-4" /> : <CopyIcon className="w-4 h-4" />}
         </button>
         <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-800 dark:bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 group-hover:opacity-100 transition-all pointer-events-none">
           {isPromptCopied ? 'Copied!' : 'Copy Prompt'}
@@ -73,22 +93,23 @@ const GenerationHeader: React.FC<GenerationHeaderProps> = ({ prompt, response, o
           className="p-1.5 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-700/70 transition-colors duration-200"
           aria-label="Reuse this prompt"
         >
-          {isReuseCopied ? <CheckIcon className="w-4 h-4 text-green-500 animate-scale-in" /> : <RotateCcwIcon className="w-4 h-4" />}
+          <RotateCcwIcon className="w-4 h-4" />
         </button>
         <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-800 dark:bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 group-hover:opacity-100 transition-all pointer-events-none">
-          {isReuseCopied ? 'Copied to Input!' : 'Reuse Prompt'}
+          Reuse Prompt
         </div>
       </div>
       <div className="relative group flex-shrink-0">
         <button
           onClick={handleShare}
-          className="p-1.5 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-700/70 transition-colors duration-200"
+          disabled={isShared}
+          className="p-1.5 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-700/70 transition-colors duration-200 disabled:text-green-500"
           aria-label="Share this generation"
         >
-          {isShareLinkCopied ? <CheckIcon className="w-4 h-4 text-green-500 animate-scale-in" /> : <ShareIcon className="w-4 h-4" />}
+          {isShared ? <CheckIcon className="w-4 h-4" /> : <ShareIcon className="w-4 h-4" />}
         </button>
         <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-800 dark:bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 group-hover:opacity-100 transition-all pointer-events-none">
-          {isShareLinkCopied ? 'Link Copied!' : 'Share'}
+          {isShared ? 'Link Copied!' : 'Share'}
         </div>
       </div>
     </div>

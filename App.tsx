@@ -1,5 +1,6 @@
 
-import React, { useState, useCallback, useLayoutEffect, useRef } from 'react';
+
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import Header from './components/Header';
 import PromptInput from './components/PromptInput';
 import OutputDisplay from './components/OutputDisplay';
@@ -21,6 +22,7 @@ const App: React.FC = () => {
   const [isResetting, setIsResetting] = useState<boolean>(false);
   const [isPromptHighlighting, setIsPromptHighlighting] = useState<boolean>(false);
   const [isResetModalOpen, setIsResetModalOpen] = useState<boolean>(false);
+  const [ariaLiveMessage, setAriaLiveMessage] = useState<string>('');
 
   // --- Resizable Panel Logic ---
   const mainContainerRef = useRef<HTMLDivElement>(null);
@@ -33,7 +35,7 @@ const App: React.FC = () => {
   } = useResizablePanels(mainContainerRef);
 
   // --- Dynamic Document Title ---
-  useLayoutEffect(() => {
+  useEffect(() => {
     const baseTitle = 'WesAI.Dev';
     if (isLoading) {
       document.title = `Generating... | ${baseTitle}`;
@@ -45,8 +47,31 @@ const App: React.FC = () => {
     }
   }, [isLoading, response, prompt]);
   
+  // --- Accessibility: ARIA Live Region for Screen Readers ---
+  useEffect(() => {
+    if (isLoading) {
+      setAriaLiveMessage('Generation started.');
+    }
+  }, [isLoading]);
+
+  useEffect(() => {
+    if (error) {
+      setAriaLiveMessage(`An error occurred: ${error}`);
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (!isLoading && response && !error) {
+        // Announce completion after a short delay to feel more natural
+        const timer = setTimeout(() => {
+            setAriaLiveMessage('Generation complete. Preview is now available.');
+        }, 500);
+        return () => clearTimeout(timer);
+    }
+  }, [isLoading, response, error]);
+
   // --- Handle Shared Links on Load ---
-  useLayoutEffect(() => {
+  useEffect(() => {
     const handleHash = () => {
         const hash = window.location.hash.substring(1);
         if (hash) {
@@ -114,6 +139,11 @@ const App: React.FC = () => {
 
   return (
     <div className="h-screen flex flex-col bg-transparent transition-colors duration-300">
+      {/* Visually hidden container for screen reader announcements */}
+      <div aria-live="polite" className="sr-only">
+        {ariaLiveMessage}
+      </div>
+
       <Header 
         onHelpClick={() => setIsHelpOpen(true)}
         onResetClick={() => setIsResetModalOpen(true)}
@@ -148,7 +178,7 @@ const App: React.FC = () => {
             aria-valuemax={PANEL_MAX_SIZE_PERCENT}
             className="hidden md:flex w-4 cursor-col-resize flex-shrink-0 items-center justify-center group focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950 rounded-full transition-colors duration-300"
         >
-            <div className={`w-0.5 h-16 bg-slate-200 dark:bg-slate-800 rounded-full transition-all relative ${isDragging ? 'duration-75 bg-indigo-500 scale-x-150 shadow-[0_0_15px_3px_theme(colors.indigo.500)]' : 'duration-300 group-hover:bg-indigo-500/60 group-focus-visible:bg-indigo-500/60'}`}>
+            <div className={`w-0.5 h-16 bg-slate-200 dark:bg-slate-800 rounded-full transition-all relative ${isDragging ? 'duration-75 bg-indigo-500 scale-x-150 shadow-xl shadow-indigo-500/30' : 'duration-300 group-hover:bg-indigo-500/60 group-focus-visible:bg-indigo-500/60'}`}>
                <div className={`absolute bottom-full mb-2.5 -translate-x-1/2 left-1/2 bg-slate-800 text-white text-xs font-mono py-1 px-2.5 rounded-md shadow-lg transition-opacity duration-200 pointer-events-none ${isDragging ? 'opacity-100' : 'opacity-0'}`}>
                     {Math.round(dividerPosition)}%&nbsp;/&nbsp;{100 - Math.round(dividerPosition)}%
                </div>
@@ -168,6 +198,7 @@ const App: React.FC = () => {
             setPrompt={setPrompt}
             onReusePrompt={handleReusePrompt}
             prompt={prompt}
+            onRetry={handleGenerate}
           />
         </div>
       </main>

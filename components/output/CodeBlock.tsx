@@ -1,8 +1,11 @@
 
 
 
-import React, { useState, useCallback, useMemo } from 'react';
-import { CopyIcon, CheckIcon, DownloadIcon } from '../Icons';
+
+import React, { useMemo, useCallback } from 'react';
+import { useToast } from '../../contexts/ToastContext';
+import { CopyIcon, DownloadIcon, CheckIcon } from '../Icons';
+import { useActionFeedback } from '../../hooks/useActionFeedback';
 
 interface CodeBlockProps {
     code: string;
@@ -10,7 +13,10 @@ interface CodeBlockProps {
 }
 
 const CodeBlock: React.FC<CodeBlockProps> = ({ code, prompt }) => {
-    const [isCopied, setIsCopied] = useState(false);
+    const { addToast } = useToast();
+    const { isActionDone: isCopied, trigger: triggerCopied } = useActionFeedback();
+    const { isActionDone: isDownloaded, trigger: triggerDownloaded } = useActionFeedback();
+
 
     const highlightedLines = useMemo(() => {
         if (!code || !window.hljs) return [];
@@ -21,10 +27,10 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ code, prompt }) => {
     const handleCopy = useCallback(() => {
         if (!code) return;
         navigator.clipboard.writeText(code).then(() => {
-            setIsCopied(true);
-            setTimeout(() => setIsCopied(false), 2000);
+            addToast('Code copied to clipboard');
+            triggerCopied();
         });
-    }, [code]);
+    }, [code, addToast, triggerCopied]);
 
     const handleDownload = useCallback(() => {
         if (!code || !prompt) return;
@@ -43,7 +49,9 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ code, prompt }) => {
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
-    }, [code, prompt]);
+        addToast('File download started');
+        triggerDownloaded();
+    }, [code, prompt, addToast, triggerDownloaded]);
     
     if (!code) return null;
 
@@ -55,10 +63,11 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ code, prompt }) => {
                     <div className="relative group">
                         <button
                             onClick={handleDownload}
-                            className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+                            disabled={isDownloaded}
+                            className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors disabled:text-green-500"
                         >
-                            <DownloadIcon className="w-4 h-4" />
-                            Download
+                            {isDownloaded ? <CheckIcon className="w-4 h-4" /> : <DownloadIcon className="w-4 h-4" />}
+                            {isDownloaded ? 'Downloaded' : 'Download'}
                         </button>
                         <div className="absolute bottom-full mb-2 right-0 whitespace-nowrap rounded-md bg-slate-800 dark:bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                             Download File
@@ -68,23 +77,14 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ code, prompt }) => {
                     <div className="relative group">
                         <button
                             onClick={handleCopy}
-                            className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors disabled:opacity-50"
                             disabled={isCopied}
+                            className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors disabled:text-green-500"
                         >
-                            {isCopied ? (
-                                <span className="flex items-center gap-2 text-green-600 dark:text-green-500 animate-scale-in">
-                                    <CheckIcon className="w-4 h-4" />
-                                    Copied!
-                                </span>
-                            ) : (
-                                <>
-                                    <CopyIcon className="w-4 h-4" />
-                                    Copy
-                                </>
-                            )}
+                            {isCopied ? <CheckIcon className="w-4 h-4" /> : <CopyIcon className="w-4 h-4" />}
+                            {isCopied ? 'Copied' : 'Copy'}
                         </button>
                         <div className="absolute bottom-full mb-2 right-0 whitespace-nowrap rounded-md bg-slate-800 dark:bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                            {isCopied ? 'Copied!' : 'Copy Code'}
+                            Copy Code
                         </div>
                     </div>
                 </div>

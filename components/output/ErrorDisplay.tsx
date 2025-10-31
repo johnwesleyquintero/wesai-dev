@@ -1,35 +1,54 @@
 
-import React, { useState, useCallback } from 'react';
-import { AlertTriangleIcon, CopyIcon, CheckIcon } from '../Icons';
+import React, { useCallback } from 'react';
+import { useToast } from '../../contexts/ToastContext';
+import { AlertTriangleIcon, CopyIcon, CheckIcon, RotateCcwIcon } from '../Icons';
+import { useActionFeedback } from '../../hooks/useActionFeedback';
 
-const ErrorDisplay: React.FC<{ error: string; title: string; }> = ({ error, title }) => {
-    const [isCopied, setIsCopied] = useState(false);
+interface ErrorDisplayProps {
+    error: string;
+    title: string;
+    onRetry?: () => void;
+}
+
+const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ error, title, onRetry }) => {
+    const { addToast } = useToast();
+    const { isActionDone: isCopied, trigger: triggerCopied } = useActionFeedback();
+
     const handleCopyError = useCallback(() => {
-      navigator.clipboard.writeText(error).then(() => {
-          setIsCopied(true);
-          setTimeout(() => setIsCopied(false), 2000);
-      });
-    }, [error]);
+        navigator.clipboard.writeText(error).then(() => {
+            addToast('Error details copied');
+            triggerCopied();
+        });
+    }, [error, addToast, triggerCopied]);
 
     return (
         <div className="p-4">
             <div className="text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/50 p-4 rounded-lg">
-                <div className="flex justify-between items-start">
-                    <div className="flex">
-                        <AlertTriangleIcon className="text-red-500 dark:text-red-400 mr-3 h-6 w-6 flex-shrink-0"/>
-                        <div>
-                            <p className="font-bold text-red-800 dark:text-red-300">{title}</p>
-                            <p className="text-sm mt-1 whitespace-pre-wrap">{error}</p>
-                        </div>
+                <div className="flex items-start">
+                    <AlertTriangleIcon className="text-red-500 dark:text-red-400 mr-3 h-6 w-6 flex-shrink-0" />
+                    <div className="flex-1">
+                        <p className="font-bold text-red-800 dark:text-red-300">{title}</p>
+                        <p className="text-sm mt-1 whitespace-pre-wrap">{error}</p>
                     </div>
+                </div>
+                <div className="flex justify-end items-center gap-2 mt-3">
                     <button
                         onClick={handleCopyError}
-                        className="ml-4 flex-shrink-0 flex items-center gap-1.5 text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors p-1.5 rounded-md hover:bg-slate-400/20 disabled:opacity-50"
                         disabled={isCopied}
+                        className="flex-shrink-0 flex items-center gap-1.5 text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors p-1.5 rounded-md hover:bg-slate-400/20 disabled:text-green-600 dark:disabled:text-green-500"
                     >
-                        {isCopied ? <CheckIcon className="text-green-500 w-4 h-4"/> : <CopyIcon className="w-4 h-4" />}
+                        {isCopied ? <CheckIcon className="w-4 h-4" /> : <CopyIcon className="w-4 h-4" />}
                         {isCopied ? 'Copied' : 'Copy'}
                     </button>
+                    {onRetry && (
+                         <button
+                            onClick={onRetry}
+                            className="flex-shrink-0 flex items-center gap-1.5 text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors p-1.5 rounded-md hover:bg-slate-400/20"
+                        >
+                            <RotateCcwIcon className="w-4 h-4" />
+                            Retry
+                        </button>
+                    )}
                 </div>
             </div>
         </div>

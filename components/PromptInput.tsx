@@ -1,5 +1,6 @@
 
 
+
 import React, { useRef, useEffect, useState } from 'react';
 import { SparkleIcon, CloseIcon, CubeIcon } from './Icons';
 import QuickStartPrompts from './QuickStartPrompts';
@@ -12,27 +13,35 @@ interface PromptInputProps {
   isHighlighting: boolean;
 }
 
-const PRO_TIPS = [
-  "Press <kbd>Cmd</kbd> + <kbd>Enter</kbd> to generate.",
-  "Be specific for better results. Try describing colors, layout, and state.",
-  "Need icons? Ask for 'inline SVGs' in your prompt for best results.",
-  "WesAI is great for brainstorming variations. Try asking for 'another version'.",
-  "Describe animations like 'a button that pulses on hover' for interactive results."
+interface ProTipPart {
+  type: 'text' | 'kbd';
+  content: string;
+}
+
+interface ProTipData {
+  parts: ProTipPart[];
+}
+
+const PRO_TIPS: ProTipData[] = [
+  { parts: [{type: 'text', content: 'Press '}, {type: 'kbd', content: 'Cmd'}, {type: 'text', content: ' + '}, {type: 'kbd', content: 'Enter'}, {type: 'text', content: ' to generate.'}] },
+  { parts: [{type: 'text', content: 'Be specific for better results. Try describing colors, layout, and state.'}] },
+  { parts: [{type: 'text', content: "Need icons? Ask for 'inline SVGs' in your prompt for best results."}] },
+  { parts: [{type: 'text', content: "WesAI is great for brainstorming variations. Try asking for 'another version'."}] },
+  { parts: [{type: 'text', content: "Describe animations like 'a button that pulses on hover' for interactive results."}] },
 ];
 
-const ProTip: React.FC<{ tip: string }> = ({ tip }) => {
-  const parts = tip.split(/(\<kbd\>.*?\<\/kbd\>)/g);
+const ProTip: React.FC<{ tip: ProTipData }> = ({ tip }) => {
   return (
     <p className="text-center text-xs text-slate-500 dark:text-slate-400">
-      Pro Tip: {parts.map((part, index) => {
-        if (part.startsWith('<kbd>')) {
+      Pro Tip: {tip.parts.map((part, index) => {
+        if (part.type === 'kbd') {
           return (
             <kbd key={index} className="font-sans mx-0.5 px-1.5 py-0.5 border border-slate-300 dark:border-slate-600 bg-slate-200/50 dark:bg-slate-700/50 rounded-md">
-              {part.replace(/<\/?kbd>/g, '')}
+              {part.content}
             </kbd>
           );
         }
-        return <React.Fragment key={index}>{part}</React.Fragment>;
+        return <React.Fragment key={index}>{part.content}</React.Fragment>;
       })}
     </p>
   );
@@ -40,7 +49,7 @@ const ProTip: React.FC<{ tip: string }> = ({ tip }) => {
 
 const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGenerate, isLoading, isHighlighting }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [proTip, setProTip] = useState<string>('');
+  const [proTip, setProTip] = useState<ProTipData | null>(null);
   
   useEffect(() => {
     // Select a random pro tip on component mount
@@ -84,7 +93,7 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
                   onKeyDown={handleKeyDown}
                   placeholder="e.g., A responsive login form with a 'remember me' checkbox and a pulsing gradient on the submit button..."
                   rows={3}
-                  className={`w-full p-4 pr-10 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 resize-none placeholder:text-slate-500 dark:placeholder:text-slate-500 focus:bg-white dark:focus:bg-slate-900/50 max-h-96 ${isHighlighting ? 'animate-pulse-indigo-glow' : ''}`}
+                  className={`font-mono w-full p-4 pr-10 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 resize-none placeholder:text-slate-500 dark:placeholder:text-slate-500 focus:bg-white dark:focus:bg-slate-900/50 max-h-96 ${isHighlighting ? 'animate-pulse-indigo-glow' : ''}`}
                   disabled={isLoading}
                 />
                 {prompt && (
