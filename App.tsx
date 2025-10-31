@@ -19,7 +19,7 @@ const App: React.FC = () => {
   const [theme, setTheme] = useState<Theme>(() => {
     const savedTheme = localStorage.getItem('theme') as Theme | null;
     if (savedTheme) return savedTheme;
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    return window.matchMedia('(pre-prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   });
 
   // --- Resizable Panel Logic ---
@@ -73,6 +73,15 @@ const App: React.FC = () => {
     }
     localStorage.setItem('theme', theme);
   }, [theme]);
+
+  // Check for API key on initial load
+  useEffect(() => {
+    const apiKey = localStorage.getItem('gemini-api-key');
+    if (!apiKey) {
+      setIsSettingsOpen(true);
+    }
+  }, []);
+
 
   const toggleTheme = () => {
     setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
@@ -143,7 +152,7 @@ const App: React.FC = () => {
                 onMouseDown={handleMouseDown}
                 className="w-2 cursor-col-resize flex-shrink-0 flex items-center justify-center group"
             >
-                <div className="w-1 h-1/4 bg-slate-300 dark:bg-slate-700 rounded-full group-hover:bg-indigo-500 transition-all duration-200 group-hover:scale-x-150"></div>
+                <div className={`w-1 h-20 bg-slate-300 dark:bg-slate-700 rounded-full transition-all duration-200 ${isDragging ? 'bg-indigo-500 scale-x-150' : 'group-hover:bg-indigo-500/50'}`}></div>
             </div>
             <div className="flex flex-col h-full" style={{ width: `calc(100% - ${dividerPosition}% - 8px)` }}>
               <OutputDisplay
@@ -157,7 +166,7 @@ const App: React.FC = () => {
         </div>
       </main>
       <footer className="text-center py-4 text-slate-500 dark:text-slate-500 text-xs border-t border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-950">
-        © 2025 WesAI.Dev | Powered by Google Gemini.
+        © 2025 WesAI.Dev | Powered by <a href="https://ai.google.dev/" target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:underline">Google Gemini</a>.
       </footer>
       <SettingsModal
         isOpen={isSettingsOpen}

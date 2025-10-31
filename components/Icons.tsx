@@ -91,19 +91,25 @@ export const CloseIcon: React.FC<{ className?: string }> = ({ className }) => (
 );
 
 export const WesAILogoIcon: React.FC<{className?: string}> = ({className}) => (
-    <svg width="160" height="40" viewBox="0 0 160 40" className={className}>
-        <text x="0" y="30" fontFamily="Inter, sans-serif" fontSize="32" fontWeight="bold" fill="currentColor">
-            WesAI
-            <tspan fill="url(#grad1)">.Dev</tspan>
-        </text>
+    <svg viewBox="0 0 160 35" xmlns="http://www.w3.org/2000/svg" className={className} preserveAspectRatio="xMinYMid meet">
         <defs>
-            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" style={{stopColor: '#6366f1'}} /> {/* indigo-500 */}
-                <stop offset="100%" style={{stopColor: '#06b6d4'}} /> {/* cyan-500 */}
+            <linearGradient id="logoHeaderGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#4f46e5" />
+                <stop offset="100%" stopColor="#06b6d4" />
             </linearGradient>
         </defs>
+        <text 
+            fontFamily="Manrope, sans-serif" 
+            fontSize="30" 
+            fontWeight="800" 
+            fill="currentColor"
+            y="25"
+        >
+            WesAI<tspan fill="url(#logoHeaderGrad)">.Dev</tspan>
+        </text>
     </svg>
 );
+
 
 export const InitialStateLogoIcon: React.FC<{className?: string}> = ({className}) => (
     <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" className={className}>

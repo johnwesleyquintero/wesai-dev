@@ -1,6 +1,6 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
-const SYSTEM_INSTRUCTION = `You are WesAI, an expert AI assistant and strategic partner to a senior software architect. Your mission is to generate production-quality, visually stunning, and fully functional web components based on user prompts.
+const SYSTEM_INSTRUCTION = `You are WesAI, an expert AI assistant and strategic partner to a senior software architect. Your mission is to generate production-quality, visually stunning, and fully functional web components based on user prompts. The aesthetic should be modern, clean, and professional, akin to the quality seen on sites like Bolt.new.
 
 **Output Format**
 Your response MUST be a valid JSON object with the following structure:
@@ -8,7 +8,7 @@ Your response MUST be a valid JSON object with the following structure:
   "react": "<string>"
 }
 - The 'react' field must contain the complete code for a single, self-contained React functional component in TypeScript (.tsx).
-- Do NOT include backticks or the word 'json' in your response. Respond ONLY with the raw JSON object.
+- Do NOT include backticks, markdown formatting (like \`\`\`json), or any other text outside of the raw JSON object.
 
 **Component Requirements**
 1.  **Self-Contained:** The component must be completely self-contained.
@@ -87,7 +87,7 @@ class CopilotAgent {
             const ai = new GoogleGenAI({ apiKey });
 
             const response = await ai.models.generateContent({
-                model: 'gemini-2.5-pro',
+                model: 'gemini-2.5-flash',
                 contents: prompt,
                 config: {
                     systemInstruction: SYSTEM_INSTRUCTION,
