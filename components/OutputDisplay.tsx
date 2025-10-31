@@ -1,12 +1,14 @@
-import React, { useState, useCallback, useEffect, useRef, useLayoutEffect } from 'react';
+
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { CodeOutput } from '../copilot/agent';
-import { CopyIcon, CheckIcon, EyeIcon, CodeIcon, RotateCcwIcon, CubeIcon } from './Icons';
+import { EyeIcon, CodeIcon, CubeIcon } from './Icons';
 import CodeBlock from './output/CodeBlock';
 import ErrorDisplay from './output/ErrorDisplay';
 import InitialState from './output/InitialState';
 import LoadingState from './output/LoadingState';
 import PreviewPanel from './output/PreviewPanel';
+import GenerationHeader from './output/GenerationHeader';
 
 type ActiveTab = 'preview' | 'code';
 
@@ -29,8 +31,6 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
   const { theme } = useTheme();
   const [activeTab, setActiveTab] = useState<ActiveTab>('preview');
   const [previewError, setPreviewError] = useState<string | null>(null);
-  const [isReuseCopied, setIsReuseCopied] = useState(false);
-  const [isPromptCopied, setIsPromptCopied] = useState(false);
   
   const tabsRef = useRef<(HTMLButtonElement | null)[]>([]);
   const [gliderStyle, setGliderStyle] = useState({});
@@ -45,23 +45,6 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
       });
     }
   }, [activeTab, response]);
-
-  const handleReusePrompt = useCallback(() => {
-    if (prompt) {
-        onReusePrompt(prompt);
-        setIsReuseCopied(true);
-        setTimeout(() => setIsReuseCopied(false), 2000);
-    }
-  }, [prompt, onReusePrompt]);
-
-  const handleCopyPrompt = useCallback(() => {
-    if (prompt) {
-        navigator.clipboard.writeText(prompt);
-        setIsPromptCopied(true);
-        setTimeout(() => setIsPromptCopied(false), 2000);
-    }
-  }, [prompt]);
-
 
   // When a new response comes in, switch to the preview tab and listen for sandbox errors
   useEffect(() => {
@@ -139,35 +122,11 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
                 <CubeIcon className="w-5 h-5 text-slate-500 dark:text-slate-400"/>
                 <h2 id="output-heading" className="text-lg font-semibold text-slate-900 dark:text-slate-200 flex-shrink-0">Output</h2>
                 {response && !error && (
-                    <div className="flex items-center gap-1.5 border-l border-slate-300 dark:border-slate-700 pl-2 min-w-0">
-                        <p className="text-sm text-slate-500 dark:text-slate-400 whitespace-nowrap fade-out-right" title={prompt}>
-                            {prompt}
-                        </p>
-                        <div className="relative group flex-shrink-0">
-                            <button
-                                onClick={handleCopyPrompt}
-                                className="p-1.5 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-700/70 transition-colors duration-200"
-                                aria-label="Copy this prompt"
-                            >
-                                {isPromptCopied ? <CheckIcon className="w-4 h-4 text-green-500 animate-scale-in" /> : <CopyIcon className="w-4 h-4" />}
-                            </button>
-                             <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-800 dark:bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 group-hover:opacity-100 transition-all pointer-events-none">
-                                {isPromptCopied ? 'Copied!' : 'Copy Prompt'}
-                            </div>
-                        </div>
-                        <div className="relative group flex-shrink-0">
-                            <button
-                                onClick={handleReusePrompt}
-                                className="p-1.5 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-700/70 transition-colors duration-200"
-                                aria-label="Reuse this prompt"
-                            >
-                                {isReuseCopied ? <CheckIcon className="w-4 h-4 text-green-500 animate-scale-in" /> : <RotateCcwIcon className="w-4 h-4" />}
-                            </button>
-                            <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-800 dark:bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 group-hover:opacity-100 transition-all pointer-events-none">
-                                {isReuseCopied ? 'Copied to Input!' : 'Reuse Prompt'}
-                            </div>
-                        </div>
-                    </div>
+                    <GenerationHeader
+                        prompt={prompt}
+                        response={response}
+                        onReusePrompt={onReusePrompt}
+                    />
                 )}
             </div>
             {response && !error && (

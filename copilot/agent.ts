@@ -100,10 +100,17 @@ class CopilotAgent {
             });
             
             const jsonString = response.text.trim();
-             if (!jsonString.startsWith('{') || !jsonString.endsWith('}')) {
+            try {
+                const parsed = JSON.parse(jsonString);
+                // The responseSchema should enforce this, but this is a fallback for safety.
+                if (typeof parsed.react !== 'string') {
+                    throw new Error("Parsed JSON response is missing the required 'react' property.");
+                }
+                return parsed as CodeOutput;
+            } catch (parseError) {
+                console.error("Failed to parse AI response as JSON. Raw response:", jsonString, "Error:", parseError);
                 throw new Error("The AI returned an invalid response format. Please try refining your prompt or try again.");
             }
-            return JSON.parse(jsonString) as CodeOutput;
 
         } catch (error) {
             console.error("Error generating content with CopilotAgent:", error);

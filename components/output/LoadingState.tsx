@@ -32,7 +32,7 @@ const LoadingState: React.FC<{ prompt: string }> = ({ prompt }) => {
                         <span className="line-clamp-2 ml-1">{prompt}</span>
                     </p>
                     <div className="mt-3 w-full h-1 bg-slate-200 dark:bg-slate-700/50 rounded-full overflow-hidden relative">
-                        <div className="absolute top-0 left-0 w-1/4 h-full bg-gradient-to-r from-indigo-500 to-purple-500 animate-indeterminate-progress"></div>
+                        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-indigo-500 to-transparent animate-indeterminate-progress" style={{ backgroundSize: '200% 100%' }}></div>
                     </div>
                 </div>
             )}

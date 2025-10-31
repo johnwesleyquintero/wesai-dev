@@ -26,8 +26,8 @@ const CodeBlock: React.FC<{ code: string }> = ({ code }) => {
 
     // Use specific background colors that match the atom-one-light and atom-one-dark themes.
     return (
-        <div className={`rounded-lg overflow-hidden border flex-1 flex flex-col min-h-0 bg-[#FAFAFA] dark:bg-[#282C34] transition-colors duration-300 ${isCopied ? 'border-green-500/50' : 'border-slate-200 dark:border-slate-700/50'}`}>
-            <div className="flex justify-between items-center bg-slate-200/50 dark:bg-slate-800/50 px-4 py-2 border-b border-inherit">
+        <div className={`overflow-hidden flex flex-col min-h-0 bg-[#FAFAFA] dark:bg-[#282C34] transition-colors duration-300`}>
+            <div className="flex justify-between items-center bg-slate-200/50 dark:bg-slate-800/50 px-4 py-2 border-b border-slate-200 dark:border-slate-700/50">
                 <h3 className="text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">React Component (.tsx)</h3>
                 <div className="relative group">
                     <button

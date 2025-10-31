@@ -4,6 +4,7 @@ import Header from './components/Header';
 import PromptInput from './components/PromptInput';
 import OutputDisplay from './components/OutputDisplay';
 import HelpModal from './components/HelpModal';
+import ConfirmModal from './components/ConfirmModal';
 import { brainstormIdea } from './services/geminiService';
 import { CodeOutput } from './copilot/agent';
 import { GripVerticalIcon } from './components/Icons';
@@ -19,6 +20,7 @@ const App: React.FC = () => {
   const [isHelpOpen, setIsHelpOpen] = useState<boolean>(false);
   const [isResetting, setIsResetting] = useState<boolean>(false);
   const [isPromptHighlighting, setIsPromptHighlighting] = useState<boolean>(false);
+  const [isResetModalOpen, setIsResetModalOpen] = useState<boolean>(false);
 
   // --- Resizable Panel Logic ---
   const mainContainerRef = useRef<HTMLDivElement>(null);
@@ -42,6 +44,31 @@ const App: React.FC = () => {
         document.title = baseTitle;
     }
   }, [isLoading, response, prompt]);
+  
+  // --- Handle Shared Links on Load ---
+  useLayoutEffect(() => {
+    const handleHash = () => {
+        const hash = window.location.hash.substring(1);
+        if (hash) {
+            try {
+                const decodedString = atob(decodeURIComponent(hash));
+                const data = JSON.parse(decodedString);
+                if (data.prompt && data.react) {
+                    setPrompt(data.prompt);
+                    setResponse({ react: data.react });
+                }
+            } catch (e) {
+                console.error("Failed to parse shared link:", e);
+                setError("The shared link is invalid or corrupted.");
+            } finally {
+                // Clear the hash for a clean URL.
+                window.history.replaceState(null, '', window.location.pathname + window.location.search);
+            }
+        }
+    };
+    handleHash();
+  }, [setPrompt, setResponse, setError]);
+
 
   const handleGenerate = useCallback(async () => {
     if (!prompt.trim() || isLoading) return;
@@ -89,7 +116,7 @@ const App: React.FC = () => {
     <div className="h-screen flex flex-col bg-transparent transition-colors duration-300">
       <Header 
         onHelpClick={() => setIsHelpOpen(true)}
-        onResetClick={handleReset}
+        onResetClick={() => setIsResetModalOpen(true)}
       />
       <main ref={mainContainerRef} className="flex-grow p-4 md:p-6 lg:p-8 flex flex-col md:flex-row overflow-y-auto md:overflow-hidden gap-6 md:gap-0">
         
@@ -121,11 +148,11 @@ const App: React.FC = () => {
             aria-valuemax={PANEL_MAX_SIZE_PERCENT}
             className="hidden md:flex w-4 cursor-col-resize flex-shrink-0 items-center justify-center group focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950 rounded-full transition-colors duration-300"
         >
-            <div className={`w-0.5 h-16 bg-slate-300 dark:bg-slate-700 rounded-full transition-all relative ${isDragging ? 'duration-75 bg-indigo-500 scale-x-150 shadow-[0_0_15px_3px_theme(colors.indigo.500)]' : 'duration-300 group-hover:bg-indigo-500/60 group-focus-visible:bg-indigo-500/60'}`}>
+            <div className={`w-0.5 h-16 bg-slate-200 dark:bg-slate-800 rounded-full transition-all relative ${isDragging ? 'duration-75 bg-indigo-500 scale-x-150 shadow-[0_0_15px_3px_theme(colors.indigo.500)]' : 'duration-300 group-hover:bg-indigo-500/60 group-focus-visible:bg-indigo-500/60'}`}>
                <div className={`absolute bottom-full mb-2.5 -translate-x-1/2 left-1/2 bg-slate-800 text-white text-xs font-mono py-1 px-2.5 rounded-md shadow-lg transition-opacity duration-200 pointer-events-none ${isDragging ? 'opacity-100' : 'opacity-0'}`}>
                     {Math.round(dividerPosition)}%&nbsp;/&nbsp;{100 - Math.round(dividerPosition)}%
                </div>
-               <GripVerticalIcon className={`absolute text-slate-500 dark:text-slate-400 w-5 h-5 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-80 group-hover:opacity-100 group-hover:scale-125 group-focus-visible:opacity-100 group-focus-visible:scale-125 group-active:text-indigo-600 dark:group-active:text-indigo-400 transition-all duration-200 ${isDragging ? 'text-indigo-600 dark:text-indigo-400' : ''}`} />
+               <GripVerticalIcon className={`absolute text-slate-500 dark:text-slate-400 w-5 h-5 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-50 group-hover:opacity-100 group-hover:scale-125 group-focus-visible:opacity-100 group-focus-visible:scale-125 group-active:text-indigo-600 dark:group-active:text-indigo-400 transition-all duration-200 ${isDragging ? 'text-indigo-600 dark:text-indigo-400' : ''}`} />
             </div>
         </div>
         
@@ -154,6 +181,15 @@ const App: React.FC = () => {
       <HelpModal
         isOpen={isHelpOpen}
         onClose={() => setIsHelpOpen(false)}
+      />
+      <ConfirmModal
+        isOpen={isResetModalOpen}
+        onClose={() => setIsResetModalOpen(false)}
+        onConfirm={handleReset}
+        title="Start New Session?"
+        message="This will clear your current prompt and output. Are you sure you want to continue?"
+        confirmText="Reset Session"
+        confirmVariant="destructive"
       />
     </div>
   );

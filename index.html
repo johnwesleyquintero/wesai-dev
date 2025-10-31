@@ -29,13 +29,12 @@
               },
               keyframes: {
                 'indeterminate-progress': {
-                  '0%': { transform: 'translateX(-100%)', opacity: '0.75' },
-                  '50%': { opacity: '1' },
-                  '100%': { transform: 'translateX(400%)', opacity: '0.75' },
+                  '0%': { backgroundPosition: '200% center' },
+                  '100%': { backgroundPosition: '-200% center' },
                 },
               },
               animation: {
-                'indeterminate-progress': 'indeterminate-progress 1.8s infinite cubic-bezier(0.4, 0, 0.2, 1)',
+                'indeterminate-progress': 'indeterminate-progress 2s infinite ease-in-out',
               },
             },
           },
