@@ -80,7 +80,7 @@ const CodeBlock: React.FC<{ code: string }> = ({ code }) => {
 
     return (
         <div className={`bg-slate-100 dark:bg-slate-900/70 rounded-lg overflow-hidden border flex-1 flex flex-col min-h-0 transition-all duration-300 ${isCopied ? 'border-green-500/50 ring-2 ring-green-500/20' : 'border-slate-200 dark:border-slate-700/50'}`}>
-            <div className="flex justify-between items-center bg-slate-200/80 dark:bg-slate-900 px-4 py-2 border-b border-inherit">
+            <div className="flex justify-between items-center bg-slate-200/50 dark:bg-slate-800/50 px-4 py-2 border-b border-inherit">
                 <h3 className="text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">React Component (.tsx)</h3>
                 <div className="relative group">
                     <button
@@ -261,7 +261,7 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
   
   if (isLoading) {
     return (
-        <div className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-lg flex flex-col h-full shadow-lg">
+        <div className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-lg flex flex-col h-full shadow-md">
             <div className="flex-shrink-0 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-slate-100/80 dark:bg-slate-900/80 p-2 rounded-t-lg">
                 <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-200 px-2">Output</h2>
             </div>
@@ -298,7 +298,7 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
   const contentKey = error ? 'error' : response ? `${activeTab}-${response.react.length}-${previewError}` : 'initial';
 
   return (
-    <div className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-lg flex flex-col h-full shadow-lg">
+    <div className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-lg flex flex-col h-full shadow-md">
         <div className="flex-shrink-0 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-slate-100/80 dark:bg-slate-900/80 p-2 rounded-t-lg">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-200 px-2">Output</h2>
             {response && !error && (
