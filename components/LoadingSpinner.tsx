@@ -1,11 +1,12 @@
 
+
 import React from 'react';
-import { WesAILogoSpinnerIcon } from './Icons';
+import { ModernSpinnerIcon } from './Icons';
 
 const LoadingSpinner: React.FC = () => {
     return (
         <div className="flex justify-center items-center h-full">
-            <WesAILogoSpinnerIcon className="w-16 h-16" />
+            <ModernSpinnerIcon className="w-16 h-16 animate-spin text-indigo-500" />
         </div>
     );
 };

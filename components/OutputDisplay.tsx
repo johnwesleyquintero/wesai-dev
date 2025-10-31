@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useEffect, useRef, useLayoutEffect } from 'react';
 import LoadingSpinner from './LoadingSpinner';
 import { CodeOutput } from '../copilot/agent';
@@ -148,7 +149,7 @@ const LoadingState: React.FC = () => {
         "Analyzing your request...", 
         "Architecting the component...", 
         "Writing React code...",
-        "Applying styles...",
+        "Applying modern styles...",
         "Finalizing the component..."
     ];
     let index = 0;
@@ -277,7 +278,6 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
                         style={gliderStyle}
                      />
                      <button 
-                        // FIX: The ref callback function must not return a value. Using a block statement `{}` ensures an implicit `undefined` return.
                         ref={el => { tabsRef.current[0] = el; }}
                         onClick={() => setActiveTab('preview')}
                         className={`relative z-10 flex items-center gap-2 px-3 py-1 text-sm font-medium rounded-md transition-colors ${activeTab === 'preview' ? 'text-indigo-600 dark:text-white' : 'text-slate-600 dark:text-slate-400'}`}
@@ -286,7 +286,6 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
                         Preview
                      </button>
                      <button 
-                        // FIX: The ref callback function must not return a value. Using a block statement `{}` ensures an implicit `undefined` return.
                         ref={el => { tabsRef.current[1] = el; }}
                         onClick={() => setActiveTab('code')}
                         className={`relative z-10 flex items-center gap-2 px-3 py-1 text-sm font-medium rounded-md transition-colors ${activeTab === 'code' ? 'text-indigo-600 dark:text-white' : 'text-slate-600 dark:text-slate-400'}`}
