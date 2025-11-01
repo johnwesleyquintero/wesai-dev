@@ -1,4 +1,5 @@
 
+
 import React, { useRef } from 'react';
 import { CloseIcon, CheckCircleIcon } from './Icons';
 import { useModalAccessibility } from '../hooks/useModalAccessibility';
@@ -7,6 +8,13 @@ interface HelpModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
+
+// FIX: Moved the `Key` component outside of `HelpModal`. Defining components inside other components is an anti-pattern that can cause performance issues and unexpected behavior, including type errors.
+const Key = ({ children }: { children: React.ReactNode }) => (
+    <kbd className="font-sans mx-0.5 px-1.5 py-0.5 border border-slate-300 dark:border-slate-600 bg-slate-200/50 dark:bg-slate-700/50 rounded-md">
+      {children}
+    </kbd>
+);
 
 const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
   const modalRef = useRef<HTMLDivElement>(null);
@@ -30,12 +38,6 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
     { keys: ['Esc'], description: 'Close this modal' },
   ];
   
-  // FIX: Explicitly typed the 'children' prop to satisfy TypeScript.
-  const Key = ({ children }: { children: React.ReactNode }) => (
-    <kbd className="font-sans mx-0.5 px-1.5 py-0.5 border border-slate-300 dark:border-slate-600 bg-slate-200/50 dark:bg-slate-700/50 rounded-md">
-      {children}
-    </kbd>
-  );
 
   return (
     <div

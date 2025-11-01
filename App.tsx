@@ -2,6 +2,8 @@
 
 
 
+
+
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import Header from './components/Header';
 import PromptInput from './components/PromptInput';
@@ -31,6 +33,7 @@ const App: React.FC = () => {
   const [isPromptHighlighting, setIsPromptHighlighting] = useState<boolean>(false);
   const [isResetModalOpen, setIsResetModalOpen] = useState<boolean>(false);
   const [ariaLiveMessage, setAriaLiveMessage] = useState<string>('');
+  // FIX: Use `number` for the timeout ID, which is the correct type for browser environments.
   const resetTimeoutRef = useRef<number | null>(null);
   const { addToast } = useToast();
   
