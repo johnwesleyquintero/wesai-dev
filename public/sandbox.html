@@ -92,11 +92,17 @@
     <div id="root"></div>
     <script type="text/javascript">
         const root = ReactDOM.createRoot(document.getElementById('root'));
+        let parentOrigin = null;
 
         window.addEventListener('message', (event) => {
             // A simple security check
             if (event.source !== window.parent) {
                 return;
+            }
+
+            // Capture the parent's origin on the first message for secure communication
+            if (!parentOrigin) {
+                parentOrigin = event.origin;
             }
 
             const { type, payload } = event.data;
@@ -113,7 +119,7 @@
                     root.render(React.createElement(Component));
 
                     // Send success confirmation back if needed
-                    window.parent.postMessage({ type: 'RENDER_SUCCESS' }, '*');
+                    window.parent.postMessage({ type: 'RENDER_SUCCESS' }, parentOrigin);
                 } catch (e) {
                     console.error("Sandbox Render Error:", e);
                     const errorMessage = e.message || 'An unknown error occurred during preview.';
@@ -130,7 +136,7 @@
                     );
                     root.render(ErrorComponent);
                     // Send error details back to the parent
-                    window.parent.postMessage({ type: 'RENDER_ERROR', payload: { message: errorMessage } }, '*');
+                    window.parent.postMessage({ type: 'RENDER_ERROR', payload: { message: errorMessage } }, parentOrigin);
                 }
             } else if (type === 'SET_THEME') {
                  if (payload.theme === 'dark') {
@@ -143,7 +149,8 @@
             }
         });
 
-        // Notify parent that the sandbox is ready
+        // Notify parent that the sandbox is ready. Must use '*' here as parent origin is not yet known.
+        // The parent validates the source of this message, so the risk is minimal.
         window.parent.postMessage({ type: 'SANDBOX_READY' }, '*');
     </script>
 </body>

@@ -23,6 +23,7 @@ const App: React.FC = () => {
   const [isPromptHighlighting, setIsPromptHighlighting] = useState<boolean>(false);
   const [isResetModalOpen, setIsResetModalOpen] = useState<boolean>(false);
   const [ariaLiveMessage, setAriaLiveMessage] = useState<string>('');
+  const resetTimeoutRef = useRef<number | null>(null);
 
   // --- Resizable Panel Logic ---
   const mainContainerRef = useRef<HTMLDivElement>(null);
@@ -87,7 +88,7 @@ const App: React.FC = () => {
     }
   }, [isLoading, response, error]);
 
-  // --- Handle Shared Links on Load ---
+  // --- Handle Shared Links on Load & on Hash Change ---
   useEffect(() => {
     const handleHash = () => {
         const hash = window.location.hash.substring(1);
@@ -109,8 +110,14 @@ const App: React.FC = () => {
             }
         }
     };
-    handleHash();
-  }, [setPrompt, setResponse, setError]);
+    
+    window.addEventListener('hashchange', handleHash);
+    handleHash(); // Handle initial hash on load
+
+    return () => {
+        window.removeEventListener('hashchange', handleHash);
+    };
+  }, []);
 
 
   const handleGenerate = useCallback(async () => {
@@ -136,15 +143,27 @@ const App: React.FC = () => {
 
   const handleReset = useCallback(() => {
     setIsResetting(true);
-    setTimeout(() => {
+    // Clear any pending timeout from a previous click
+    if (resetTimeoutRef.current) {
+        clearTimeout(resetTimeoutRef.current);
+    }
+    resetTimeoutRef.current = window.setTimeout(() => {
       setPrompt('');
       setResponse(null);
       setError(null);
       setDividerPosition(PANEL_DEFAULT_SIZE_PERCENT);
-      // usePersistentState will handle removing from localStorage
       setIsResetting(false);
     }, RESET_ANIMATION_DURATION_MS); // Match animation duration
-  }, [setPrompt, setResponse, setDividerPosition]);
+  }, [setPrompt, setResponse, setError, setDividerPosition]);
+
+  // Cleanup for the reset timeout to prevent memory leaks
+  useEffect(() => {
+    return () => {
+        if (resetTimeoutRef.current) {
+            clearTimeout(resetTimeoutRef.current);
+        }
+    };
+  }, []);
   
   const handleReusePrompt = useCallback((newPrompt: string) => {
     setPrompt(newPrompt);

@@ -53,17 +53,22 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
   useEffect(() => {
     // Select a random pro tip on component mount
     setProTipIndex(Math.floor(Math.random() * PRO_TIPS.length));
-
-    // Cycle through pro tips
+    
+    let timeoutId: number | null = null;
     const tipInterval = setInterval(() => {
         setIsTipVisible(false);
-        setTimeout(() => {
+        timeoutId = window.setTimeout(() => {
             setProTipIndex(prevIndex => (prevIndex + 1) % PRO_TIPS.length);
             setIsTipVisible(true);
         }, 300); // Wait for fade-out to complete
     }, 5000); // Change tip every 5 seconds
 
-    return () => clearInterval(tipInterval);
+    return () => {
+        clearInterval(tipInterval);
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+        }
+    };
   }, []);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {

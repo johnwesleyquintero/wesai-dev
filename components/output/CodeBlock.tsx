@@ -19,7 +19,21 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ code, prompt }) => {
 
 
     const highlightedLines = useMemo(() => {
-        if (!code || !window.hljs) return [];
+        if (!code) return [];
+
+        // Graceful degradation: If highlight.js isn't loaded,
+        // render the raw code safely to prevent an empty display.
+        if (!window.hljs) {
+            const escapeHtml = (unsafe: string) => 
+                unsafe
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            return code.split('\n').map(line => escapeHtml(line));
+        }
+
         const highlightedCode = window.hljs.highlight(code, { language: 'tsx' }).value;
         return highlightedCode.split('\n');
     }, [code]);
