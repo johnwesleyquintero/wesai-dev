@@ -47,14 +47,15 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
     }
   }, [activeTab]);
 
-  // When a new response comes in, switch to the preview tab and listen for sandbox errors
+  // When a new response comes in, switch to the preview tab.
   useEffect(() => {
     if (response) {
       setActiveTab('preview');
     }
-    
-    if (!response) return;
-
+  }, [response]);
+  
+  // Listen for sandbox errors (runs only once on mount).
+  useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
         if (event.data.type === 'RENDER_ERROR' && event.data.payload.message) {
             setPreviewError(event.data.payload.message);
@@ -65,7 +66,7 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
     return () => {
         window.removeEventListener('message', handleMessage);
     };
-  }, [response]);
+  }, []);
 
   // Reset preview error on new generation
   useEffect(() => {

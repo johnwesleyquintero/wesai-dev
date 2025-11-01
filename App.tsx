@@ -117,7 +117,7 @@ const App: React.FC = () => {
     return () => {
         window.removeEventListener('hashchange', handleHash);
     };
-  }, []);
+  }, [setPrompt, setResponse]);
 
 
   const handleGenerate = useCallback(async () => {

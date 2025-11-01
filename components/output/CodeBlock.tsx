@@ -10,6 +10,9 @@ interface CodeBlockProps {
     prompt: string;
 }
 
+const MIN_FONT_SIZE = 10;
+const MAX_FONT_SIZE = 20;
+
 const CodeBlock: React.FC<CodeBlockProps> = ({ code, prompt }) => {
     const { addToast } = useToast();
     const { isActionDone: isCopied, trigger: triggerCopied } = useActionFeedback();
@@ -76,7 +79,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ code, prompt }) => {
                 <div className="flex items-center gap-2">
                     <div className="relative group">
                         <button
-                            onClick={() => setFontSize(size => Math.max(10, size - 1))}
+                            onClick={() => setFontSize(size => Math.max(MIN_FONT_SIZE, size - 1))}
                             className="p-1.5 rounded-md text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-300/50 dark:hover:bg-slate-700/50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
                             aria-label="Decrease font size"
                         >
@@ -88,7 +91,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ code, prompt }) => {
                     </div>
                      <div className="relative group">
                         <button
-                            onClick={() => setFontSize(size => Math.min(20, size + 1))}
+                            onClick={() => setFontSize(size => Math.min(MAX_FONT_SIZE, size + 1))}
                             className="p-1.5 rounded-md text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-300/50 dark:hover:bg-slate-700/50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
                             aria-label="Increase font size"
                         >

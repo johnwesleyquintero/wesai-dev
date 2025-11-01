@@ -1,5 +1,6 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef } from 'react';
 import { CloseIcon, CheckCircleIcon } from './Icons';
+import { useModalAccessibility } from '../hooks/useModalAccessibility';
 
 interface HelpModalProps {
   isOpen: boolean;
@@ -9,47 +10,8 @@ interface HelpModalProps {
 const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
-  const previouslyFocusedElement = useRef<HTMLElement | null>(null);
-
-  useEffect(() => {
-    if (isOpen) {
-      previouslyFocusedElement.current = document.activeElement as HTMLElement;
-      // Focus the close button for better accessibility flow.
-      closeButtonRef.current?.focus();
-    } else {
-      previouslyFocusedElement.current?.focus();
-    }
-  }, [isOpen]);
-
-
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'Escape') {
-      onClose();
-      return;
-    }
-
-    if (event.key === 'Tab') {
-        const focusableElements = modalRef.current?.querySelectorAll<HTMLElement>(
-            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
-        if (!focusableElements) return;
-
-        const firstElement = focusableElements[0];
-        const lastElement = focusableElements[focusableElements.length - 1];
-
-        if (event.shiftKey) { // Shift + Tab
-            if (document.activeElement === firstElement) {
-                lastElement.focus();
-                event.preventDefault();
-            }
-        } else { // Tab
-            if (document.activeElement === lastElement) {
-                firstElement.focus();
-                event.preventDefault();
-            }
-        }
-    }
-  };
+  
+  const { handleKeyDown } = useModalAccessibility(isOpen, onClose, modalRef, closeButtonRef);
 
   if (!isOpen) return null;
 

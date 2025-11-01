@@ -1,5 +1,6 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef } from 'react';
 import { CloseIcon, AlertTriangleIcon } from './Icons';
+import { useModalAccessibility } from '../hooks/useModalAccessibility';
 
 interface ConfirmModalProps {
   isOpen: boolean;
@@ -14,47 +15,8 @@ interface ConfirmModalProps {
 const ConfirmModal: React.FC<ConfirmModalProps> = ({ isOpen, onClose, onConfirm, title, message, confirmText = 'Confirm', confirmVariant = 'default' }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const cancelButtonRef = useRef<HTMLButtonElement>(null);
-  const previouslyFocusedElement = useRef<HTMLElement | null>(null);
-
-  useEffect(() => {
-    if (isOpen) {
-      previouslyFocusedElement.current = document.activeElement as HTMLElement;
-      // Focus the cancel button for a safer, more accessible default action.
-      cancelButtonRef.current?.focus();
-    } else {
-      previouslyFocusedElement.current?.focus();
-    }
-  }, [isOpen]);
-
-
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'Escape') {
-      onClose();
-      return;
-    }
-
-    if (event.key === 'Tab') {
-        const focusableElements = modalRef.current?.querySelectorAll<HTMLElement>(
-            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
-        if (!focusableElements || focusableElements.length === 0) return;
-
-        const firstElement = focusableElements[0];
-        const lastElement = focusableElements[focusableElements.length - 1];
-
-        if (event.shiftKey) { // Shift + Tab
-            if (document.activeElement === firstElement) {
-                lastElement.focus();
-                event.preventDefault();
-            }
-        } else { // Tab
-            if (document.activeElement === lastElement) {
-                firstElement.focus();
-                event.preventDefault();
-            }
-        }
-    }
-  };
+  
+  const { handleKeyDown } = useModalAccessibility(isOpen, onClose, modalRef, cancelButtonRef);
 
   if (!isOpen) return null;
 
