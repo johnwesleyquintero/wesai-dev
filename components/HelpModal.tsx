@@ -90,11 +90,16 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
                         <div key={index} className="flex justify-between items-center gap-4">
                             <p className="text-slate-800 dark:text-slate-200">{shortcut.description}</p>
                             <div className="flex-shrink-0">
-                                <Key>{shortcut.keys[0]}</Key>
-                                {shortcut.keys.length > 1 && <span className="mx-0.5 text-slate-400 dark:text-slate-500">/</span>}
-                                {shortcut.keys[1] && <Key>{shortcut.keys[1]}</Key>}
+                                {shortcut.keys.map((key, i) => (
+                                    <React.Fragment key={key}>
+                                        {/* FIX: Explicitly pass children as a prop to resolve a potential tooling/compiler issue. */}
+                                        <Key children={key} />
+                                        {i < shortcut.keys.length - 1 && <span className="mx-0.5 text-slate-400 dark:text-slate-500">/</span>}
+                                    </React.Fragment>
+                                ))}
                                 {shortcut.plus && <span className="mx-0.5 text-slate-400 dark:text-slate-500">+</span>}
-                                {shortcut.final && <Key>{shortcut.final}</Key>}
+                                {/* FIX: Explicitly pass children as a prop to resolve a potential tooling/compiler issue. */}
+                                {shortcut.final && <Key children={shortcut.final} />}
                             </div>
                         </div>
                     ))}

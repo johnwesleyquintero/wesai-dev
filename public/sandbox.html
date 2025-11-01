@@ -115,7 +115,8 @@
             }
             
             renderError() {
-                const errorMessage = this.state.error ? this.state.error.message : 'A runtime error occurred.';
+                // The detailed error is now only shown in the main app window.
+                // This component now just indicates that an error occurred.
                 return React.createElement('div', { className: 'render-error-wrapper' },
                     React.createElement('div', { className: 'render-error-header' },
                         React.createElement('svg', { xmlns: 'http://www.w3.org/2000/svg', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round', style: { width: '1.25rem', height: '1.25rem', marginRight: '0.75rem', flexShrink: 0 } },
@@ -123,9 +124,9 @@
                             React.createElement('path', { d: 'M12 9v4' }),
                             React.createElement('path', { d: 'M12 17h.01' })
                         ),
-                        'Preview Runtime Error' // Differentiate from initial render error
+                        'Preview Error'
                     ),
-                    React.createElement('div', { className: 'render-error-details' }, errorMessage)
+                    React.createElement('div', { className: 'render-error-details', style: { opacity: 0.7, fontFamily: 'sans-serif' } }, 'Check the main panel for more details.')
                 );
             }
 

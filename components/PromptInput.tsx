@@ -1,8 +1,7 @@
-
 import React, { useRef, useEffect, useState } from 'react';
 import { SparkleIcon, CloseIcon, CubeIcon } from './Icons';
 import QuickStartPrompts from './QuickStartPrompts';
-import { PROMPT_MAX_LENGTH, TOOLTIP_CLASSES } from '../constants';
+import { PROMPT_MAX_LENGTH, TOOLTIP_CLASSES, RESET_ANIMATION_DURATION_MS } from '../constants';
 
 interface PromptInputProps {
   prompt: string;
@@ -51,28 +50,22 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [proTipIndex, setProTipIndex] = useState(0);
   const [isTipVisible, setIsTipVisible] = useState(true);
-  const timeoutIdRef = useRef<number | null>(null);
-  const isMountedRef = useRef(true);
+  const timeoutIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
   useEffect(() => {
     // Select a random pro tip on component mount
     setProTipIndex(Math.floor(Math.random() * PRO_TIPS.length));
     
     const tipInterval = setInterval(() => {
-        if (!isMountedRef.current) return;
-        
         setIsTipVisible(false);
-        timeoutIdRef.current = window.setTimeout(() => {
-            // Only update state if the component is still mounted
-            if (isMountedRef.current) {
-                setProTipIndex(prevIndex => (prevIndex + 1) % PRO_TIPS.length);
-                setIsTipVisible(true);
-            }
-        }, 300); // Wait for fade-out to complete
+        timeoutIdRef.current = setTimeout(() => {
+            // The cleanup function will prevent this from running if the component is unmounted.
+            setProTipIndex(prevIndex => (prevIndex + 1) % PRO_TIPS.length);
+            setIsTipVisible(true);
+        }, RESET_ANIMATION_DURATION_MS); // Wait for fade-out to complete
     }, 5000); // Change tip every 5 seconds
 
     return () => {
-        isMountedRef.current = false; // Mark as unmounted
         clearInterval(tipInterval);
         if (timeoutIdRef.current) {
             clearTimeout(timeoutIdRef.current);

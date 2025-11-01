@@ -1,7 +1,5 @@
-
-
 // FIX: Import React to make the React namespace available for types.
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 // A custom hook to persist state in localStorage
 function usePersistentState<T>(key: string, initialValue: T): [T, React.Dispatch<React.SetStateAction<T>>] {
@@ -21,6 +19,7 @@ function usePersistentState<T>(key: string, initialValue: T): [T, React.Dispatch
     return initialValue;
   });
 
+  // Effect to write state changes from the current tab to localStorage.
   useEffect(() => {
     // Prevent SSR errors by checking for 'window'
     if (typeof window === 'undefined') {
@@ -36,6 +35,33 @@ function usePersistentState<T>(key: string, initialValue: T): [T, React.Dispatch
       console.error(`Error setting localStorage key "${key}":`, error);
     }
   }, [key, state]);
+
+  // Callback to handle storage events from other tabs.
+  const handleStorageChange = useCallback((event: StorageEvent) => {
+    if (event.key === key) {
+        try {
+            if (event.newValue) {
+                // The value from another tab has changed. Update our state.
+                setState(JSON.parse(event.newValue));
+            } else {
+                // The item was removed from storage in another tab. Reset to initial value.
+                setState(initialValue);
+            }
+        } catch (error) {
+            console.error(`Error parsing storage change for key "${key}":`, error);
+            setState(initialValue); // Reset to initial on error for safety.
+        }
+    }
+  }, [key, initialValue]);
+
+  // Effect to listen for storage changes from other tabs.
+  useEffect(() => {
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+        window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [handleStorageChange]);
+
 
   return [state, setState];
 }

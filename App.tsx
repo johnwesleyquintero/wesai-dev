@@ -33,8 +33,8 @@ const App: React.FC = () => {
   const [isPromptHighlighting, setIsPromptHighlighting] = useState<boolean>(false);
   const [isResetModalOpen, setIsResetModalOpen] = useState<boolean>(false);
   const [ariaLiveMessage, setAriaLiveMessage] = useState<string>('');
-  // FIX: Use `number` for the timeout ID, which is the correct type for browser environments.
-  const resetTimeoutRef = useRef<number | null>(null);
+  // FIX: Use `ReturnType<typeof setTimeout>` for robust type safety across environments.
+  const resetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { addToast } = useToast();
   
   const mainContainerRef = useRef<HTMLDivElement>(null);
@@ -186,7 +186,7 @@ const App: React.FC = () => {
 
     // 2. After the animation duration, clear all the state and end the animation.
     // This ensures the old content fades out before the new state appears.
-    resetTimeoutRef.current = window.setTimeout(() => {
+    resetTimeoutRef.current = setTimeout(() => {
         setPrompt('');
         setResponse(null);
         setError(null);

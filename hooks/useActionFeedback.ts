@@ -7,8 +7,9 @@ import { useState, useCallback, useRef, useEffect } from 'react';
  */
 export const useActionFeedback = (duration: number = 2000) => {
   const [isActionDone, setIsActionDone] = useState(false);
-  // FIX: Use `number` for the timeout ID, which is the correct type for browser environments.
-  const timeoutRef = useRef<number | null>(null);
+  // FIX: Use `ReturnType<typeof setTimeout>` for robust type safety across environments.
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mountedRef = useRef(true); // Add ref to track mounted state.
 
   const trigger = useCallback(() => {
     // Clear any existing timeout to handle rapid clicks
@@ -18,15 +19,20 @@ export const useActionFeedback = (duration: number = 2000) => {
     
     setIsActionDone(true);
 
-    timeoutRef.current = window.setTimeout(() => {
-      setIsActionDone(false);
+    timeoutRef.current = setTimeout(() => {
+      // Fortification: Only update state if the component is still mounted.
+      if (mountedRef.current) {
+        setIsActionDone(false);
+      }
       timeoutRef.current = null;
     }, duration);
   }, [duration]);
 
-  // Cleanup timeout on unmount
+  // On unmount, clear any pending timeout and update the mounted ref.
   useEffect(() => {
+    mountedRef.current = true; // Set on mount
     return () => {
+      mountedRef.current = false; // Set on unmount
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
