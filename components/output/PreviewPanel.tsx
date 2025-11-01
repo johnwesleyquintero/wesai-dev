@@ -1,16 +1,33 @@
 
+
 import React, { useRef, useState, useEffect } from 'react';
 
 type Theme = 'light' | 'dark';
 
-const PreviewPanel: React.FC<{ code: string; theme: Theme; }> = ({ code, theme }) => {
+interface PreviewPanelProps {
+    code: string;
+    theme: Theme;
+    onError: (message: string) => void;
+}
+
+const PreviewPanel: React.FC<PreviewPanelProps> = ({ code, theme, onError }) => {
     const iframeRef = useRef<HTMLIFrameElement>(null);
     const [isSandboxReady, setIsSandboxReady] = useState(false);
 
+    // Consolidated message handler for all sandbox communication
     useEffect(() => {
         const handleMessage = (event: MessageEvent) => {
-            if (event.source === iframeRef.current?.contentWindow && event.data.type === 'SANDBOX_READY') {
+            // Security: Only accept messages from our own iframe's content window
+            if (event.source !== iframeRef.current?.contentWindow) {
+                return;
+            }
+
+            const { type, payload } = event.data;
+            
+            if (type === 'SANDBOX_READY') {
                 setIsSandboxReady(true);
+            } else if (type === 'RENDER_ERROR' && payload?.message) {
+                onError(payload.message);
             }
         };
 
@@ -18,7 +35,7 @@ const PreviewPanel: React.FC<{ code: string; theme: Theme; }> = ({ code, theme }
         return () => {
             window.removeEventListener('message', handleMessage);
         };
-    }, []);
+    }, [onError]);
     
     // Decouple theme updates from code rendering to prevent unnecessary re-renders in the sandbox.
     useEffect(() => {

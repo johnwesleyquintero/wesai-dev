@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useRef, useLayoutEffect, useCallback } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { CodeOutput } from '../copilot/agent';
@@ -70,20 +71,6 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
     }
   }, [response]);
   
-  // Listen for sandbox errors (runs only once on mount).
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-        if (event.data.type === 'RENDER_ERROR' && event.data.payload.message) {
-            setPreviewError(event.data.payload.message);
-        }
-    };
-
-    window.addEventListener('message', handleMessage);
-    return () => {
-        window.removeEventListener('message', handleMessage);
-    };
-  }, []);
-
   // Reset preview error on new generation or when switching away from the preview tab
   useEffect(() => {
     if (isLoading) {
@@ -136,7 +123,7 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
                 />
             );
           }
-          return <PreviewPanel code={response.react} theme={theme} />;
+          return <PreviewPanel code={response.react} theme={theme} onError={setPreviewError} />;
       }
       return (
         <div className="bg-slate-50 dark:bg-slate-800/50 rounded-b-md h-full flex flex-col">
@@ -213,6 +200,11 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
         aria-labelledby={activeTab === 'preview' ? 'tab-preview' : 'tab-code'}
         className="flex-grow relative animate-fade-in min-h-0"
       >
+        {isLoading && (
+            <div className="absolute top-0 left-0 w-full h-0.5 z-10 overflow-hidden">
+                <div className="w-full h-full bg-gradient-to-r from-indigo-400 via-cyan-400 to-indigo-400 animate-indeterminate-progress bg-[length:200%_100%]"></div>
+            </div>
+        )}
         {renderContent()}
       </div>
     </div>

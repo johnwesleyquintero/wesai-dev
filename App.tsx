@@ -89,35 +89,35 @@ const App: React.FC = () => {
   }, [isLoading, response, error]);
 
   // --- Handle Shared Links on Load & on Hash Change ---
-  useEffect(() => {
-    const handleHash = () => {
-        const hash = window.location.hash.substring(1);
-        if (hash) {
-            try {
-                const decodedString = atob(decodeURIComponent(hash));
-                const decompressed = pako.inflate(decodedString, { to: 'string' });
-                const data = JSON.parse(decompressed);
-                if (data.prompt && data.react) {
-                    setPrompt(data.prompt);
-                    setResponse({ react: data.react });
-                }
-            } catch (e) {
-                console.error("Failed to parse shared link:", e);
-                setError("The shared link is invalid or corrupted.");
-            } finally {
-                // Clear the hash for a clean URL.
-                window.history.replaceState(null, '', window.location.pathname + window.location.search);
+  const handleHash = useCallback(() => {
+    const hash = window.location.hash.substring(1);
+    if (hash) {
+        try {
+            const decodedString = atob(decodeURIComponent(hash));
+            const decompressed = pako.inflate(decodedString, { to: 'string' });
+            const data = JSON.parse(decompressed);
+            if (data.prompt && data.react) {
+                setPrompt(data.prompt);
+                setResponse({ react: data.react });
             }
+        } catch (e) {
+            console.error("Failed to parse shared link:", e);
+            setError("The shared link is invalid or corrupted.");
+        } finally {
+            // Clear the hash for a clean URL.
+            window.history.replaceState(null, '', window.location.pathname + window.location.search);
         }
-    };
-    
+    }
+  }, [setPrompt, setResponse]);
+
+  useEffect(() => {
     window.addEventListener('hashchange', handleHash);
     handleHash(); // Handle initial hash on load
 
     return () => {
         window.removeEventListener('hashchange', handleHash);
     };
-  }, [setPrompt, setResponse]);
+  }, [handleHash]);
 
 
   const handleGenerate = useCallback(async () => {
