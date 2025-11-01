@@ -154,7 +154,7 @@ const App: React.FC = () => {
 
 
   return (
-    <div className="h-screen flex flex-col bg-transparent transition-colors duration-300">
+    <div className="h-screen flex flex-col bg-transparent transition-colors duration-normal">
       {/* Visually hidden container for screen reader announcements */}
       <div aria-live="polite" className="sr-only">
         {ariaLiveMessage}
@@ -169,7 +169,7 @@ const App: React.FC = () => {
         {/* Unified Layout */}
         <div 
           id="prompt-panel"
-          className={`flex flex-col md:h-full md:min-h-0 ${isResetting ? 'animate-fade-out' : ''} ${!isDragging ? 'transition-[width] duration-200 ease-out' : ''}`}
+          className={`flex flex-col md:h-full md:min-h-0 ${isResetting ? 'animate-fade-out' : ''} ${!isDragging ? 'transition-[width] duration-fast ease-out-quad' : ''}`}
           style={{ width: 'var(--panel-one-width, 100%)' }}
         >
            <PromptInput 
@@ -192,19 +192,19 @@ const App: React.FC = () => {
             aria-valuenow={Math.round(dividerPosition)}
             aria-valuemin={PANEL_MIN_SIZE_PERCENT}
             aria-valuemax={PANEL_MAX_SIZE_PERCENT}
-            className="hidden md:flex w-4 cursor-col-resize flex-shrink-0 items-center justify-center group focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950 rounded-full transition-colors duration-300"
+            className="hidden md:flex w-4 cursor-col-resize flex-shrink-0 items-center justify-center group focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950 rounded-full transition-colors duration-normal"
         >
-            <div className={`w-0.5 h-16 bg-slate-200 dark:bg-slate-800 rounded-full transition-all relative ${isDragging ? 'duration-75 bg-indigo-500 scale-x-150 shadow-xl shadow-indigo-500/30' : 'duration-300 group-hover:bg-indigo-500/60 group-focus-visible:bg-indigo-500/60'}`}>
-               <div className={`absolute bottom-full mb-2.5 -translate-x-1/2 left-1/2 bg-slate-800 text-white text-xs font-mono py-1 px-2.5 rounded-md shadow-lg transition-opacity duration-200 pointer-events-none ${isDragging ? 'opacity-100' : 'opacity-0'}`}>
+            <div className={`w-0.5 h-16 bg-slate-200 dark:bg-slate-800 rounded-full transition-all relative ${isDragging ? 'duration-75 bg-indigo-500 scale-x-150 shadow-xl shadow-indigo-500/30' : 'duration-normal group-hover:bg-indigo-500/60 group-focus-visible:bg-indigo-500/60'}`}>
+               <div className={`absolute bottom-full mb-2.5 -translate-x-1/2 left-1/2 bg-slate-800 text-white text-xs font-mono py-1 px-2.5 rounded-md shadow-lg transition-opacity duration-fast pointer-events-none ${isDragging ? 'opacity-100' : 'opacity-0'}`}>
                     {Math.round(dividerPosition)}%&nbsp;/&nbsp;{100 - Math.round(dividerPosition)}%
                </div>
-               <GripVerticalIcon className={`absolute text-slate-500 dark:text-slate-400 w-5 h-5 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-50 group-hover:opacity-100 group-hover:scale-125 group-focus-visible:opacity-100 group-focus-visible:scale-125 group-active:text-indigo-600 dark:group-active:text-indigo-400 transition-all duration-200 ${isDragging ? 'text-indigo-600 dark:text-indigo-400' : ''}`} />
+               <GripVerticalIcon className={`absolute text-slate-500 dark:text-slate-400 w-5 h-5 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-50 group-hover:opacity-100 group-hover:scale-125 group-focus-visible:opacity-100 group-focus-visible:scale-125 group-active:text-indigo-600 dark:group-active:text-indigo-400 transition-all duration-fast ${isDragging ? 'text-indigo-600 dark:text-indigo-400' : ''}`} />
             </div>
         </div>
         
         <div 
           id="output-panel"
-          className={`flex flex-col md:h-full md:min-h-0 ${isResetting ? 'animate-fade-out' : ''} ${!isDragging ? 'transition-[width] duration-200 ease-out' : ''}`}
+          className={`flex flex-col md:h-full md:min-h-0 ${isResetting ? 'animate-fade-out' : ''} ${!isDragging ? 'transition-[width] duration-fast ease-out-quad' : ''}`}
           style={{ width: 'var(--panel-two-width, 100%)' }}
         >
           <OutputDisplay

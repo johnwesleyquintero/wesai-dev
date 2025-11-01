@@ -238,3 +238,39 @@ export const WrapTextIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => 
         <path d="m18 15-3 3 3 3" />
     </svg>
 );
+
+export const FontSizeIncreaseIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <path d="M4 12h8"/>
+        <path d="M4 6h12"/>
+        <path d="M10 6v12"/>
+        <path d="M18 9h4"/>
+        <path d="M20 7v4"/>
+    </svg>
+);
+
+export const FontSizeDecreaseIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <path d="M4 12h8"/>
+        <path d="M4 6h12"/>
+        <path d="M10 6v12"/>
+        <path d="M18 9h4"/>
+    </svg>
+);
+
+export const QrCodeIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <rect x="3" y="3" width="7" height="7" />
+        <rect x="14" y="3" width="7" height="7" />
+        <rect x="3" y="14" width="7" height="7" />
+        <line x1="14" y1="14" x2="14" y2="14.01" />
+        <line x1="17" y1="14" x2="17" y2="14.01" />
+        <line x1="14" y1="17" x2="14" y2="17.01" />
+        <line x1="17" y1="17" x2="17" y2="17.01" />
+        <line x1="20" y1="14" x2="20" y2="14.01" />
+        <line x1="14" y1="20" x2="14" y2="20.01" />
+        <line x1="17" y1="20" x2="17" y2="20.01" />
+        <line x1="20" y1="17" x2="20" y2="17.01" />
+        <line x1="20" y1="20" x2="20" y2="20.01" />
+    </svg>
+);

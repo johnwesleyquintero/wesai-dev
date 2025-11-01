@@ -7,7 +7,7 @@ interface HeaderProps {
     onResetClick: () => void;
 }
 
-const tooltipClasses = "absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-800 dark:bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 group-focus:opacity-100 group-focus:scale-100 transition-all pointer-events-none transform translate-y-0 group-hover:-translate-y-1 group-focus:-translate-y-1 duration-200";
+const tooltipClasses = "absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-800 dark:bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 group-focus:opacity-100 group-focus:scale-100 transition-all pointer-events-none transform translate-y-0 group-hover:-translate-y-1 group-focus:-translate-y-1 duration-fast tooltip-with-arrow";
 
 const Header: React.FC<HeaderProps> = ({ onHelpClick, onResetClick }) => {
   const { theme, toggleTheme } = useTheme();
@@ -22,7 +22,7 @@ const Header: React.FC<HeaderProps> = ({ onHelpClick, onResetClick }) => {
             <div className="relative group">
                 <button 
                     onClick={onResetClick} 
-                    className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800/70 transition-all duration-200 hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950" 
+                    className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800/70 transition-all duration-fast hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950" 
                     aria-label="Start new session"
                 >
                     <RotateCcwIcon className="w-5 h-5" />
@@ -35,7 +35,7 @@ const Header: React.FC<HeaderProps> = ({ onHelpClick, onResetClick }) => {
             <div className="w-px h-6 bg-slate-200 dark:bg-slate-700"></div>
 
             <div className="relative group">
-                <button onClick={toggleTheme} className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800/70 transition-all duration-200 hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950" aria-label="Toggle theme">
+                <button onClick={toggleTheme} className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800/70 transition-all duration-fast hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950" aria-label="Toggle theme">
                     {theme === 'dark' ? <SunIcon className="w-6 h-6" /> : <MoonIcon className="w-6 h-6" />}
                 </button>
                 <div className={tooltipClasses}>
@@ -43,7 +43,7 @@ const Header: React.FC<HeaderProps> = ({ onHelpClick, onResetClick }) => {
                 </div>
             </div>
             <div className="relative group">
-                <button onClick={onHelpClick} className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800/70 transition-all duration-200 hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950" aria-label="Open help and what's new">
+                <button onClick={onHelpClick} className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800/70 transition-all duration-fast hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950" aria-label="Open help and what's new">
                     <HelpIcon className="w-6 h-6" />
                 </button>
                  <div className={tooltipClasses}>

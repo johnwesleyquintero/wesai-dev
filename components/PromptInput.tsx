@@ -86,7 +86,7 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
   }, [prompt]);
 
   return (
-    <div className={`bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border border-slate-200 dark:border-slate-800 ring-1 ring-black/5 dark:ring-white/10 rounded-lg flex flex-col h-full shadow-md transition-opacity duration-300 ${isLoading ? 'opacity-70 pointer-events-none' : ''}`}>
+    <div className={`bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border border-slate-200 dark:border-slate-800 ring-1 ring-black/5 dark:ring-white/10 rounded-lg flex flex-col h-full shadow-md transition-opacity duration-normal ${isLoading ? 'opacity-70 pointer-events-none' : ''}`}>
         <div className="flex-shrink-0 flex items-center justify-between border-b border-slate-200 dark:border-slate-700 p-2 pl-4">
              <div className="flex items-center gap-2">
                 <CubeIcon className="w-5 h-5 text-slate-500 dark:text-slate-400"/>
@@ -105,7 +105,7 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
                   placeholder="e.g., A responsive login form with a 'remember me' checkbox and a pulsing gradient on the submit button..."
                   rows={3}
                   maxLength={PROMPT_MAX_LENGTH}
-                  className={`font-mono w-full p-4 pr-10 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 resize-none placeholder:text-slate-500 dark:placeholder:text-slate-400 focus:bg-white dark:focus:bg-slate-900/50 max-h-96 ${isHighlighting ? 'animate-pulse-indigo-glow' : ''}`}
+                  className={`font-mono w-full p-4 pr-10 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-fast resize-none placeholder:text-slate-500 dark:placeholder:text-slate-400 focus:bg-white dark:focus:bg-slate-900/50 max-h-96 ${isHighlighting ? 'animate-pulse-indigo-glow' : ''}`}
                   disabled={isLoading}
                 />
                 {prompt && (
@@ -119,13 +119,13 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
                 )}
             </div>
              <div className={`flex-shrink-0 overflow-hidden`}>
-                <div className={`transition-[max-height,opacity,margin] duration-500 ease-in-out ${prompt ? 'max-h-0 opacity-0' : 'max-h-96 opacity-100 mt-0'}`}>
+                <div className={`transition-[max-height,opacity,margin] duration-slow ease-in-out ${prompt ? 'max-h-0 opacity-0' : 'max-h-96 opacity-100 mt-0'}`}>
                     <QuickStartPrompts setPrompt={setPrompt} onPromptSelect={() => textareaRef.current?.focus()} layout="grid" />
                 </div>
             </div>
             <div className="mt-auto flex-shrink-0 space-y-3 pt-4">
                 <div className="flex justify-between items-center">
-                    <div className={`flex-1 transition-opacity duration-300 ${isTipVisible ? 'opacity-100' : 'opacity-0'}`}>
+                    <div className={`flex-1 transition-opacity duration-normal ${isTipVisible ? 'opacity-100' : 'opacity-0'}`}>
                       <ProTip tip={PRO_TIPS[proTipIndex]} />
                     </div>
                     <div className={`text-right text-xs font-mono pr-1 transition-colors ${prompt.length > PROMPT_MAX_LENGTH ? 'text-red-500' : 'text-slate-500 dark:text-slate-400'}`}>
@@ -135,7 +135,7 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
                 <button
                     onClick={handleGenerate}
                     disabled={isLoading || !prompt.trim()}
-                    className={`w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-3 px-4 rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 hover:shadow-xl hover:shadow-indigo-500/50 animate-gradient ${!isLoading && prompt.trim() ? 'animate-pulse-glow' : ''} ${isLoading ? 'pointer-events-auto' : ''}`}
+                    className={`w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-3 px-4 rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-normal flex items-center justify-center gap-2 transform hover:-translate-y-0.5 hover:shadow-xl hover:shadow-indigo-500/50 animate-gradient ${!isLoading && prompt.trim() ? 'animate-pulse-glow' : ''} ${isLoading ? 'pointer-events-auto' : ''}`}
                 >
                     {isLoading ? (
                     <>

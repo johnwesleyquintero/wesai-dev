@@ -28,6 +28,14 @@
                 sans: ['Inter', 'sans-serif'],
                 mono: ['JetBrains Mono', 'monospace'],
               },
+              transitionDuration: {
+                'fast': 'var(--timing-fast)',
+                'normal': 'var(--timing-normal)',
+                'slow': 'var(--timing-slow)',
+              },
+              transitionTimingFunction: {
+                'ease-out-quad': 'var(--ease-out-quad)',
+              },
               keyframes: {
                 'indeterminate-progress': {
                   '0%': { backgroundPosition: '200% center' },
@@ -55,6 +63,13 @@
     }
     </script>
 <style>
+    /* --- Base Variables & Styles --- */
+    :root {
+        --timing-fast: 200ms;
+        --timing-normal: 300ms;
+        --timing-slow: 500ms;
+        --ease-out-quad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
     /* --- Base Animation Styles --- */
     @keyframes spin-slow {
         from { transform: rotate(0deg); }
@@ -65,21 +80,21 @@
         to { opacity: 1; transform: translateY(0) scale(1); }
     }
     .animate-fade-in {
-        animation: fadeIn 0.4s ease-out forwards;
+        animation: fadeIn 0.4s var(--ease-out-quad) forwards;
     }
     @keyframes fadeOut {
         from { opacity: 1; transform: scale(1); }
         to { opacity: 0; transform: scale(0.98); }
     }
     .animate-fade-out {
-        animation: fadeOut 0.3s ease-in-out forwards;
+        animation: fadeOut var(--timing-normal) ease-in-out forwards;
     }
     @keyframes scaleIn {
         from { opacity: 0; transform: scale(0.95); }
         to { opacity: 1; transform: scale(1); }
     }
     .animate-scale-in {
-        animation: scaleIn 0.2s ease-out forwards;
+        animation: scaleIn var(--timing-fast) var(--ease-out-quad) forwards;
     }
     /* Added for toast notifications */
     @keyframes toast-in {
@@ -87,14 +102,14 @@
         to { opacity: 1; transform: translateX(0); }
     }
     .animate-toast-in {
-        animation: toast-in 0.3s ease-out forwards;
+        animation: toast-in var(--timing-normal) var(--ease-out-quad) forwards;
     }
     @keyframes toast-out {
         from { opacity: 1; transform: translateX(0); }
         to { opacity: 0; transform: translateX(100%); }
     }
     .animate-toast-out {
-        animation: toast-out 0.3s ease-in forwards;
+        animation: toast-out var(--timing-normal) ease-in forwards;
     }
     @keyframes pulse-glow {
       0%, 100% { opacity: 0.9; transform: scale(1); }
@@ -228,6 +243,41 @@
     .dark body::before {
         background-image: radial-gradient(circle at 1px 1px, theme(colors.slate.800) 1px, transparent 0);
     }
+    /* Animated Aurora Background */
+    @keyframes aurora-glow {
+      0% { transform: scale(1) rotate(0deg); opacity: 0.8; }
+      100% { transform: scale(1.5) rotate(10deg); opacity: 1; }
+    }
+    body::after {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: radial-gradient(circle at 10% 20%, theme(colors.indigo.500 / 0.1), transparent 30%),
+                    radial-gradient(circle at 80% 70%, theme(colors.cyan.500 / 0.1), transparent 30%);
+        z-index: -2; /* Behind the dot grid */
+        animation: aurora-glow 20s infinite ease-in-out alternate;
+    }
+    .dark body::after {
+        background: radial-gradient(circle at 10% 20%, theme(colors.indigo.500 / 0.15), transparent 40%),
+                    radial-gradient(circle at 80% 70%, theme(colors.cyan.500 / 0.15), transparent 40%);
+    }
+    /* Tooltip Arrow */
+    .tooltip-with-arrow::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 100%; /* At the bottom of the tooltip */
+        transform: translateX(-50%);
+        border-width: 5px;
+        border-style: solid;
+        border-color: theme(colors.slate.800) transparent transparent transparent;
+    }
+    .dark .tooltip-with-arrow::after {
+        border-color: theme(colors.slate.900) transparent transparent transparent;
+    }
     /* Ensure hljs theme background takes priority */
     .hljs {
         background: none;
@@ -293,7 +343,7 @@
     }
 </style>
 </head>
-<body class="font-sans bg-slate-50 dark:bg-slate-950 animate-fade-in transition-colors duration-300">
+<body class="font-sans bg-slate-50 dark:bg-slate-950 animate-fade-in transition-colors duration-normal">
     <div id="root">
         <!-- Preloader: This gets replaced by React once it mounts -->
         <div class="preloader">
