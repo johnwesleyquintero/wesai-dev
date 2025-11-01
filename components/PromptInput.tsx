@@ -1,4 +1,5 @@
-import React, { useRef, useEffect, useState } from 'react';
+
+import React, { useRef, useEffect, useState, useId } from 'react';
 import { SparkleIcon, CloseIcon, CubeIcon } from './Icons';
 import QuickStartPrompts from './QuickStartPrompts';
 import { PROMPT_MAX_LENGTH, TOOLTIP_CLASSES, RESET_ANIMATION_DURATION_MS } from '../constants';
@@ -52,6 +53,9 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
   const [isTipVisible, setIsTipVisible] = useState(true);
   const timeoutIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
+  const clearTooltipId = useId();
+  const apiKeyTooltipId = useId();
+
   useEffect(() => {
     // Select a random pro tip on component mount
     setProTipIndex(Math.floor(Math.random() * PRO_TIPS.length));
@@ -122,10 +126,11 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
                         onClick={() => setPrompt('')}
                         className="p-1 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1 dark:focus-visible:ring-offset-slate-800"
                         aria-label="Clear input"
+                        aria-describedby={clearTooltipId}
                     >
                         <CloseIcon className="w-4 h-4" />
                     </button>
-                    <div className={`${TOOLTIP_CLASSES} right-0`}>
+                    <div id={clearTooltipId} role="tooltip" className={`${TOOLTIP_CLASSES} right-0`}>
                         Clear Input
                     </div>
                   </div>
@@ -150,6 +155,7 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
                         onClick={handleGenerate}
                         disabled={isGenerateDisabled}
                         className={`w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-3 px-4 rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-normal flex items-center justify-center gap-2 transform hover:-translate-y-0.5 hover:shadow-xl hover:shadow-indigo-500/50 animate-gradient ${!isLoading && prompt.trim() && isApiKeySet ? 'animate-pulse-glow' : ''} ${isLoading ? 'pointer-events-auto' : ''}`}
+                        aria-describedby={!isApiKeySet && !isLoading ? apiKeyTooltipId : undefined}
                     >
                         {isLoading ? (
                         <>
@@ -168,7 +174,7 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
                     </button>
                     {!isApiKeySet && !isLoading && (
                         <div className="absolute inset-0 flex items-center justify-center group cursor-not-allowed">
-                            <div className="absolute bottom-full mb-2 whitespace-nowrap rounded-md bg-slate-800 dark:bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all pointer-events-none transform translate-y-0 group-hover:-translate-y-1 duration-fast tooltip-with-arrow">
+                            <div id={apiKeyTooltipId} role="tooltip" className="absolute bottom-full mb-2 whitespace-nowrap rounded-md bg-slate-800 dark:bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all pointer-events-none transform translate-y-0 group-hover:-translate-y-1 duration-fast tooltip-with-arrow">
                                 Please set your API Key in Settings
                             </div>
                         </div>

@@ -1,4 +1,5 @@
-import React, { useCallback, useState } from 'react';
+
+import React, { useCallback, useState, useId } from 'react';
 import { useToast } from '../../contexts/ToastContext';
 import { CodeOutput } from '../../copilot/agent';
 import { CopyIcon, RotateCcwIcon, ShareIcon, CheckIcon, QrCodeIcon, CloseIcon } from '../Icons';
@@ -19,6 +20,13 @@ const GenerationHeader: React.FC<GenerationHeaderProps> = ({ prompt, response, o
   const { isActionDone: isShared, trigger: triggerShared } = useActionFeedback();
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState('');
+
+  const promptTooltipId = useId();
+  const copyTooltipId = useId();
+  const reuseTooltipId = useId();
+  const shareTooltipId = useId();
+  const qrTooltipId = useId();
+
   const isShareApiAvailable = typeof navigator !== 'undefined' && !!navigator.share;
 
   const handleReusePrompt = useCallback(() => {
@@ -57,32 +65,33 @@ const GenerationHeader: React.FC<GenerationHeaderProps> = ({ prompt, response, o
   }, [prompt, response, addToast]);
 
   const handleShare = useCallback(async () => {
-    const url = generateShareUrl();
-    if (url) {
-      try {
+    try {
+        const url = generateShareUrl();
+        if (!url) {
+            // generateShareUrl already shows a toast, so we just return.
+            return;
+        }
         const shareData = {
-          title: 'WesAI.Dev Generation',
-          text: `Check out this component I generated with WesAI: "${prompt}"`,
-          url,
+            title: 'WesAI.Dev Generation',
+            text: `Check out this component I generated with WesAI: "${prompt}"`,
+            url,
         };
 
-        if (navigator.share) {
-          await navigator.share(shareData);
-          addToast('Shared successfully!');
-          triggerShared();
+        if (isShareApiAvailable) {
+            await navigator.share(shareData);
+            addToast('Shared successfully!');
         } else {
-          await navigator.clipboard.writeText(url);
-          addToast('Shareable link copied!');
-          triggerShared();
+            await navigator.clipboard.writeText(url);
+            addToast('Shareable link copied!');
         }
-      } catch (e) {
+        triggerShared(); // Trigger feedback on success
+    } catch (e) {
         if (e instanceof Error && e.name !== 'AbortError') {
-          console.error("Failed to share:", e);
-          addToast('Failed to create share link', 'error');
+            console.error("Failed to share:", e);
+            addToast('Could not create or share link.', 'error');
         }
-      }
     }
-  }, [prompt, generateShareUrl, addToast, triggerShared]);
+  }, [prompt, generateShareUrl, addToast, triggerShared, isShareApiAvailable]);
 
   const handleQrCodeClick = useCallback(() => {
     const url = generateShareUrl();
@@ -104,7 +113,7 @@ const GenerationHeader: React.FC<GenerationHeaderProps> = ({ prompt, response, o
         <p className="text-sm text-slate-600 dark:text-slate-400 whitespace-nowrap overflow-hidden">
             {prompt}
         </p>
-        <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-max max-w-xs sm:max-w-sm md:max-w-md whitespace-normal break-words rounded-md bg-slate-800 dark:bg-slate-900 px-3 py-2 text-xs font-semibold text-white opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all pointer-events-none z-10 shadow-lg tooltip-with-arrow">
+        <div id={promptTooltipId} role="tooltip" className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-max max-w-xs sm:max-w-sm md:max-w-md whitespace-normal break-words rounded-md bg-slate-800 dark:bg-slate-900 px-3 py-2 text-xs font-semibold text-white opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all pointer-events-none z-10 shadow-lg tooltip-with-arrow">
           {prompt}
         </div>
       </div>
@@ -114,10 +123,11 @@ const GenerationHeader: React.FC<GenerationHeaderProps> = ({ prompt, response, o
           disabled={isPromptCopied}
           className="p-1.5 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-700/70 transition-colors duration-fast disabled:text-green-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900"
           aria-label="Copy this prompt"
+          aria-describedby={copyTooltipId}
         >
           {isPromptCopied ? <CheckIcon className="w-4 h-4" /> : <CopyIcon className="w-4 h-4" />}
         </button>
-        <div className={`${TOOLTIP_CLASSES} left-1/2 -translate-x-1/2`}>
+        <div id={copyTooltipId} role="tooltip" className={`${TOOLTIP_CLASSES} left-1/2 -translate-x-1/2`}>
           {isPromptCopied ? 'Copied!' : 'Copy Prompt'}
         </div>
       </div>
@@ -126,10 +136,11 @@ const GenerationHeader: React.FC<GenerationHeaderProps> = ({ prompt, response, o
           onClick={handleReusePrompt}
           className="p-1.5 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-700/70 transition-colors duration-fast focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900"
           aria-label="Reuse this prompt"
+          aria-describedby={reuseTooltipId}
         >
           <RotateCcwIcon className="w-4 h-4" />
         </button>
-        <div className={`${TOOLTIP_CLASSES} left-1/2 -translate-x-1/2`}>
+        <div id={reuseTooltipId} role="tooltip" className={`${TOOLTIP_CLASSES} left-1/2 -translate-x-1/2`}>
           Reuse Prompt
         </div>
       </div>
@@ -139,10 +150,11 @@ const GenerationHeader: React.FC<GenerationHeaderProps> = ({ prompt, response, o
           disabled={isShared}
           className="p-1.5 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-700/70 transition-colors duration-fast disabled:text-green-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900"
           aria-label={isShareApiAvailable ? "Share this generation" : "Copy shareable link"}
+          aria-describedby={shareTooltipId}
         >
           {isShared ? <CheckIcon className="w-4 h-4" /> : <ShareIcon className="w-4 h-4" />}
         </button>
-        <div className={`${TOOLTIP_CLASSES} left-1/2 -translate-x-1/2`}>
+        <div id={shareTooltipId} role="tooltip" className={`${TOOLTIP_CLASSES} left-1/2 -translate-x-1/2`}>
           {isShared ? 'Link Copied!' : (isShareApiAvailable ? 'Share' : 'Copy Share Link')}
         </div>
       </div>
@@ -151,10 +163,11 @@ const GenerationHeader: React.FC<GenerationHeaderProps> = ({ prompt, response, o
           onClick={handleQrCodeClick}
           className="p-1.5 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-700/70 transition-colors duration-fast focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900"
           aria-label="Show QR code for sharing"
+          aria-describedby={qrTooltipId}
         >
           <QrCodeIcon className="w-4 h-4" />
         </button>
-        <div className={`${TOOLTIP_CLASSES} left-1/2 -translate-x-1/2`}>
+        <div id={qrTooltipId} role="tooltip" className={`${TOOLTIP_CLASSES} left-1/2 -translate-x-1/2`}>
           Show QR Code
         </div>
       </div>

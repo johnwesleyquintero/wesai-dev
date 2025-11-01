@@ -23,8 +23,14 @@
         (function() {
             try {
                 const theme = localStorage.getItem('theme');
-                if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                const isDark = theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                if (isDark) {
                     document.documentElement.classList.add('dark');
+                    // FIX: Also manage syntax highlighting themes to prevent code block flicker.
+                    const lightHljs = document.getElementById('hljs-light');
+                    const darkHljs = document.getElementById('hljs-dark');
+                    if (lightHljs) lightHljs.disabled = true;
+                    if (darkHljs) darkHljs.disabled = false;
                 }
             } catch (e) { /* ignore */ }
         })();

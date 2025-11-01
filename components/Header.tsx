@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useId } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { HelpIcon, SunIcon, MoonIcon, WesAILogoIcon, RotateCcwIcon, SettingsIcon } from './Icons';
 import { TOOLTIP_CLASSES } from '../constants';
@@ -12,6 +12,11 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ onHelpClick, onResetClick, onSettingsClick }) => {
   const { theme, toggleTheme } = useTheme();
+  // Accessibility: Assign unique IDs for ARIA descriptions.
+  const resetTooltipId = useId();
+  const settingsTooltipId = useId();
+  const themeTooltipId = useId();
+  const helpTooltipId = useId();
 
   return (
     <header className="flex-shrink-0 py-3 px-4 sm:px-6 lg:px-8 border-b border-slate-200 dark:border-slate-800 bg-slate-100/80 dark:bg-slate-950/80 backdrop-blur-lg z-10 shadow-sm">
@@ -25,10 +30,11 @@ const Header: React.FC<HeaderProps> = ({ onHelpClick, onResetClick, onSettingsCl
                     onClick={onResetClick} 
                     className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800/70 transition-all duration-fast hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950" 
                     aria-label="Start new session"
+                    aria-describedby={resetTooltipId}
                 >
                     <RotateCcwIcon className="w-5 h-5" />
                 </button>
-                <div className={`${TOOLTIP_CLASSES} left-1/2 -translate-x-1/2`}>
+                <div id={resetTooltipId} role="tooltip" className={`${TOOLTIP_CLASSES} left-1/2 -translate-x-1/2`}>
                     New Session
                 </div>
             </div>
@@ -36,27 +42,27 @@ const Header: React.FC<HeaderProps> = ({ onHelpClick, onResetClick, onSettingsCl
             <div className="w-px h-6 bg-slate-200 dark:bg-slate-700"></div>
             
             <div className="relative group">
-                <button onClick={onSettingsClick} className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800/70 transition-all duration-fast hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950" aria-label="Open settings">
+                <button onClick={onSettingsClick} className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800/70 transition-all duration-fast hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950" aria-label="Open settings" aria-describedby={settingsTooltipId}>
                     <SettingsIcon className="w-6 h-6" />
                 </button>
-                <div className={`${TOOLTIP_CLASSES} left-1/2 -translate-x-1/2`}>
+                <div id={settingsTooltipId} role="tooltip" className={`${TOOLTIP_CLASSES} left-1/2 -translate-x-1/2`}>
                     Settings
                 </div>
             </div>
 
             <div className="relative group">
-                <button onClick={toggleTheme} className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800/70 transition-all duration-fast hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950" aria-label="Toggle theme">
+                <button onClick={toggleTheme} className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800/70 transition-all duration-fast hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950" aria-label="Toggle theme" aria-describedby={themeTooltipId}>
                     {theme === 'dark' ? <SunIcon className="w-6 h-6" /> : <MoonIcon className="w-6 h-6" />}
                 </button>
-                <div className={`${TOOLTIP_CLASSES} left-1/2 -translate-x-1/2`}>
+                <div id={themeTooltipId} role="tooltip" className={`${TOOLTIP_CLASSES} left-1/2 -translate-x-1/2`}>
                     {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
                 </div>
             </div>
             <div className="relative group">
-                <button onClick={onHelpClick} className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800/70 transition-all duration-fast hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950" aria-label="Open help and what's new">
+                <button onClick={onHelpClick} className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800/70 transition-all duration-fast hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950" aria-label="Open help and what's new" aria-describedby={helpTooltipId}>
                     <HelpIcon className="w-6 h-6" />
                 </button>
-                 <div className={`${TOOLTIP_CLASSES} left-1/2 -translate-x-1/2`}>
+                 <div id={helpTooltipId} role="tooltip" className={`${TOOLTIP_CLASSES} left-1/2 -translate-x-1/2`}>
                     Help & Info
                 </div>
             </div>

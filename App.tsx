@@ -62,7 +62,7 @@ const App: React.FC = () => {
     if (!faviconLink) return;
 
     const originalFavicon = faviconLink.getAttribute('href');
-    const loadingFavicon = "data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='faviconGrad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%234f46e5;'/%3E%3Cstop offset='100%25' style='stop-color:%2306b6d4;'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='6' fill='url(%23faviconGrad)'/%3E%3Cpath d='M8 10 L12 22 L16 12 L20 22 L24 10' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Canimate attributeName='opacity' values='0.5;1;0.5' dur='1.5s' repeatCount='indefinite' /%3E%3C/path%3E%3C/svg%3E";
+    const loadingFavicon = "data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='faviconGrad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%234f46e5;'/%3E%3Cstop offset='100%25' style='stop-color:%2306b6d4;'/%3E%3C/defs%3E%3Crect width='32' height='32' rx='6' fill='url(%23faviconGrad)'/%3E%3Cpath d='M8 10 L12 22 L16 12 L20 22 L24 10' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Canimate attributeName='opacity' values='0.5;1;0.5' dur='1.5s' repeatCount='indefinite' /%3E%3C/path%3E%3C/svg%3E";
     
     if (isLoading) {
       document.title = `Generating... | ${baseTitle}`;
@@ -97,7 +97,8 @@ const App: React.FC = () => {
   }, [error]);
 
   useEffect(() => {
-    if (!isLoading && response && !error) {
+    // FIX: Add `isResetting` check to prevent announcing completion if a reset is in progress.
+    if (!isLoading && response && !error && !isResetting) {
         // Announce completion after a short delay to feel more natural
         const timer = setTimeout(() => {
             setAriaLiveMessage('Generation complete. Preview is now available.');
@@ -106,7 +107,7 @@ const App: React.FC = () => {
         }, 500);
         return () => clearTimeout(timer);
     }
-  }, [isLoading, response, error]);
+  }, [isLoading, response, error, isResetting]);
 
   // --- Handle Shared Links on Load & on Hash Change ---
   const handleHash = useCallback(() => {

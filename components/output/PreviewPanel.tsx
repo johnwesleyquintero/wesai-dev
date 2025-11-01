@@ -1,6 +1,6 @@
 
-
 import React, { useRef, useState, useEffect } from 'react';
+import { SANDBOX_PATH } from '../../constants';
 
 type Theme = 'light' | 'dark';
 
@@ -59,7 +59,7 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({ code, theme, onError }) => 
     return (
         <iframe
             ref={iframeRef}
-            src="/sandbox.html"
+            src={SANDBOX_PATH}
             title="Component Preview"
             className="w-full h-full border-0 bg-transparent"
             sandbox="allow-scripts"
