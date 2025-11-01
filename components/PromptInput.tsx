@@ -1,4 +1,5 @@
 
+
 import React, { useRef, useEffect, useState } from 'react';
 import { SparkleIcon, CloseIcon, CubeIcon } from './Icons';
 import QuickStartPrompts from './QuickStartPrompts';
@@ -51,20 +52,27 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
   const [proTipIndex, setProTipIndex] = useState(0);
   const [isTipVisible, setIsTipVisible] = useState(true);
   const timeoutIdRef = useRef<number | null>(null);
+  const isMountedRef = useRef(true);
   
   useEffect(() => {
     // Select a random pro tip on component mount
     setProTipIndex(Math.floor(Math.random() * PRO_TIPS.length));
     
     const tipInterval = setInterval(() => {
+        if (!isMountedRef.current) return;
+        
         setIsTipVisible(false);
         timeoutIdRef.current = window.setTimeout(() => {
-            setProTipIndex(prevIndex => (prevIndex + 1) % PRO_TIPS.length);
-            setIsTipVisible(true);
+            // Only update state if the component is still mounted
+            if (isMountedRef.current) {
+                setProTipIndex(prevIndex => (prevIndex + 1) % PRO_TIPS.length);
+                setIsTipVisible(true);
+            }
         }, 300); // Wait for fade-out to complete
     }, 5000); // Change tip every 5 seconds
 
     return () => {
+        isMountedRef.current = false; // Mark as unmounted
         clearInterval(tipInterval);
         if (timeoutIdRef.current) {
             clearTimeout(timeoutIdRef.current);
