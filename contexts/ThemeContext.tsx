@@ -1,5 +1,6 @@
 import React, { createContext, useLayoutEffect, useContext, ReactNode } from 'react';
 import usePersistentState from '../hooks/usePersistentState';
+import { LOCAL_STORAGE_KEYS } from '../constants';
 
 type Theme = 'light' | 'dark';
 
@@ -11,7 +12,7 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [theme, setTheme] = usePersistentState<Theme>('theme', 
+  const [theme, setTheme] = usePersistentState<Theme>(LOCAL_STORAGE_KEYS.THEME, 
     window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
   );
 

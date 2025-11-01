@@ -274,3 +274,10 @@ export const QrCodeIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
         <line x1="20" y1="20" x2="20" y2="20.01" />
     </svg>
 );
+
+export const SendIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <path d="m22 2-7 20-4-9-9-4Z"/>
+        <path d="M22 2 11 13"/>
+    </svg>
+);

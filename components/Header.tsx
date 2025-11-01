@@ -1,13 +1,12 @@
 import React from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { HelpIcon, SunIcon, MoonIcon, WesAILogoIcon, RotateCcwIcon } from './Icons';
+import { TOOLTIP_CLASSES } from '../constants';
 
 interface HeaderProps {
     onHelpClick: () => void;
     onResetClick: () => void;
 }
-
-const tooltipClasses = "absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-800 dark:bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 group-focus:opacity-100 group-focus:scale-100 transition-all pointer-events-none transform translate-y-0 group-hover:-translate-y-1 group-focus:-translate-y-1 duration-fast tooltip-with-arrow";
 
 const Header: React.FC<HeaderProps> = ({ onHelpClick, onResetClick }) => {
   const { theme, toggleTheme } = useTheme();
@@ -27,7 +26,7 @@ const Header: React.FC<HeaderProps> = ({ onHelpClick, onResetClick }) => {
                 >
                     <RotateCcwIcon className="w-5 h-5" />
                 </button>
-                <div className={tooltipClasses}>
+                <div className={`${TOOLTIP_CLASSES} left-1/2 -translate-x-1/2`}>
                     New Session
                 </div>
             </div>
@@ -38,7 +37,7 @@ const Header: React.FC<HeaderProps> = ({ onHelpClick, onResetClick }) => {
                 <button onClick={toggleTheme} className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800/70 transition-all duration-fast hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950" aria-label="Toggle theme">
                     {theme === 'dark' ? <SunIcon className="w-6 h-6" /> : <MoonIcon className="w-6 h-6" />}
                 </button>
-                <div className={tooltipClasses}>
+                <div className={`${TOOLTIP_CLASSES} left-1/2 -translate-x-1/2`}>
                     {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
                 </div>
             </div>
@@ -46,7 +45,7 @@ const Header: React.FC<HeaderProps> = ({ onHelpClick, onResetClick }) => {
                 <button onClick={onHelpClick} className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800/70 transition-all duration-fast hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950" aria-label="Open help and what's new">
                     <HelpIcon className="w-6 h-6" />
                 </button>
-                 <div className={tooltipClasses}>
+                 <div className={`${TOOLTIP_CLASSES} left-1/2 -translate-x-1/2`}>
                     Help & Info
                 </div>
             </div>

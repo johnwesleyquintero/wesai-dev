@@ -3,6 +3,7 @@ import { useToast } from '../../contexts/ToastContext';
 import { CodeOutput } from '../../copilot/agent';
 import { CopyIcon, RotateCcwIcon, ShareIcon, CheckIcon, QrCodeIcon, CloseIcon } from '../Icons';
 import { useActionFeedback } from '../../hooks/useActionFeedback';
+import { TOOLTIP_CLASSES } from '../../constants';
 
 declare const pako: any;
 
@@ -90,8 +91,8 @@ const GenerationHeader: React.FC<GenerationHeaderProps> = ({ prompt, response, o
   return (
     <>
     <div className="flex items-center gap-2 border-l border-slate-300 dark:border-slate-700 pl-3 min-w-0">
-      <div className="relative group bg-slate-200/70 dark:bg-slate-800/70 rounded-full px-2.5 py-1 min-w-0">
-        <p className="text-sm text-slate-600 dark:text-slate-400 whitespace-nowrap overflow-hidden text-ellipsis">
+      <div className="relative group bg-slate-200/70 dark:bg-slate-800/70 rounded-full px-2.5 py-1 min-w-0 fade-out-right">
+        <p className="text-sm text-slate-600 dark:text-slate-400 whitespace-nowrap overflow-hidden">
             {prompt}
         </p>
         <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-max max-w-xs sm:max-w-sm md:max-w-md whitespace-normal break-words rounded-md bg-slate-800 dark:bg-slate-900 px-3 py-2 text-xs font-semibold text-white opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all pointer-events-none z-10 shadow-lg tooltip-with-arrow">
@@ -107,7 +108,7 @@ const GenerationHeader: React.FC<GenerationHeaderProps> = ({ prompt, response, o
         >
           {isPromptCopied ? <CheckIcon className="w-4 h-4" /> : <CopyIcon className="w-4 h-4" />}
         </button>
-        <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-800 dark:bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 group-hover:opacity-100 transition-all pointer-events-none tooltip-with-arrow">
+        <div className={`${TOOLTIP_CLASSES} left-1/2 -translate-x-1/2`}>
           {isPromptCopied ? 'Copied!' : 'Copy Prompt'}
         </div>
       </div>
@@ -119,7 +120,7 @@ const GenerationHeader: React.FC<GenerationHeaderProps> = ({ prompt, response, o
         >
           <RotateCcwIcon className="w-4 h-4" />
         </button>
-        <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-800 dark:bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 group-hover:opacity-100 transition-all pointer-events-none tooltip-with-arrow">
+        <div className={`${TOOLTIP_CLASSES} left-1/2 -translate-x-1/2`}>
           Reuse Prompt
         </div>
       </div>
@@ -132,7 +133,7 @@ const GenerationHeader: React.FC<GenerationHeaderProps> = ({ prompt, response, o
         >
           {isShared ? <CheckIcon className="w-4 h-4" /> : <ShareIcon className="w-4 h-4" />}
         </button>
-        <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-800 dark:bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 group-hover:opacity-100 transition-all pointer-events-none tooltip-with-arrow">
+        <div className={`${TOOLTIP_CLASSES} left-1/2 -translate-x-1/2`}>
           {isShared ? 'Link Copied!' : (isShareApiAvailable ? 'Share' : 'Copy Share Link')}
         </div>
       </div>
@@ -144,7 +145,7 @@ const GenerationHeader: React.FC<GenerationHeaderProps> = ({ prompt, response, o
         >
           <QrCodeIcon className="w-4 h-4" />
         </button>
-        <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-800 dark:bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 group-hover:opacity-100 transition-all pointer-events-none tooltip-with-arrow">
+        <div className={`${TOOLTIP_CLASSES} left-1/2 -translate-x-1/2`}>
           Show QR Code
         </div>
       </div>

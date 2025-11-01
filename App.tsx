@@ -7,15 +7,15 @@ import ConfirmModal from './components/ConfirmModal';
 import { brainstormIdea } from './services/geminiService';
 import { CodeOutput } from './copilot/agent';
 import { GripVerticalIcon } from './components/Icons';
-import { PANEL_DEFAULT_SIZE_PERCENT, PANEL_MIN_SIZE_PERCENT, PANEL_MAX_SIZE_PERCENT, RESET_ANIMATION_DURATION_MS } from './constants';
+import { PANEL_DEFAULT_SIZE_PERCENT, PANEL_MIN_SIZE_PERCENT, PANEL_MAX_SIZE_PERCENT, RESET_ANIMATION_DURATION_MS, LOCAL_STORAGE_KEYS } from './constants';
 import usePersistentState from './hooks/usePersistentState';
 import { useResizablePanels } from './hooks/useResizablePanels';
 
 declare const pako: any;
 
 const App: React.FC = () => {
-  const [prompt, setPrompt] = usePersistentState<string>('prompt', '');
-  const [response, setResponse] = usePersistentState<CodeOutput | null>('response', null);
+  const [prompt, setPrompt] = usePersistentState<string>(LOCAL_STORAGE_KEYS.PROMPT, '');
+  const [response, setResponse] = usePersistentState<CodeOutput | null>(LOCAL_STORAGE_KEYS.RESPONSE, null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isHelpOpen, setIsHelpOpen] = useState<boolean>(false);
@@ -80,6 +80,8 @@ const App: React.FC = () => {
         // Announce completion after a short delay to feel more natural
         const timer = setTimeout(() => {
             setAriaLiveMessage('Generation complete. Preview is now available.');
+            // Move focus to the preview tab for improved keyboard navigation and accessibility.
+            document.getElementById('tab-preview')?.focus();
         }, 500);
         return () => clearTimeout(timer);
     }
@@ -156,7 +158,7 @@ const App: React.FC = () => {
   return (
     <div className="h-screen flex flex-col bg-transparent transition-colors duration-normal">
       {/* Visually hidden container for screen reader announcements */}
-      <div aria-live="polite" className="sr-only">
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
         {ariaLiveMessage}
       </div>
 

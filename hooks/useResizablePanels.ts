@@ -1,11 +1,12 @@
 
+
 import React, { useState, useCallback, useEffect } from 'react';
 import usePersistentState from './usePersistentState';
-import { PANEL_DEFAULT_SIZE_PERCENT, PANEL_MIN_SIZE_PERCENT, PANEL_MAX_SIZE_PERCENT } from '../constants';
+import { PANEL_DEFAULT_SIZE_PERCENT, PANEL_MIN_SIZE_PERCENT, PANEL_MAX_SIZE_PERCENT, LOCAL_STORAGE_KEYS } from '../constants';
 
 export const useResizablePanels = (mainContainerRef: React.RefObject<HTMLDivElement>) => {
     // Manages the value in localStorage
-    const [persistedDividerPosition, setPersistedDividerPosition] = usePersistentState('dividerPosition', PANEL_DEFAULT_SIZE_PERCENT);
+    const [persistedDividerPosition, setPersistedDividerPosition] = usePersistentState(LOCAL_STORAGE_KEYS.DIVIDER_POSITION, PANEL_DEFAULT_SIZE_PERCENT);
     // Manages the live value during drag for smooth UI updates
     const [liveDividerPosition, setLiveDividerPosition] = useState(persistedDividerPosition);
     

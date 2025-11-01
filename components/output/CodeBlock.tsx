@@ -3,6 +3,7 @@ import { useToast } from '../../contexts/ToastContext';
 import { CopyIcon, DownloadIcon, CheckIcon, WrapTextIcon, FontSizeIncreaseIcon, FontSizeDecreaseIcon } from '../Icons';
 import { useActionFeedback } from '../../hooks/useActionFeedback';
 import usePersistentState from '../../hooks/usePersistentState';
+import { TOOLTIP_CLASSES, LOCAL_STORAGE_KEYS } from '../../constants';
 
 interface CodeBlockProps {
     code: string;
@@ -13,8 +14,8 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ code, prompt }) => {
     const { addToast } = useToast();
     const { isActionDone: isCopied, trigger: triggerCopied } = useActionFeedback();
     const { isActionDone: isDownloaded, trigger: triggerDownloaded } = useActionFeedback();
-    const [isLineWrapEnabled, setIsLineWrapEnabled] = usePersistentState('line-wrap-enabled', false);
-    const [fontSize, setFontSize] = usePersistentState('code-font-size', 14);
+    const [isLineWrapEnabled, setIsLineWrapEnabled] = usePersistentState(LOCAL_STORAGE_KEYS.LINE_WRAP_ENABLED, false);
+    const [fontSize, setFontSize] = usePersistentState(LOCAL_STORAGE_KEYS.CODE_FONT_SIZE, 14);
 
 
     const highlightedLines = useMemo(() => {
@@ -67,7 +68,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ code, prompt }) => {
                         >
                             <FontSizeDecreaseIcon className="w-5 h-5" />
                         </button>
-                        <div className="absolute bottom-full mb-2 right-1/2 translate-x-1/2 whitespace-nowrap rounded-md bg-slate-800 dark:bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none tooltip-with-arrow">
+                        <div className={`${TOOLTIP_CLASSES} left-1/2 -translate-x-1/2`}>
                             Decrease Font Size
                         </div>
                     </div>
@@ -79,7 +80,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ code, prompt }) => {
                         >
                             <FontSizeIncreaseIcon className="w-5 h-5" />
                         </button>
-                        <div className="absolute bottom-full mb-2 right-1/2 translate-x-1/2 whitespace-nowrap rounded-md bg-slate-800 dark:bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none tooltip-with-arrow">
+                         <div className={`${TOOLTIP_CLASSES} left-1/2 -translate-x-1/2`}>
                             Increase Font Size
                         </div>
                     </div>
@@ -91,7 +92,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ code, prompt }) => {
                         >
                             <WrapTextIcon className="w-4 h-4" />
                         </button>
-                        <div className="absolute bottom-full mb-2 right-0 whitespace-nowrap rounded-md bg-slate-800 dark:bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none tooltip-with-arrow">
+                        <div className={`${TOOLTIP_CLASSES} right-0`}>
                             {isLineWrapEnabled ? 'Disable Line Wrapping' : 'Enable Line Wrapping'}
                         </div>
                     </div>
@@ -105,7 +106,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ code, prompt }) => {
                             {isDownloaded ? <CheckIcon className="w-4 h-4" /> : <DownloadIcon className="w-4 h-4" />}
                             {isDownloaded ? 'Downloaded' : 'Download'}
                         </button>
-                        <div className="absolute bottom-full mb-2 right-0 whitespace-nowrap rounded-md bg-slate-800 dark:bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none tooltip-with-arrow">
+                        <div className={`${TOOLTIP_CLASSES} right-0`}>
                             Download File
                         </div>
                     </div>
@@ -119,7 +120,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ code, prompt }) => {
                             {isCopied ? <CheckIcon className="w-4 h-4" /> : <CopyIcon className="w-4 h-4" />}
                             {isCopied ? 'Copied' : 'Copy'}
                         </button>
-                        <div className="absolute bottom-full mb-2 right-0 whitespace-nowrap rounded-md bg-slate-800 dark:bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none tooltip-with-arrow">
+                        <div className={`${TOOLTIP_CLASSES} right-0`}>
                             Copy Code
                         </div>
                     </div>

@@ -8,13 +8,14 @@ interface HelpModalProps {
 
 const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
   const modalRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
   const previouslyFocusedElement = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (isOpen) {
       previouslyFocusedElement.current = document.activeElement as HTMLElement;
-      // Focus the modal container itself for better screen reader context.
-      modalRef.current?.focus();
+      // Focus the close button for better accessibility flow.
+      closeButtonRef.current?.focus();
     } else {
       previouslyFocusedElement.current?.focus();
     }
@@ -89,7 +90,8 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
       >
         <div className="flex justify-between items-center mb-6 sticky top-0 bg-white dark:bg-slate-800 py-2 -mt-2">
           <h2 id="help-modal-title" className="text-xl font-bold text-slate-900 dark:text-white">Help & What's New</h2>
-          <button 
+          <button
+            ref={closeButtonRef}
             onClick={onClose} 
             className="p-1 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-800"
             aria-label="Close help"

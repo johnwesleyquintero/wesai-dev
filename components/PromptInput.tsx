@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { SparkleIcon, CloseIcon, CubeIcon } from './Icons';
 import QuickStartPrompts from './QuickStartPrompts';
+import { PROMPT_MAX_LENGTH } from '../constants';
 
 interface PromptInputProps {
   prompt: string;
@@ -26,8 +27,6 @@ const PRO_TIPS: ProTipData[] = [
   { parts: [{type: 'text', content: "WesAI is great for brainstorming variations. Try asking for 'another version'."}] },
   { parts: [{type: 'text', content: "Describe animations like 'a button that pulses on hover' for interactive results."}] },
 ];
-
-const PROMPT_MAX_LENGTH = 4000;
 
 const ProTip: React.FC<{ tip: ProTipData }> = ({ tip }) => {
   return (
@@ -128,7 +127,7 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
                     <div className={`flex-1 transition-opacity duration-normal ${isTipVisible ? 'opacity-100' : 'opacity-0'}`}>
                       <ProTip tip={PRO_TIPS[proTipIndex]} />
                     </div>
-                    <div className={`text-right text-xs font-mono pr-1 transition-colors ${prompt.length > PROMPT_MAX_LENGTH ? 'text-red-500' : 'text-slate-500 dark:text-slate-400'}`}>
+                    <div className={`text-right text-xs font-mono pr-1 transition-colors ${prompt.length >= PROMPT_MAX_LENGTH ? 'text-red-500' : 'text-slate-500 dark:text-slate-400'}`}>
                       {prompt.length} / {PROMPT_MAX_LENGTH}
                     </div>
                 </div>

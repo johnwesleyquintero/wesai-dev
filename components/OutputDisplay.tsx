@@ -8,6 +8,7 @@ import InitialState from './output/InitialState';
 import LoadingState from './output/LoadingState';
 import PreviewPanel from './output/PreviewPanel';
 import GenerationHeader from './output/GenerationHeader';
+import ReadyState from './output/ReadyState';
 
 type ActiveTab = 'preview' | 'code';
 
@@ -44,7 +45,7 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
         transform: `translateX(${activeTabEl.offsetLeft}px)`,
       });
     }
-  }, [activeTab, response]);
+  }, [activeTab]);
 
   // When a new response comes in, switch to the preview tab and listen for sandbox errors
   useEffect(() => {
@@ -93,6 +94,7 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
   }, [activeTab]);
   
   const renderContent = () => {
+    if (isLoading) return <LoadingState />;
     if (error) return <ErrorDisplay error={error} title="Generation Error" onRetry={onRetry} />;
     if (response) {
       if (activeTab === 'preview') {
@@ -112,6 +114,9 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
         </div>
       );
     }
+    if (prompt) {
+        return <ReadyState />;
+    }
     return <InitialState setPrompt={setPrompt} />;
   };
 
@@ -120,7 +125,7 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
   return (
     <div className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 ring-1 ring-black/5 dark:ring-white/10 rounded-lg flex flex-col h-full shadow-md">
         <div className="flex-shrink-0 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-slate-100/80 dark:bg-slate-900/80 p-2 rounded-t-lg">
-            <div className="flex items-center gap-2 min-w-0 pl-2">
+            <div className="flex flex-1 items-center gap-2 min-w-0 pl-2">
                 <CubeIcon className="w-5 h-5 text-slate-500 dark:text-slate-400"/>
                 <h2 id="output-heading" className="text-lg font-semibold text-slate-900 dark:text-slate-200 flex-shrink-0">Output</h2>
                 {response && !error && (
