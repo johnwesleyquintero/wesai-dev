@@ -1,4 +1,6 @@
-import { useRef, useEffect } from 'react';
+
+// FIX: Import React to make the React namespace available for types.
+import React, { useRef, useEffect } from 'react';
 
 /**
  * A custom hook to manage modal accessibility features like focus trapping and closing on escape.

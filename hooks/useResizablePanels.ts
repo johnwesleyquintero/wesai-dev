@@ -1,4 +1,6 @@
-import { useState, useCallback, useEffect } from 'react';
+
+// FIX: Import React to make the React namespace available for types.
+import React, { useState, useCallback, useEffect } from 'react';
 import usePersistentState from './usePersistentState';
 import { PANEL_DEFAULT_SIZE_PERCENT, PANEL_MIN_SIZE_PERCENT, PANEL_MAX_SIZE_PERCENT, LOCAL_STORAGE_KEYS } from '../constants';
 

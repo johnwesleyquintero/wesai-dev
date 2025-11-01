@@ -42,16 +42,10 @@ const GenerationHeader: React.FC<GenerationHeaderProps> = ({ prompt, response, o
         const data = { prompt, react: response.react };
         const jsonString = JSON.stringify(data);
         
-        // Deflate returns a Uint8Array, which is the correct way to handle binary data.
-        const compressed = pako.deflate(jsonString);
+        // Let pako output a binary string directly, which is more efficient.
+        const compressedString = pako.deflate(jsonString, { to: 'string' });
         
-        // Convert Uint8Array to a binary string that btoa can handle safely.
-        let binaryString = '';
-        compressed.forEach((byte: number) => {
-            binaryString += String.fromCharCode(byte);
-        });
-        
-        const encoded = btoa(binaryString);
+        const encoded = btoa(compressedString);
         const url = new URL(window.location.href);
         url.hash = encodeURIComponent(encoded);
         return url.toString();

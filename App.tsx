@@ -113,14 +113,8 @@ const App: React.FC = () => {
             // Decode from Base64 to a binary string
             const binaryString = atob(decodeURIComponent(hash));
 
-            // Convert the binary string to a Uint8Array for pako
-            const compressed = new Uint8Array(binaryString.length);
-            for (let i = 0; i < binaryString.length; i++) {
-                compressed[i] = binaryString.charCodeAt(i);
-            }
-            
-            // Decompress and parse
-            const decompressed = pako.inflate(compressed, { to: 'string' });
+            // Decompress binary string and parse
+            const decompressed = pako.inflate(binaryString, { to: 'string' });
             const data = JSON.parse(decompressed);
             
             if (data.prompt && data.react) {
