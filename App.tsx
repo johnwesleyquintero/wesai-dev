@@ -6,7 +6,7 @@ import HelpModal from './components/HelpModal';
 import ConfirmModal from './components/ConfirmModal';
 import { brainstormIdea } from './services/geminiService';
 import { CodeOutput } from './copilot/agent';
-import { RESET_ANIMATION_DURATION_MS, LOCAL_STORAGE_KEYS } from './constants';
+import { RESET_ANIMATION_DURATION_MS, LOCAL_STORAGE_KEYS, PANEL_DEFAULT_SIZE_PERCENT } from './constants';
 import usePersistentState from './hooks/usePersistentState';
 import { useResizablePanels } from './hooks/useResizablePanels';
 import { GripVerticalIcon } from './components/Icons';
@@ -26,7 +26,7 @@ const App: React.FC = () => {
   const resetTimeoutRef = useRef<number | null>(null);
   
   const mainContainerRef = useRef<HTMLDivElement>(null);
-  const { isDragging, handleMouseDown, handleDividerKeyDown } = useResizablePanels(mainContainerRef);
+  const { isDragging, handleMouseDown, handleDividerKeyDown, setDividerPosition } = useResizablePanels(mainContainerRef);
 
 
   // --- Graceful Preloader Transition ---
@@ -159,9 +159,10 @@ const App: React.FC = () => {
       setPrompt('');
       setResponse(null);
       setError(null);
+      setDividerPosition(PANEL_DEFAULT_SIZE_PERCENT);
       setIsResetting(false);
     }, RESET_ANIMATION_DURATION_MS); // Match animation duration
-  }, [setPrompt, setResponse, setError]);
+  }, [setPrompt, setResponse, setError, setDividerPosition]);
 
   // Cleanup for the reset timeout to prevent memory leaks
   useEffect(() => {
@@ -192,7 +193,7 @@ const App: React.FC = () => {
         onHelpClick={() => setIsHelpOpen(true)}
         onResetClick={() => setIsResetModalOpen(true)}
       />
-      <main ref={mainContainerRef} className="flex-grow p-4 md:p-6 lg:p-8 flex flex-col md:flex-row overflow-y-auto md:overflow-hidden gap-4">
+      <main ref={mainContainerRef} className="flex-grow p-4 md:p-6 lg:p-8 flex flex-col md:flex-row overflow-hidden gap-4 min-h-0">
         
         {/* Unified Layout */}
         <div 
@@ -238,7 +239,7 @@ const App: React.FC = () => {
           />
         </div>
       </main>
-      <footer className="text-center py-3 px-4 sm:px-6 lg:px-8 text-slate-500 dark:text-slate-400 text-xs bg-slate-100/80 dark:bg-slate-950/80 backdrop-blur-lg sticky bottom-0 z-10 flex flex-wrap justify-center items-center gap-x-2 border-t border-slate-200 dark:border-slate-800">
+      <footer className="flex-shrink-0 text-center py-3 px-4 sm:px-6 lg:px-8 text-slate-500 dark:text-slate-400 text-xs bg-slate-100/80 dark:bg-slate-950/80 backdrop-blur-lg z-10 flex flex-wrap justify-center items-center gap-x-2 border-t border-slate-200 dark:border-slate-800">
         <span>© 2024 WesAI.Dev</span>
         <span className="text-slate-400 dark:text-slate-600 hidden sm:inline">|</span>
         <span>A <a href="https://jwq.dev" target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:underline">John Wesley Quintero</a> Project</span>

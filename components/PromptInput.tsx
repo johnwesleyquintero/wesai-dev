@@ -1,5 +1,3 @@
-
-
 import React, { useRef, useEffect, useState } from 'react';
 import { SparkleIcon, CloseIcon, CubeIcon } from './Icons';
 import QuickStartPrompts from './QuickStartPrompts';
@@ -106,7 +104,7 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
                 <h2 id="input-heading" className="text-lg font-semibold text-slate-900 dark:text-slate-200">Input</h2>
              </div>
         </div>
-        <div className="p-4 flex flex-col gap-4 flex-1 h-full min-h-0">
+        <div className="p-4 flex flex-col gap-4 flex-1 h-full min-h-0 overflow-y-auto custom-scrollbar">
             <div className="relative w-full flex-grow flex flex-col">
                 <textarea
                   ref={textareaRef}
