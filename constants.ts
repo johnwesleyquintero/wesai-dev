@@ -1,8 +1,8 @@
+
 export const RESET_ANIMATION_DURATION_MS = 300;
 export const PROMPT_MAX_LENGTH = 4000;
 
 // --- Resizable Panel Constants ---
-// Fix: Add missing constants for the resizable panels hook.
 export const PANEL_DEFAULT_SIZE_PERCENT = 50;
 export const PANEL_MIN_SIZE_PERCENT = 25;
 export const PANEL_MAX_SIZE_PERCENT = 75;
@@ -15,8 +15,8 @@ export const LOCAL_STORAGE_KEYS = {
     PROMPT: 'prompt',
     RESPONSE: 'response',
     THEME: 'theme',
+    API_KEY: 'api-key',
     LINE_WRAP_ENABLED: 'line-wrap-enabled',
     CODE_FONT_SIZE: 'code-font-size',
-    // Fix: Add missing local storage key for the resizable panels hook.
     DIVIDER_POSITION: 'divider-position',
 };

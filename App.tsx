@@ -1,31 +1,38 @@
 
 
+
+
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import Header from './components/Header';
 import PromptInput from './components/PromptInput';
 import OutputDisplay from './components/OutputDisplay';
 import HelpModal from './components/HelpModal';
 import ConfirmModal from './components/ConfirmModal';
+import SettingsModal from './components/SettingsModal';
 import { brainstormIdea } from './services/geminiService';
 import { CodeOutput } from './copilot/agent';
 import { RESET_ANIMATION_DURATION_MS, LOCAL_STORAGE_KEYS, PANEL_DEFAULT_SIZE_PERCENT } from './constants';
 import usePersistentState from './hooks/usePersistentState';
 import { useResizablePanels } from './hooks/useResizablePanels';
 import { GripVerticalIcon } from './components/Icons';
+import { useToast } from './contexts/ToastContext';
 
 declare const pako: any;
 
 const App: React.FC = () => {
   const [prompt, setPrompt] = usePersistentState<string>(LOCAL_STORAGE_KEYS.PROMPT, '');
   const [response, setResponse] = usePersistentState<CodeOutput | null>(LOCAL_STORAGE_KEYS.RESPONSE, null);
+  const [apiKey, setApiKey] = usePersistentState<string | null>(LOCAL_STORAGE_KEYS.API_KEY, null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isHelpOpen, setIsHelpOpen] = useState<boolean>(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
   const [isResetting, setIsResetting] = useState<boolean>(false);
   const [isPromptHighlighting, setIsPromptHighlighting] = useState<boolean>(false);
   const [isResetModalOpen, setIsResetModalOpen] = useState<boolean>(false);
   const [ariaLiveMessage, setAriaLiveMessage] = useState<string>('');
   const resetTimeoutRef = useRef<number | null>(null);
+  const { addToast } = useToast();
   
   const mainContainerRef = useRef<HTMLDivElement>(null);
   const { isDragging, handleMouseDown, handleDividerKeyDown, setDividerPosition } = useResizablePanels(mainContainerRef);
@@ -103,9 +110,19 @@ const App: React.FC = () => {
     const hash = window.location.hash.substring(1);
     if (hash) {
         try {
-            const decodedString = atob(decodeURIComponent(hash));
-            const decompressed = pako.inflate(decodedString, { to: 'string' });
+            // Decode from Base64 to a binary string
+            const binaryString = atob(decodeURIComponent(hash));
+
+            // Convert the binary string to a Uint8Array for pako
+            const compressed = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                compressed[i] = binaryString.charCodeAt(i);
+            }
+            
+            // Decompress and parse
+            const decompressed = pako.inflate(compressed, { to: 'string' });
             const data = JSON.parse(decompressed);
+            
             if (data.prompt && data.react) {
                 setPrompt(data.prompt);
                 setResponse({ react: data.react });
@@ -137,12 +154,18 @@ const App: React.FC = () => {
   const handleGenerate = useCallback(async () => {
     if (!prompt.trim() || isLoading) return;
 
+    if (!apiKey) {
+        addToast('Please set your API key to generate.', 'info');
+        setIsSettingsOpen(true);
+        return;
+    }
+
     setIsLoading(true);
     setError(null);
     setResponse(null);
 
     try {
-      const result = await brainstormIdea(prompt);
+      const result = await brainstormIdea(prompt, apiKey);
       setResponse(result);
     } catch (e) {
       if (e instanceof Error) {
@@ -153,28 +176,26 @@ const App: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [prompt, isLoading, setResponse]);
+  }, [prompt, isLoading, apiKey, setResponse, addToast]);
 
   const handleReset = useCallback(() => {
-    // 1. Immediately clear all persistent state. This is atomic and safe.
-    setPrompt('');
-    setResponse(null);
-    setError(null);
-    setDividerPosition(PANEL_DEFAULT_SIZE_PERCENT);
-
-    // 2. Trigger the visual fade-out animation.
+    // 1. Trigger the visual fade-out animation on the current content.
     setIsResetting(true);
     
-    // Clear any pending timeout from a previous click
+    // Clear any pending timeout from a previous click to avoid race conditions.
     if (resetTimeoutRef.current) {
         clearTimeout(resetTimeoutRef.current);
     }
 
-    // 3. After the animation duration, turn off the resetting state.
-    // This doesn't affect the actual data, only the UI animation class.
+    // 2. After the animation duration, clear all the state and end the animation.
+    // This ensures the old content fades out before the new state appears.
     resetTimeoutRef.current = window.setTimeout(() => {
-      setIsResetting(false);
-    }, RESET_ANIMATION_DURATION_MS); // Match animation duration
+        setPrompt('');
+        setResponse(null);
+        setError(null);
+        setDividerPosition(PANEL_DEFAULT_SIZE_PERCENT);
+        setIsResetting(false); // This removes the fade-out class and allows new content to animate in.
+    }, RESET_ANIMATION_DURATION_MS);
   }, [setPrompt, setResponse, setError, setDividerPosition]);
 
   // Cleanup for the reset timeout to prevent memory leaks
@@ -205,6 +226,7 @@ const App: React.FC = () => {
       <Header 
         onHelpClick={() => setIsHelpOpen(true)}
         onResetClick={() => setIsResetModalOpen(true)}
+        onSettingsClick={() => setIsSettingsOpen(true)}
       />
       <main ref={mainContainerRef} className="flex-grow p-4 md:p-6 lg:p-8 flex flex-col md:flex-row overflow-hidden gap-4 min-h-0">
         
@@ -219,6 +241,7 @@ const App: React.FC = () => {
             handleGenerate={handleGenerate}
             isLoading={isLoading}
             isHighlighting={isPromptHighlighting}
+            isApiKeySet={!!apiKey}
            />
         </div>
         
@@ -255,13 +278,17 @@ const App: React.FC = () => {
       <footer className="flex-shrink-0 text-center py-3 px-4 sm:px-6 lg:px-8 text-slate-500 dark:text-slate-400 text-xs bg-slate-100/80 dark:bg-slate-950/80 backdrop-blur-lg z-10 flex flex-wrap justify-center items-center gap-x-2 border-t border-slate-200 dark:border-slate-800">
         <span>© 2024 WesAI.Dev</span>
         <span className="text-slate-400 dark:text-slate-600 hidden sm:inline">|</span>
-        <span>A <a href="https://jwq.dev" target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:underline">John Wesley Quintero</a> Project</span>
-        <span className="text-slate-400 dark:text-slate-600 hidden sm:inline">|</span>
         <span>Powered by <a href="https://ai.google.dev/" target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:underline">Google Gemini</a>.</span>
       </footer>
       <HelpModal
         isOpen={isHelpOpen}
         onClose={() => setIsHelpOpen(false)}
+      />
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        currentKey={apiKey}
+        onSaveKey={setApiKey}
       />
       <ConfirmModal
         isOpen={isResetModalOpen}

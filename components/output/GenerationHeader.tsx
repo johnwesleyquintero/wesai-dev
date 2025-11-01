@@ -38,14 +38,29 @@ const GenerationHeader: React.FC<GenerationHeaderProps> = ({ prompt, response, o
   
   const generateShareUrl = useCallback(() => {
     if (!prompt || !response) return null;
-    const data = { prompt, react: response.react };
-    const jsonString = JSON.stringify(data);
-    const compressed = pako.deflate(jsonString, { to: 'string' });
-    const encoded = btoa(compressed);
-    const url = new URL(window.location.href);
-    url.hash = encodeURIComponent(encoded);
-    return url.toString();
-  }, [prompt, response]);
+    try {
+        const data = { prompt, react: response.react };
+        const jsonString = JSON.stringify(data);
+        
+        // Deflate returns a Uint8Array, which is the correct way to handle binary data.
+        const compressed = pako.deflate(jsonString);
+        
+        // Convert Uint8Array to a binary string that btoa can handle safely.
+        let binaryString = '';
+        compressed.forEach((byte: number) => {
+            binaryString += String.fromCharCode(byte);
+        });
+        
+        const encoded = btoa(binaryString);
+        const url = new URL(window.location.href);
+        url.hash = encodeURIComponent(encoded);
+        return url.toString();
+    } catch (e) {
+        console.error("Failed to generate share URL:", e);
+        addToast('Could not create shareable link.', 'error');
+        return null;
+    }
+  }, [prompt, response, addToast]);
 
   const handleShare = useCallback(async () => {
     const url = generateShareUrl();

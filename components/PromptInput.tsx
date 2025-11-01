@@ -1,7 +1,8 @@
+
 import React, { useRef, useEffect, useState } from 'react';
 import { SparkleIcon, CloseIcon, CubeIcon } from './Icons';
 import QuickStartPrompts from './QuickStartPrompts';
-import { PROMPT_MAX_LENGTH } from '../constants';
+import { PROMPT_MAX_LENGTH, TOOLTIP_CLASSES } from '../constants';
 
 interface PromptInputProps {
   prompt: string;
@@ -9,6 +10,7 @@ interface PromptInputProps {
   handleGenerate: () => void;
   isLoading: boolean;
   isHighlighting: boolean;
+  isApiKeySet: boolean;
 }
 
 interface ProTipPart {
@@ -45,7 +47,7 @@ const ProTip: React.FC<{ tip: ProTipData }> = ({ tip }) => {
   );
 };
 
-const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGenerate, isLoading, isHighlighting }) => {
+const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGenerate, isLoading, isHighlighting, isApiKeySet }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [proTipIndex, setProTipIndex] = useState(0);
   const [isTipVisible, setIsTipVisible] = useState(true);
@@ -96,6 +98,8 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
     }
   }, [prompt]);
 
+  const isGenerateDisabled = isLoading || !prompt.trim() || !isApiKeySet;
+
   return (
     <div className={`bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border border-slate-200 dark:border-slate-800 ring-1 ring-black/5 dark:ring-white/10 rounded-lg flex flex-col h-full shadow-md transition-opacity duration-normal ${isLoading ? 'opacity-70 pointer-events-none' : ''}`}>
         <div className="flex-shrink-0 flex items-center justify-between border-b border-slate-200 dark:border-slate-700 p-2 pl-4">
@@ -120,13 +124,18 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
                   disabled={isLoading}
                 />
                 {prompt && (
-                <button
-                    onClick={() => setPrompt('')}
-                    className="absolute top-3 right-3 p-1 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1 dark:focus-visible:ring-offset-slate-800"
-                    aria-label="Clear input"
-                >
-                    <CloseIcon className="w-4 h-4" />
-                </button>
+                  <div className="absolute top-3 right-3 group">
+                    <button
+                        onClick={() => setPrompt('')}
+                        className="p-1 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1 dark:focus-visible:ring-offset-slate-800"
+                        aria-label="Clear input"
+                    >
+                        <CloseIcon className="w-4 h-4" />
+                    </button>
+                    <div className={`${TOOLTIP_CLASSES} right-0`}>
+                        Clear Input
+                    </div>
+                  </div>
                 )}
             </div>
              <div className={`flex-shrink-0 overflow-hidden`}>
@@ -143,26 +152,35 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
                       {prompt.length} / {PROMPT_MAX_LENGTH}
                     </div>
                 </div>
-                <button
-                    onClick={handleGenerate}
-                    disabled={isLoading || !prompt.trim()}
-                    className={`w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-3 px-4 rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-normal flex items-center justify-center gap-2 transform hover:-translate-y-0.5 hover:shadow-xl hover:shadow-indigo-500/50 animate-gradient ${!isLoading && prompt.trim() ? 'animate-pulse-glow' : ''} ${isLoading ? 'pointer-events-auto' : ''}`}
-                >
-                    {isLoading ? (
-                    <>
-                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Generating...
-                    </>
-                    ) : (
-                    <>
-                        <SparkleIcon className="w-5 h-5" />
-                        Generate with WesAI
-                    </>
+                <div className="relative">
+                    <button
+                        onClick={handleGenerate}
+                        disabled={isGenerateDisabled}
+                        className={`w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-3 px-4 rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-normal flex items-center justify-center gap-2 transform hover:-translate-y-0.5 hover:shadow-xl hover:shadow-indigo-500/50 animate-gradient ${!isLoading && prompt.trim() && isApiKeySet ? 'animate-pulse-glow' : ''} ${isLoading ? 'pointer-events-auto' : ''}`}
+                    >
+                        {isLoading ? (
+                        <>
+                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Generating...
+                        </>
+                        ) : (
+                        <>
+                            <SparkleIcon className="w-5 h-5" />
+                            Generate with WesAI
+                        </>
+                        )}
+                    </button>
+                    {!isApiKeySet && !isLoading && (
+                        <div className="absolute inset-0 flex items-center justify-center group cursor-not-allowed">
+                            <div className="absolute bottom-full mb-2 whitespace-nowrap rounded-md bg-slate-800 dark:bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all pointer-events-none transform translate-y-0 group-hover:-translate-y-1 duration-fast tooltip-with-arrow">
+                                Please set your API Key in Settings
+                            </div>
+                        </div>
                     )}
-                </button>
+                </div>
             </div>
         </div>
     </div>

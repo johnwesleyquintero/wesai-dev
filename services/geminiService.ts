@@ -1,10 +1,11 @@
+
 import agent, { CodeOutput } from '../copilot/agent';
 
-export const brainstormIdea = async (idea: string): Promise<CodeOutput> => {
+export const brainstormIdea = async (idea: string, apiKey: string): Promise<CodeOutput> => {
     try {
         // Delegate the generation task to our centralized CopilotAgent
-        // The agent now handles API key retrieval internally.
-        return await agent.generate(idea);
+        // The agent now receives the API key directly for each call.
+        return await agent.generate(idea, apiKey);
     } catch (error) {
         console.error("Error calling Gemini API via agent:", error);
         // Re-throw the error to be handled by the UI component.

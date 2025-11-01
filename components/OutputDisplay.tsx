@@ -11,6 +11,7 @@ import LoadingState from './output/LoadingState';
 import PreviewPanel from './output/PreviewPanel';
 import GenerationHeader from './output/GenerationHeader';
 import ReadyState from './output/ReadyState';
+import usePrevious from '../hooks/usePrevious';
 
 type ActiveTab = 'preview' | 'code';
 
@@ -34,11 +35,10 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
   const { theme } = useTheme();
   const [activeTab, setActiveTab] = useState<ActiveTab>('preview');
   const [previewError, setPreviewError] = useState<string | null>(null);
+  const prevActiveTab = usePrevious(activeTab);
   
   const tabsRef = useRef<(HTMLButtonElement | null)[]>([]);
   const tabContainerRef = useRef<HTMLDivElement>(null); // Ref for the tab container
-  // FIX: Explicitly initialize useRef with undefined to fix "Expected 1 arguments, but got 0" runtime error.
-  const prevActiveTabRef = useRef<ActiveTab | undefined>(undefined);
   const [gliderStyle, setGliderStyle] = useState({});
 
   // Memoize the style calculation to avoid re-creating the function on every render.
@@ -87,12 +87,12 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
     if (isLoading) {
         setPreviewError(null);
     }
-    // If we're navigating away from the preview tab, clear any errors.
-    if (prevActiveTabRef.current === 'preview' && activeTab !== 'preview') {
+    // If we're navigating away from the preview tab, clear any errors. This prevents
+    // showing a stale error if the user clicks back to the preview.
+    if (prevActiveTab === 'preview' && activeTab !== 'preview') {
         setPreviewError(null);
     }
-    prevActiveTabRef.current = activeTab;
-  }, [isLoading, activeTab]);
+  }, [isLoading, activeTab, prevActiveTab]);
 
   const handleTabKeyDown = useCallback((e: React.KeyboardEvent) => {
     const tabs = ['preview', 'code'] as ActiveTab[];
