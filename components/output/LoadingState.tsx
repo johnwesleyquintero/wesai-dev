@@ -1,24 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { WesAILogoSpinnerIcon } from '../Icons';
-
-const LOADING_MESSAGES = [
-    "WesAI is thinking...",
-    "Architecting your component...",
-    "Polishing the pixels...",
-    "Generating brilliance..."
-];
+import { LOADING_MESSAGES } from '../../constants';
 
 const LoadingState: React.FC = () => {
     const [message, setMessage] = useState(LOADING_MESSAGES[0]);
 
     useEffect(() => {
-        let index = 0;
-        const interval = setInterval(() => {
-            index = (index + 1) % LOADING_MESSAGES.length;
-            setMessage(LOADING_MESSAGES[index]);
-        }, 2000);
+        // Use a sequence of timeouts to create a staged loading experience
+        const timeouts = [
+            setTimeout(() => setMessage(LOADING_MESSAGES[1]), 1200),
+            setTimeout(() => setMessage(LOADING_MESSAGES[2]), 2800),
+            setTimeout(() => setMessage(LOADING_MESSAGES[3]), 4500)
+        ];
 
-        return () => clearInterval(interval);
+        // Cleanup function to clear timeouts if the component unmounts
+        return () => {
+            timeouts.forEach(clearTimeout);
+        };
     }, []);
 
     return (

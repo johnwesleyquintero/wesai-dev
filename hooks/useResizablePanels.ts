@@ -1,6 +1,7 @@
 
 
 
+
 import React, { useState, useCallback, useEffect } from 'react';
 import usePersistentState from './usePersistentState';
 import { PANEL_DEFAULT_SIZE_PERCENT, PANEL_MIN_SIZE_PERCENT, PANEL_MAX_SIZE_PERCENT, LOCAL_STORAGE_KEYS } from '../constants';
@@ -18,17 +19,20 @@ export const useResizablePanels = (mainContainerRef: React.RefObject<HTMLDivElem
         }
     }, [dividerPosition, mainContainerRef]);
 
-    const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    const handleMouseDown = useCallback((e: React.MouseEvent | React.TouchEvent) => {
         e.preventDefault();
         e.stopPropagation();
         setIsDragging(true);
     }, []);
 
-    const handleMouseMove = useCallback((e: MouseEvent) => {
+    const handleMouseMove = useCallback((e: MouseEvent | TouchEvent) => {
         if (!mainContainerRef.current) return;
         const containerRect = mainContainerRef.current.getBoundingClientRect();
         if (containerRect.width === 0) return;
-        const newPosition = ((e.clientX - containerRect.left) / containerRect.width) * 100;
+
+        const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+        const newPosition = ((clientX - containerRect.left) / containerRect.width) * 100;
+        
         const clampedPosition = Math.max(PANEL_MIN_SIZE_PERCENT, Math.min(PANEL_MAX_SIZE_PERCENT, newPosition));
         setDividerPosition(clampedPosition);
     }, [mainContainerRef, setDividerPosition]);
@@ -41,25 +45,21 @@ export const useResizablePanels = (mainContainerRef: React.RefObject<HTMLDivElem
     useEffect(() => {
         if (!isDragging) return;
 
-        const previewIframe = document.querySelector('iframe[title="Component Preview"]') as HTMLIFrameElement | null;
-        document.body.style.cursor = 'col-resize';
-        document.body.style.userSelect = 'none';
-        if (previewIframe) {
-            previewIframe.style.pointerEvents = 'none';
-        }
+        // Instead of direct style manipulation, we add a class to the body.
+        document.body.classList.add('is-resizing');
 
         document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('touchmove', handleMouseMove);
         document.addEventListener('mouseup', handleMouseUp);
+        document.addEventListener('touchend', handleMouseUp);
 
         // Cleanup function to run when isDragging becomes false or the component unmounts.
         return () => {
             document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('touchmove', handleMouseMove);
             document.removeEventListener('mouseup', handleMouseUp);
-            document.body.style.cursor = '';
-            document.body.style.userSelect = '';
-            if (previewIframe) {
-                previewIframe.style.pointerEvents = 'auto';
-            }
+            document.removeEventListener('touchend', handleMouseUp);
+            document.body.classList.remove('is-resizing');
         };
     }, [isDragging, handleMouseMove, handleMouseUp]);
 

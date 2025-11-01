@@ -1,34 +1,11 @@
 
 
-import React, { useRef, useEffect, useState, useId } from 'react';
+
+import React, { useRef, useEffect, useId } from 'react';
 import { SparkleIcon, CloseIcon, CubeIcon } from './Icons';
 import QuickStartPrompts from './QuickStartPrompts';
-import { PROMPT_MAX_LENGTH, TOOLTIP_CLASSES, RESET_ANIMATION_DURATION_MS } from '../constants';
-
-interface PromptInputProps {
-  prompt: string;
-  setPrompt: (prompt: string) => void;
-  handleGenerate: () => void;
-  isLoading: boolean;
-  isHighlighting: boolean;
-}
-
-interface ProTipPart {
-  type: 'text' | 'kbd';
-  content: string;
-}
-
-interface ProTipData {
-  parts: ProTipPart[];
-}
-
-const PRO_TIPS: ProTipData[] = [
-  { parts: [{type: 'text', content: 'Press '}, {type: 'kbd', content: 'Cmd'}, {type: 'text', content: ' + '}, {type: 'kbd', content: 'Enter'}, {type: 'text', content: ' to generate.'}] },
-  { parts: [{type: 'text', content: 'Be specific for better results. Try describing colors, layout, and state.'}] },
-  { parts: [{type: 'text', content: "Need icons? Ask for 'inline SVGs' in your prompt for best results."}] },
-  { parts: [{type: 'text', content: "WesAI is great for brainstorming variations. Try asking for 'another version'."}] },
-  { parts: [{type: 'text', content: "Describe animations like 'a button that pulses on hover' for interactive results."}] },
-];
+import { PROMPT_MAX_LENGTH, TOOLTIP_CLASSES, PRO_TIPS, ProTipData } from '../constants';
+import { useCyclingItems } from '../hooks/useCyclingItems';
 
 const ProTip: React.FC<{ tip: ProTipData }> = ({ tip }) => {
   return (
@@ -47,34 +24,19 @@ const ProTip: React.FC<{ tip: ProTipData }> = ({ tip }) => {
   );
 };
 
+interface PromptInputProps {
+  prompt: string;
+  setPrompt: (prompt: string) => void;
+  handleGenerate: () => void;
+  isLoading: boolean;
+  isHighlighting: boolean;
+}
+
 const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGenerate, isLoading, isHighlighting }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [proTipIndex, setProTipIndex] = useState(0);
-  const [isTipVisible, setIsTipVisible] = useState(true);
-  const timeoutIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { currentItem: currentProTip, isVisible: isTipVisible } = useCyclingItems(PRO_TIPS, 5000);
   
   const clearTooltipId = useId();
-
-  useEffect(() => {
-    // Select a random pro tip on component mount
-    setProTipIndex(Math.floor(Math.random() * PRO_TIPS.length));
-    
-    const tipInterval = setInterval(() => {
-        setIsTipVisible(false);
-        timeoutIdRef.current = setTimeout(() => {
-            // The cleanup function will prevent this from running if the component is unmounted.
-            setProTipIndex(prevIndex => (prevIndex + 1) % PRO_TIPS.length);
-            setIsTipVisible(true);
-        }, RESET_ANIMATION_DURATION_MS); // Wait for fade-out to complete
-    }, 5000); // Change tip every 5 seconds
-
-    return () => {
-        clearInterval(tipInterval);
-        if (timeoutIdRef.current) {
-            clearTimeout(timeoutIdRef.current);
-        }
-    };
-  }, []);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
@@ -143,9 +105,12 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
             <div className="mt-auto flex-shrink-0 space-y-3 pt-4">
                 <div className="flex justify-between items-center">
                     <div className={`flex-1 transition-opacity duration-normal ${isTipVisible ? 'opacity-100' : 'opacity-0'}`}>
-                      <ProTip tip={PRO_TIPS[proTipIndex]} />
+                      <ProTip tip={currentProTip} />
                     </div>
-                    <div className={`text-right text-xs font-mono pr-1 transition-colors ${prompt.length >= PROMPT_MAX_LENGTH ? 'text-red-500' : 'text-slate-500 dark:text-slate-400'}`}>
+                    <div 
+                      aria-live="polite"
+                      aria-atomic="true"
+                      className={`text-right text-xs font-mono pr-1 transition-colors ${prompt.length >= PROMPT_MAX_LENGTH ? 'text-red-500' : 'text-slate-500 dark:text-slate-400'}`}>
                       {prompt.length} / {PROMPT_MAX_LENGTH}
                     </div>
                 </div>

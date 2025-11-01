@@ -1,6 +1,4 @@
-
-
-import React, { useId } from 'react';
+import React, { useId, memo } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { HelpIcon, SunIcon, MoonIcon, WesAILogoIcon, RotateCcwIcon } from './Icons';
 import { TOOLTIP_CLASSES } from '../constants';
@@ -62,4 +60,4 @@ const Header: React.FC<HeaderProps> = ({ onHelpClick, onResetClick }) => {
   );
 };
 
-export default Header;
+export default memo(Header);

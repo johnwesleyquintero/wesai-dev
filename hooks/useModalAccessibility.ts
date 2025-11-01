@@ -1,6 +1,3 @@
-
-
-// FIX: Import React to make the React namespace available for types.
 import React, { useRef, useEffect } from 'react';
 
 /**

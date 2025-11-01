@@ -15,11 +15,6 @@ import usePrevious from '../hooks/usePrevious';
 
 type ActiveTab = 'preview' | 'code';
 
-// Add hljs to the window object for TypeScript
-declare global {
-    interface Window { hljs: any; }
-}
-
 // --- MAIN COMPONENT ---
 interface OutputDisplayProps {
   response: CodeOutput | null;

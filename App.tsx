@@ -1,8 +1,7 @@
-
-
-
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useEffect, useReducer } from 'react';
+import pako from 'pako';
 import Header from './components/Header';
+import Footer from './components/Footer';
 import PromptInput from './components/PromptInput';
 import OutputDisplay from './components/OutputDisplay';
 import HelpModal from './components/HelpModal';
@@ -13,42 +12,91 @@ import { RESET_ANIMATION_DURATION_MS, LOCAL_STORAGE_KEYS, PANEL_DEFAULT_SIZE_PER
 import usePersistentState from './hooks/usePersistentState';
 import { useResizablePanels } from './hooks/useResizablePanels';
 import { GripVerticalIcon } from './components/Icons';
-import { useToast } from './contexts/ToastContext';
 
-declare const pako: any;
+// --- State Management with Reducer ---
+
+interface GenerationState {
+  status: 'idle' | 'loading' | 'success' | 'error';
+  response: CodeOutput | null;
+  error: string | null;
+}
+
+type GenerationAction =
+  | { type: 'GENERATE_START' }
+  | { type: 'GENERATE_SUCCESS'; payload: CodeOutput }
+  | { type: 'GENERATE_ERROR'; payload: string }
+  | { type: 'RESET' };
+
+const generationReducer = (state: GenerationState, action: GenerationAction): GenerationState => {
+  switch (action.type) {
+    case 'GENERATE_START':
+      return { status: 'loading', response: null, error: null };
+    case 'GENERATE_SUCCESS':
+      return { status: 'success', response: action.payload, error: null };
+    case 'GENERATE_ERROR':
+      return { status: 'error', response: null, error: action.payload };
+    case 'RESET':
+      return { status: 'idle', response: null, error: null };
+    default:
+      return state;
+  }
+};
+
+const initializer = (): GenerationState => {
+  try {
+    const storedResponse = localStorage.getItem(LOCAL_STORAGE_KEYS.RESPONSE);
+    if (storedResponse) {
+      return { status: 'success', response: JSON.parse(storedResponse), error: null };
+    }
+  } catch (e) {
+    console.error("Failed to parse stored response:", e);
+  }
+  return { status: 'idle', response: null, error: null };
+};
+
+// --- Main App Component ---
 
 const App: React.FC = () => {
   const [prompt, setPrompt] = usePersistentState<string>(LOCAL_STORAGE_KEYS.PROMPT, '');
-  const [response, setResponse] = usePersistentState<CodeOutput | null>(LOCAL_STORAGE_KEYS.RESPONSE, null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const [generationState, dispatch] = useReducer(generationReducer, undefined, initializer);
+
   const [isHelpOpen, setIsHelpOpen] = useState<boolean>(false);
   const [isResetting, setIsResetting] = useState<boolean>(false);
   const [isPromptHighlighting, setIsPromptHighlighting] = useState<boolean>(false);
   const [isResetModalOpen, setIsResetModalOpen] = useState<boolean>(false);
   const [ariaLiveMessage, setAriaLiveMessage] = useState<string>('');
-  const resetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const generationRef = useRef(0);
   
   const mainContainerRef = useRef<HTMLDivElement>(null);
   const { isDragging, handleMouseDown, handleDividerKeyDown, setDividerPosition } = useResizablePanels(mainContainerRef);
 
+  // --- Side Effects ---
 
-  // --- Graceful Preloader Transition ---
+  // Graceful Preloader Transition
   useEffect(() => {
     const preloader = document.getElementById('app-preloader');
     if (preloader) {
-        // Start the fade-out using existing animation class
         preloader.classList.add('animate-fade-out');
-        
-        // Remove the preloader from the DOM after the animation completes
         setTimeout(() => {
             preloader.remove();
         }, RESET_ANIMATION_DURATION_MS);
     }
-  }, []); // Empty dependency array ensures this runs only once on mount
+  }, []);
 
-  // --- Dynamic Document Title & Favicon ---
+  // Persist response to localStorage when it changes
+  useEffect(() => {
+    try {
+        if (generationState.response) {
+            localStorage.setItem(LOCAL_STORAGE_KEYS.RESPONSE, JSON.stringify(generationState.response));
+        } else {
+            localStorage.removeItem(LOCAL_STORAGE_KEYS.RESPONSE);
+        }
+    } catch (e) {
+        console.error("Failed to save response to localStorage:", e);
+    }
+  }, [generationState.response]);
+
+  // Dynamic Document Title & Favicon
   useEffect(() => {
     const baseTitle = 'WesAI.Dev';
     const faviconLink = document.querySelector("link[rel='icon']");
@@ -57,10 +105,10 @@ const App: React.FC = () => {
     const originalFavicon = faviconLink.getAttribute('href');
     const loadingFavicon = "data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='faviconGrad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%234f46e5;'/%3E%3Cstop offset='100%25' style='stop-color:%2306b6d4;'/%3E%3C/defs%3E%3Crect width='32' height='32' rx='6' fill='url(%23faviconGrad)'/%3E%3Cpath d='M8 10 L12 22 L16 12 L20 22 L24 10' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Canimate attributeName='opacity' values='0.5;1;0.5' dur='1.5s' repeatCount='indefinite' /%3E%3C/path%3E%3C/svg%3E";
     
-    if (isLoading) {
+    if (generationState.status === 'loading') {
       document.title = `Generating... | ${baseTitle}`;
       faviconLink.setAttribute('href', loadingFavicon);
-    } else if (response && prompt) {
+    } else if (generationState.response && prompt) {
         const promptSnippet = prompt.length > 30 ? `${prompt.substring(0, 30)}...` : prompt;
         document.title = `Preview: ${promptSnippet} | ${baseTitle}`;
         if (originalFavicon) faviconLink.setAttribute('href', originalFavicon);
@@ -69,184 +117,141 @@ const App: React.FC = () => {
         if (originalFavicon) faviconLink.setAttribute('href', originalFavicon);
     }
 
-    // Cleanup on unmount
     return () => {
         if (originalFavicon) faviconLink.setAttribute('href', originalFavicon);
     };
-
-  }, [isLoading, response, prompt]);
+  }, [generationState.status, generationState.response, prompt]);
   
-  // --- Accessibility: ARIA Live Region for Screen Readers ---
+  // Accessibility: ARIA Live Region for Screen Readers
   useEffect(() => {
-    if (isLoading) {
+    if (generationState.status === 'loading') {
       setAriaLiveMessage('Generation started.');
-    }
-  }, [isLoading]);
-
-  useEffect(() => {
-    if (error) {
-      setAriaLiveMessage(`An error occurred: ${error}`);
-    }
-  }, [error]);
-
-  useEffect(() => {
-    if (!isLoading && response && !error && !isResetting) {
-        // Announce completion after a short delay to feel more natural
+    } else if (generationState.status === 'error' && generationState.error) {
+      setAriaLiveMessage(`An error occurred: ${generationState.error}`);
+    } else if (generationState.status === 'success' && generationState.response) {
         const timer = setTimeout(() => {
             setAriaLiveMessage('Generation complete. Preview is now available.');
-            // Move focus to the preview tab for improved keyboard navigation and accessibility.
             document.getElementById('tab-preview')?.focus();
         }, 500);
         return () => clearTimeout(timer);
     }
-  }, [isLoading, response, error, isResetting]);
+  }, [generationState.status, generationState.response, generationState.error]);
 
-  // --- Handle Shared Links on Load & on Hash Change ---
+  // Handle Shared Links on Load & on Hash Change
   const handleHash = useCallback(() => {
     const hash = window.location.hash.substring(1);
     if (hash) {
         try {
-            // Decode from Base64 to a binary string
             const binaryString = atob(decodeURIComponent(hash));
-
-            // Decompress binary string and parse
-            const decompressed = pako.inflate(binaryString, { to: 'string' });
+            // FIX: pako.inflate expects a Uint8Array, not a binary string.
+            // Convert the binary string from atob to a Uint8Array.
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            const decompressed = pako.inflate(bytes, { to: 'string' });
             const data = JSON.parse(decompressed);
             
             if (data.prompt && data.react) {
                 setPrompt(data.prompt);
-                setResponse({ react: data.react });
-                // Reset loading/error states to correctly show the loaded content,
-                // preventing the UI from being stuck if a link is opened mid-generation.
-                setIsLoading(false);
-                setError(null);
+                dispatch({ type: 'GENERATE_SUCCESS', payload: { react: data.react } });
             }
         } catch (e) {
             console.error("Failed to parse shared link:", e);
-            setError("The shared link is invalid or corrupted.");
+            dispatch({ type: 'GENERATE_ERROR', payload: "The shared link is invalid or corrupted." });
         } finally {
-            // Clear the hash for a clean URL.
             window.history.replaceState(null, '', window.location.pathname + window.location.search);
         }
     }
-  }, [setPrompt, setResponse, setIsLoading, setError]);
+  }, [setPrompt]);
 
   useEffect(() => {
     window.addEventListener('hashchange', handleHash);
-    handleHash(); // Handle initial hash on load
-
+    handleHash();
     return () => {
         window.removeEventListener('hashchange', handleHash);
     };
   }, [handleHash]);
 
+  // --- Event Handlers ---
 
   const handleGenerate = useCallback(async () => {
-    if (!prompt.trim() || isLoading) return;
+    if (!prompt.trim() || generationState.status === 'loading') return;
 
-    // Increment generation ID and capture it for this request to prevent race conditions.
     const currentGenerationId = ++generationRef.current;
-
-    setIsLoading(true);
-    setError(null);
-    setResponse(null);
+    dispatch({ type: 'GENERATE_START' });
 
     try {
       const result = await brainstormIdea(prompt);
-      // Only update state if this is still the active generation request.
       if (generationRef.current === currentGenerationId) {
-        setResponse(result);
+        dispatch({ type: 'GENERATE_SUCCESS', payload: result });
       }
     } catch (e) {
       if (generationRef.current === currentGenerationId) {
-        if (e instanceof Error) {
-          setError(e.message);
-        } else {
-          setError('An unexpected error occurred.');
-        }
-      }
-    } finally {
-      if (generationRef.current === currentGenerationId) {
-        setIsLoading(false);
+        const errorMessage = e instanceof Error ? e.message : 'An unexpected error occurred.';
+        dispatch({ type: 'GENERATE_ERROR', payload: errorMessage });
       }
     }
-  }, [prompt, isLoading, setResponse]);
+  }, [prompt, generationState.status]);
 
   const handleReset = useCallback(() => {
-    // 1. Invalidate any ongoing generation requests to prevent them from updating the state.
-    generationRef.current++;
+    generationRef.current++; // Invalidate any ongoing generations
+    setDividerPosition(PANEL_DEFAULT_SIZE_PERCENT);
+    setIsResetting(true); // Trigger fade-out animation
 
-    // 2. Trigger the visual fade-out animation and clear loading state.
-    setIsResetting(true);
-    setIsLoading(false);
-    
-    // Clear any pending timeout from a previous click to avoid race conditions.
-    if (resetTimeoutRef.current) {
-        clearTimeout(resetTimeoutRef.current);
-    }
-
-    // 3. After the animation duration, clear all the state and end the animation.
-    resetTimeoutRef.current = setTimeout(() => {
+    // Decouple state reset from CSS animation name for robustness
+    setTimeout(() => {
         setPrompt('');
-        setResponse(null);
-        setError(null);
-        setDividerPosition(PANEL_DEFAULT_SIZE_PERCENT);
-        setIsResetting(false); // This removes the fade-out class.
+        dispatch({ type: 'RESET' });
+        setIsResetting(false); // End reset state
     }, RESET_ANIMATION_DURATION_MS);
-  }, [setPrompt, setResponse, setError, setDividerPosition]);
-
-  // Cleanup for the reset timeout to prevent memory leaks
-  useEffect(() => {
-    return () => {
-        if (resetTimeoutRef.current) {
-            clearTimeout(resetTimeoutRef.current);
-        }
-    };
-  }, []);
+  }, [setDividerPosition, setPrompt]);
   
   const handleReusePrompt = useCallback((newPrompt: string) => {
     setPrompt(newPrompt);
     setIsPromptHighlighting(true);
     document.getElementById('prompt-input')?.focus();
-    // Duration should be slightly longer than the animation
     setTimeout(() => setIsPromptHighlighting(false), 900);
   }, [setPrompt]);
+
+  // Memoize callbacks for performance optimization with React.memo
+  const openHelpModal = useCallback(() => setIsHelpOpen(true), []);
+  const openResetModal = useCallback(() => setIsResetModalOpen(true), []);
 
 
   return (
     <div className="h-screen flex flex-col bg-transparent transition-colors duration-normal">
-      {/* Visually hidden container for screen reader announcements */}
       <div aria-live="polite" aria-atomic="true" className="sr-only">
         {ariaLiveMessage}
       </div>
 
       <Header 
-        onHelpClick={() => setIsHelpOpen(true)}
-        onResetClick={() => setIsResetModalOpen(true)}
+        onHelpClick={openHelpModal}
+        onResetClick={openResetModal}
       />
       <main ref={mainContainerRef} className="flex-grow p-4 md:p-6 lg:p-8 flex flex-col md:flex-row overflow-hidden gap-4 min-h-0">
         
-        {/* Unified Layout */}
         <div 
           id="prompt-panel"
-          className={`flex flex-col flex-shrink-0 md:h-full md:min-h-0 ${isResetting ? 'animate-fade-out' : ''}`}
+          className={`flex flex-col flex-shrink-0 md:h-full md:min-h-0 transition-opacity duration-normal ${isResetting ? 'opacity-0' : 'opacity-100'}`}
+          aria-busy={generationState.status === 'loading'}
         >
            <PromptInput 
             prompt={prompt}
             setPrompt={setPrompt}
             handleGenerate={handleGenerate}
-            isLoading={isLoading}
+            isLoading={generationState.status === 'loading'}
             isHighlighting={isPromptHighlighting}
            />
         </div>
         
-        {/* --- Resizable Divider --- */}
         <div
             role="separator"
             aria-orientation="vertical"
             aria-label="Resize panels"
             tabIndex={0}
             onMouseDown={handleMouseDown}
+            onTouchStart={handleMouseDown}
             onKeyDown={handleDividerKeyDown}
             className="hidden md:flex flex-col justify-center items-center w-4 cursor-col-resize group focus:outline-none"
         >
@@ -257,12 +262,13 @@ const App: React.FC = () => {
         
         <div 
           id="output-panel"
-          className={`flex flex-col flex-1 min-h-0 md:h-full ${isResetting ? 'animate-fade-out' : ''}`}
+          className={`flex flex-col flex-1 min-h-0 md:h-full transition-opacity duration-normal ${isResetting ? 'opacity-0' : 'opacity-100'}`}
+          aria-busy={generationState.status === 'loading'}
         >
           <OutputDisplay
-            response={response}
-            isLoading={isLoading}
-            error={error}
+            response={generationState.response}
+            isLoading={generationState.status === 'loading'}
+            error={generationState.error}
             setPrompt={setPrompt}
             onReusePrompt={handleReusePrompt}
             prompt={prompt}
@@ -270,11 +276,7 @@ const App: React.FC = () => {
           />
         </div>
       </main>
-      <footer className="flex-shrink-0 text-center py-3 px-4 sm:px-6 lg:px-8 text-slate-500 dark:text-slate-400 text-xs bg-slate-100/80 dark:bg-slate-950/80 backdrop-blur-lg z-10 flex flex-wrap justify-center items-center gap-x-2 border-t border-slate-200 dark:border-slate-800">
-        <span>© 2024 WesAI.Dev</span>
-        <span className="text-slate-400 dark:text-slate-600 hidden sm:inline">|</span>
-        <span>Powered by <a href="https://ai.google.dev/" target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:underline">Google Gemini</a>.</span>
-      </footer>
+      <Footer />
       <HelpModal
         isOpen={isHelpOpen}
         onClose={() => setIsHelpOpen(false)}

@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { CloseIcon, AlertTriangleIcon } from './Icons';
 import { useModalAccessibility } from '../hooks/useModalAccessibility';
+import { BUTTON_VARIANTS } from '../constants';
 
 interface ConfirmModalProps {
   isOpen: boolean;
@@ -19,11 +20,6 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({ isOpen, onClose, onConfirm,
   const { handleKeyDown } = useModalAccessibility(isOpen, onClose, modalRef, cancelButtonRef);
 
   if (!isOpen) return null;
-
-  const confirmButtonClasses = {
-    default: "bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold hover:opacity-90 transform hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/40 animate-gradient focus-visible:ring-indigo-500",
-    destructive: "bg-red-600 hover:bg-red-700 text-white font-bold transform hover:-translate-y-0.5 hover:shadow-lg hover:shadow-red-500/40 focus-visible:ring-red-500"
-  };
 
   return (
     <div
@@ -61,7 +57,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({ isOpen, onClose, onConfirm,
                     onConfirm();
                     onClose();
                 }}
-                className={`py-2 px-4 rounded-lg transition-all duration-normal focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-800 ${confirmButtonClasses[confirmVariant]}`}
+                className={`py-2 px-4 rounded-lg transition-all duration-normal focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-800 ${BUTTON_VARIANTS[confirmVariant]}`}
             >
                 {confirmText}
             </button>
