@@ -26,7 +26,7 @@ const PreviewPanel: React.FC<{ code: string; theme: Theme; }> = ({ code, theme }
             iframeRef.current.contentWindow.postMessage({
                 type: 'RENDER_CODE',
                 payload: { code }
-            }, '*');
+            }, window.location.origin);
         }
     }, [code, isSandboxReady]);
 
@@ -35,7 +35,7 @@ const PreviewPanel: React.FC<{ code: string; theme: Theme; }> = ({ code, theme }
             iframeRef.current.contentWindow.postMessage({
                 type: 'SET_THEME',
                 payload: { theme }
-            }, '*');
+            }, window.location.origin);
         }
     }, [theme, isSandboxReady]);
 

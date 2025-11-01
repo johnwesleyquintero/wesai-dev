@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef, useLayoutEffect, useCallback } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { CodeOutput } from '../copilot/agent';
@@ -34,18 +35,33 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
   const [previewError, setPreviewError] = useState<string | null>(null);
   
   const tabsRef = useRef<(HTMLButtonElement | null)[]>([]);
+  // FIX: Explicitly initialize useRef with undefined to fix "Expected 1 arguments, but got 0" runtime error.
+  const prevActiveTabRef = useRef<ActiveTab | undefined>(undefined);
   const [gliderStyle, setGliderStyle] = useState({});
 
-  useLayoutEffect(() => {
+  // Memoize the style calculation to avoid re-creating the function on every render.
+  const updateGliderStyle = useCallback(() => {
     const activeTabIndex = activeTab === 'preview' ? 0 : 1;
     const activeTabEl = tabsRef.current[activeTabIndex];
     if (activeTabEl) {
-      setGliderStyle({
-        width: activeTabEl.offsetWidth,
-        transform: `translateX(${activeTabEl.offsetLeft}px)`,
-      });
+        setGliderStyle({
+            width: activeTabEl.offsetWidth,
+            transform: `translateX(${activeTabEl.offsetLeft}px)`,
+        });
     }
   }, [activeTab]);
+
+  // useLayoutEffect is best for DOM measurements to avoid visual flicker.
+  // This effect now runs when the active tab changes AND listens for window resize events.
+  useLayoutEffect(() => {
+    updateGliderStyle();
+
+    window.addEventListener('resize', updateGliderStyle);
+    return () => {
+        window.removeEventListener('resize', updateGliderStyle);
+    };
+  }, [updateGliderStyle]);
+
 
   // When a new response comes in, switch to the preview tab.
   useEffect(() => {
@@ -68,17 +84,22 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
     };
   }, []);
 
-  // Reset preview error on new generation
+  // Reset preview error on new generation or when switching away from the preview tab
   useEffect(() => {
     if (isLoading) {
         setPreviewError(null);
     }
-  }, [isLoading]);
+    // If we're navigating away from the preview tab, clear any errors.
+    if (prevActiveTabRef.current === 'preview' && activeTab !== 'preview') {
+        setPreviewError(null);
+    }
+    prevActiveTabRef.current = activeTab;
+  }, [isLoading, activeTab]);
 
   const handleTabKeyDown = useCallback((e: React.KeyboardEvent) => {
     const tabs = ['preview', 'code'] as ActiveTab[];
     const currentIndex = tabs.indexOf(activeTab);
-    let nextIndex;
+    let nextIndex = -1; // Use -1 to indicate no change
 
     if (e.key === 'ArrowRight') {
       e.preventDefault();
@@ -86,12 +107,20 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
     } else if (e.key === 'ArrowLeft') {
       e.preventDefault();
       nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      nextIndex = 0;
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      nextIndex = tabs.length - 1;
     } else {
       return;
     }
 
-    setActiveTab(tabs[nextIndex]);
-    tabsRef.current[nextIndex]?.focus();
+    if (nextIndex !== -1) {
+      setActiveTab(tabs[nextIndex]);
+      tabsRef.current[nextIndex]?.focus();
+    }
   }, [activeTab]);
   
   const renderContent = () => {
@@ -121,7 +150,7 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
     return <InitialState setPrompt={setPrompt} />;
   };
 
-  const contentKey = error ? 'error' : response ? `${activeTab}-${response.react.length}-${previewError}` : 'initial';
+  const contentKey = error ? 'error' : response ? `${activeTab}-${response.react.length}` : 'initial';
 
   return (
     <div className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 ring-1 ring-black/5 dark:ring-white/10 rounded-lg flex flex-col h-full shadow-md">

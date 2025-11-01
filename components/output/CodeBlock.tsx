@@ -24,21 +24,28 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ code, prompt }) => {
     const highlightedLines = useMemo(() => {
         if (!code) return [];
 
-        // Graceful degradation: If highlight.js isn't loaded,
-        // render the raw code safely to prevent an empty display.
+        const escapeHtml = (unsafe: string) => 
+            unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        
+        // Graceful degradation: If highlight.js isn't loaded or fails,
+        // render the raw code safely to prevent a crash.
         if (!window.hljs) {
-            const escapeHtml = (unsafe: string) => 
-                unsafe
-                    .replace(/&/g, "&amp;")
-                    .replace(/</g, "&lt;")
-                    .replace(/>/g, "&gt;")
-                    .replace(/"/g, "&quot;")
-                    .replace(/'/g, "&#039;");
             return code.split('\n').map(line => escapeHtml(line));
         }
 
-        const highlightedCode = window.hljs.highlight(code, { language: 'tsx' }).value;
-        return highlightedCode.split('\n');
+        try {
+            const highlightedCode = window.hljs.highlight(code, { language: 'tsx' }).value;
+            return highlightedCode.split('\n');
+        } catch (error) {
+            console.error("Code highlighting failed:", error);
+            // Fallback to un-highlighted, safely escaped code on error.
+            return code.split('\n').map(line => escapeHtml(line));
+        }
     }, [code]);
 
     const handleCopy = useCallback(() => {

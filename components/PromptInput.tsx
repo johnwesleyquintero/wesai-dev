@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState } from 'react';
 import { SparkleIcon, CloseIcon, CubeIcon } from './Icons';
 import QuickStartPrompts from './QuickStartPrompts';
@@ -49,15 +50,15 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [proTipIndex, setProTipIndex] = useState(0);
   const [isTipVisible, setIsTipVisible] = useState(true);
+  const timeoutIdRef = useRef<number | null>(null);
   
   useEffect(() => {
     // Select a random pro tip on component mount
     setProTipIndex(Math.floor(Math.random() * PRO_TIPS.length));
     
-    let timeoutId: number | null = null;
     const tipInterval = setInterval(() => {
         setIsTipVisible(false);
-        timeoutId = window.setTimeout(() => {
+        timeoutIdRef.current = window.setTimeout(() => {
             setProTipIndex(prevIndex => (prevIndex + 1) % PRO_TIPS.length);
             setIsTipVisible(true);
         }, 300); // Wait for fade-out to complete
@@ -65,8 +66,8 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, setPrompt, handleGene
 
     return () => {
         clearInterval(tipInterval);
-        if (timeoutId) {
-            clearTimeout(timeoutId);
+        if (timeoutIdRef.current) {
+            clearTimeout(timeoutIdRef.current);
         }
     };
   }, []);

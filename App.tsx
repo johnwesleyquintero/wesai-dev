@@ -190,8 +190,7 @@ const App: React.FC = () => {
         {/* Unified Layout */}
         <div 
           id="prompt-panel"
-          className={`flex flex-col md:h-full md:min-h-0 ${isResetting ? 'animate-fade-out' : ''} ${!isDragging ? 'transition-[flex-basis] duration-fast ease-out-quad' : ''}`}
-          style={{ flexBasis: 'var(--panel-one-basis, 50%)' }}
+          className={`flex flex-col flex-shrink-0 md:h-full md:min-h-0 ${isResetting ? 'animate-fade-out' : ''} ${!isDragging ? 'transition-[flex-basis] duration-fast ease-out-quad' : ''}`}
         >
            <PromptInput 
             prompt={prompt}
@@ -225,7 +224,7 @@ const App: React.FC = () => {
         
         <div 
           id="output-panel"
-          className={`flex flex-col md:h-full md:min-h-0 md:flex-1 ${isResetting ? 'animate-fade-out' : ''}`}
+          className={`flex flex-col flex-1 min-h-0 md:h-full ${isResetting ? 'animate-fade-out' : ''}`}
         >
           <OutputDisplay
             response={response}
