@@ -36,6 +36,7 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
   const [previewError, setPreviewError] = useState<string | null>(null);
   
   const tabsRef = useRef<(HTMLButtonElement | null)[]>([]);
+  const tabContainerRef = useRef<HTMLDivElement>(null); // Ref for the tab container
   // FIX: Explicitly initialize useRef with undefined to fix "Expected 1 arguments, but got 0" runtime error.
   const prevActiveTabRef = useRef<ActiveTab | undefined>(undefined);
   const [gliderStyle, setGliderStyle] = useState({});
@@ -52,16 +53,26 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
     }
   }, [activeTab]);
 
-  // useLayoutEffect is best for DOM measurements to avoid visual flicker.
-  // This effect now runs when the active tab changes AND listens for window resize events.
+  // This effect now uses a ResizeObserver for robust repositioning.
   useLayoutEffect(() => {
-    updateGliderStyle();
+    const container = tabContainerRef.current;
+    if (!container) return;
 
-    window.addEventListener('resize', updateGliderStyle);
+    // Call it once initially to set the position.
+    updateGliderStyle();
+    
+    // Use ResizeObserver to handle container resizing (e.g., dragging the panel divider).
+    const observer = new ResizeObserver(() => {
+        updateGliderStyle();
+    });
+
+    observer.observe(container);
+
+    // Cleanup by disconnecting the observer.
     return () => {
-        window.removeEventListener('resize', updateGliderStyle);
+        observer.disconnect();
     };
-  }, [updateGliderStyle]);
+  }, [updateGliderStyle]); // Dependency is correct, as updateGliderStyle depends on activeTab.
 
 
   // When a new response comes in, switch to the preview tab.
@@ -155,6 +166,7 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ response, isLoading, erro
             </div>
             {response && !error && (
                 <div 
+                    ref={tabContainerRef}
                     role="tablist" 
                     aria-labelledby="output-heading" 
                     className="relative flex items-center gap-1 bg-slate-200 dark:bg-slate-800 p-1 rounded-md flex-shrink-0"
