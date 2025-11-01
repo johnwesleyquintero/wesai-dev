@@ -6,10 +6,10 @@ import HelpModal from './components/HelpModal';
 import ConfirmModal from './components/ConfirmModal';
 import { brainstormIdea } from './services/geminiService';
 import { CodeOutput } from './copilot/agent';
-import { GripVerticalIcon } from './components/Icons';
-import { PANEL_DEFAULT_SIZE_PERCENT, PANEL_MIN_SIZE_PERCENT, PANEL_MAX_SIZE_PERCENT, RESET_ANIMATION_DURATION_MS, LOCAL_STORAGE_KEYS } from './constants';
+import { RESET_ANIMATION_DURATION_MS, LOCAL_STORAGE_KEYS } from './constants';
 import usePersistentState from './hooks/usePersistentState';
 import { useResizablePanels } from './hooks/useResizablePanels';
+import { GripVerticalIcon } from './components/Icons';
 
 declare const pako: any;
 
@@ -24,16 +24,24 @@ const App: React.FC = () => {
   const [isResetModalOpen, setIsResetModalOpen] = useState<boolean>(false);
   const [ariaLiveMessage, setAriaLiveMessage] = useState<string>('');
   const resetTimeoutRef = useRef<number | null>(null);
-
-  // --- Resizable Panel Logic ---
+  
   const mainContainerRef = useRef<HTMLDivElement>(null);
-  const {
-      dividerPosition,
-      setDividerPosition,
-      isDragging,
-      handleMouseDown,
-      handleDividerKeyDown
-  } = useResizablePanels(mainContainerRef);
+  const { isDragging, handleMouseDown, handleDividerKeyDown } = useResizablePanels(mainContainerRef);
+
+
+  // --- Graceful Preloader Transition ---
+  useEffect(() => {
+    const preloader = document.getElementById('app-preloader');
+    if (preloader) {
+        // Start the fade-out using existing animation class
+        preloader.classList.add('animate-fade-out');
+        
+        // Remove the preloader from the DOM after the animation completes
+        setTimeout(() => {
+            preloader.remove();
+        }, RESET_ANIMATION_DURATION_MS);
+    }
+  }, []); // Empty dependency array ensures this runs only once on mount
 
   // --- Dynamic Document Title & Favicon ---
   useEffect(() => {
@@ -151,10 +159,9 @@ const App: React.FC = () => {
       setPrompt('');
       setResponse(null);
       setError(null);
-      setDividerPosition(PANEL_DEFAULT_SIZE_PERCENT);
       setIsResetting(false);
     }, RESET_ANIMATION_DURATION_MS); // Match animation duration
-  }, [setPrompt, setResponse, setError, setDividerPosition]);
+  }, [setPrompt, setResponse, setError]);
 
   // Cleanup for the reset timeout to prevent memory leaks
   useEffect(() => {
@@ -185,12 +192,12 @@ const App: React.FC = () => {
         onHelpClick={() => setIsHelpOpen(true)}
         onResetClick={() => setIsResetModalOpen(true)}
       />
-      <main ref={mainContainerRef} className="flex-grow p-4 md:p-6 lg:p-8 flex flex-col md:flex-row overflow-y-auto md:overflow-hidden gap-6 md:gap-0">
+      <main ref={mainContainerRef} className="flex-grow p-4 md:p-6 lg:p-8 flex flex-col md:flex-row overflow-y-auto md:overflow-hidden gap-4">
         
         {/* Unified Layout */}
         <div 
           id="prompt-panel"
-          className={`flex flex-col flex-shrink-0 md:h-full md:min-h-0 ${isResetting ? 'animate-fade-out' : ''} ${!isDragging ? 'transition-[flex-basis] duration-fast ease-out-quad' : ''}`}
+          className={`flex flex-col flex-shrink-0 md:h-full md:min-h-0 ${isResetting ? 'animate-fade-out' : ''}`}
         >
            <PromptInput 
             prompt={prompt}
@@ -201,24 +208,18 @@ const App: React.FC = () => {
            />
         </div>
         
-        <div 
+        {/* --- Resizable Divider --- */}
+        <div
+            role="separator"
+            aria-orientation="vertical"
+            aria-label="Resize panels"
+            tabIndex={0}
             onMouseDown={handleMouseDown}
             onKeyDown={handleDividerKeyDown}
-            role="separator"
-            tabIndex={0}
-            aria-orientation="vertical"
-            aria-controls="prompt-panel output-panel"
-            aria-label="Resize panels"
-            aria-valuenow={Math.round(dividerPosition)}
-            aria-valuemin={PANEL_MIN_SIZE_PERCENT}
-            aria-valuemax={PANEL_MAX_SIZE_PERCENT}
-            className="hidden md:flex w-4 cursor-col-resize flex-shrink-0 items-center justify-center group focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950 rounded-full transition-colors duration-normal"
+            className="hidden md:flex flex-col justify-center items-center w-4 cursor-col-resize group focus:outline-none"
         >
-            <div className={`w-0.5 h-16 bg-slate-200 dark:bg-slate-800 rounded-full transition-all relative ${isDragging ? 'duration-75 bg-indigo-500 scale-x-150 shadow-xl shadow-indigo-500/30' : 'duration-normal group-hover:bg-indigo-500/60 group-focus-visible:bg-indigo-500/60'}`}>
-               <div className={`absolute bottom-full mb-2.5 -translate-x-1/2 left-1/2 bg-slate-800 text-white text-xs font-mono py-1 px-2.5 rounded-md shadow-lg transition-opacity duration-fast pointer-events-none ${isDragging ? 'opacity-100' : 'opacity-0'}`}>
-                    {Math.round(dividerPosition)}%&nbsp;/&nbsp;{100 - Math.round(dividerPosition)}%
-               </div>
-               <GripVerticalIcon className={`absolute text-slate-500 dark:text-slate-400 w-5 h-5 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-50 group-hover:opacity-100 group-hover:scale-125 group-focus-visible:opacity-100 group-focus-visible:scale-125 group-active:text-indigo-600 dark:group-active:text-indigo-400 transition-all duration-fast ${isDragging ? 'text-indigo-600 dark:text-indigo-400' : ''}`} />
+            <div className={`w-1.5 h-12 rounded-full transition-colors ${isDragging ? 'bg-indigo-400' : 'bg-slate-200 dark:bg-slate-700 group-hover:bg-slate-300 dark:group-hover:bg-slate-600 group-focus:bg-indigo-400'}`}>
+                <GripVerticalIcon className={`w-full h-full scale-50 transition-opacity duration-300 text-slate-500 dark:text-slate-400 ${isDragging ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 group-focus:opacity-100'}`} />
             </div>
         </div>
         

@@ -18,14 +18,14 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
   const whatsNewItems = [
     { text: 'React-First Generation:', description: "WesAI now generates complete, self-contained React components (.tsx) instead of separate HTML/CSS/JS." },
     { text: 'Robust Sandbox Preview:', description: "Live previews are now rendered in a secure, isolated iframe for better performance and error handling." },
-    { text: 'Resizable Panels:', description: "On desktop, you can now drag the divider between the input and output panels to resize them to your liking." },
+    { text: 'Resizable Panels:', description: "Drag the divider to resize the input and output panels to your liking. Your preference is saved automatically." },
     { text: 'UI/UX Overhaul:', description: "Refreshed the entire interface with a cleaner header, improved spacing, and more polished components for a professional feel." },
   ];
   
   const shortcuts = [
     { keys: ['Cmd', 'Ctrl'], plus: true, final: 'Enter', description: 'Generate Component' },
-    { keys: ['←', '→'], description: 'Resize Panels (divider selected)' },
-    { keys: ['Home', 'End'], description: 'Set panel to min/max size' },
+    { keys: ['←', '→'], description: 'Adjust Panel Size' },
+    { keys: ['Shift'], description: 'Hold for large panel adjustments' },
     { keys: ['Esc'], description: 'Close this modal' },
   ];
   

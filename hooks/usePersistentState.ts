@@ -3,8 +3,12 @@ import { useState, useEffect } from 'react';
 // A custom hook to persist state in localStorage
 function usePersistentState<T>(key: string, initialValue: T): [T, React.Dispatch<React.SetStateAction<T>>] {
   const [state, setState] = useState<T>(() => {
+    // Prevent SSR errors by checking for 'window'
+    if (typeof window === 'undefined') {
+      return initialValue;
+    }
     try {
-      const storedValue = localStorage.getItem(key);
+      const storedValue = window.localStorage.getItem(key);
       if (storedValue) {
         return JSON.parse(storedValue);
       }
@@ -15,11 +19,15 @@ function usePersistentState<T>(key: string, initialValue: T): [T, React.Dispatch
   });
 
   useEffect(() => {
+    // Prevent SSR errors by checking for 'window'
+    if (typeof window === 'undefined') {
+      return;
+    }
     try {
         if (state === null || state === undefined) {
-             localStorage.removeItem(key);
+             window.localStorage.removeItem(key);
         } else {
-            localStorage.setItem(key, JSON.stringify(state));
+            window.localStorage.setItem(key, JSON.stringify(state));
         }
     } catch (error) {
       console.error(`Error setting localStorage key "${key}":`, error);
