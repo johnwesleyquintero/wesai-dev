@@ -1,4 +1,5 @@
 
+
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import Header from './components/Header';
 import PromptInput from './components/PromptInput';
@@ -108,6 +109,10 @@ const App: React.FC = () => {
             if (data.prompt && data.react) {
                 setPrompt(data.prompt);
                 setResponse({ react: data.react });
+                // Reset loading/error states to correctly show the loaded content,
+                // preventing the UI from being stuck if a link is opened mid-generation.
+                setIsLoading(false);
+                setError(null);
             }
         } catch (e) {
             console.error("Failed to parse shared link:", e);
@@ -117,7 +122,7 @@ const App: React.FC = () => {
             window.history.replaceState(null, '', window.location.pathname + window.location.search);
         }
     }
-  }, [setPrompt, setResponse]);
+  }, [setPrompt, setResponse, setIsLoading, setError]);
 
   useEffect(() => {
     window.addEventListener('hashchange', handleHash);
