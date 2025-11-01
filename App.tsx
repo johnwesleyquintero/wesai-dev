@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import Header from './components/Header';
 import PromptInput from './components/PromptInput';
@@ -150,16 +151,23 @@ const App: React.FC = () => {
   }, [prompt, isLoading, setResponse]);
 
   const handleReset = useCallback(() => {
+    // 1. Immediately clear all persistent state. This is atomic and safe.
+    setPrompt('');
+    setResponse(null);
+    setError(null);
+    setDividerPosition(PANEL_DEFAULT_SIZE_PERCENT);
+
+    // 2. Trigger the visual fade-out animation.
     setIsResetting(true);
+    
     // Clear any pending timeout from a previous click
     if (resetTimeoutRef.current) {
         clearTimeout(resetTimeoutRef.current);
     }
+
+    // 3. After the animation duration, turn off the resetting state.
+    // This doesn't affect the actual data, only the UI animation class.
     resetTimeoutRef.current = window.setTimeout(() => {
-      setPrompt('');
-      setResponse(null);
-      setError(null);
-      setDividerPosition(PANEL_DEFAULT_SIZE_PERCENT);
       setIsResetting(false);
     }, RESET_ANIMATION_DURATION_MS); // Match animation duration
   }, [setPrompt, setResponse, setError, setDividerPosition]);
