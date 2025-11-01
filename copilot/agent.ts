@@ -1,6 +1,7 @@
 
 
 
+
 import { GoogleGenAI, Type } from "@google/genai";
 
 const SYSTEM_INSTRUCTION = `You are WesAI, an expert AI assistant and strategic partner to a senior software architect. Your mission is to generate production-quality, visually stunning, and fully functional web components based on user prompts. The aesthetic should be modern, clean, and professional, akin to the quality seen on sites like Bolt.new.
@@ -80,13 +81,13 @@ export interface CodeOutput {
 }
 
 class CopilotAgent {
-    public async generate(prompt: string, apiKey: string): Promise<CodeOutput> {
-        if (!apiKey) {
-            throw new Error("API Key is not configured. Please set it in the settings.");
+    public async generate(prompt: string): Promise<CodeOutput> {
+        if (!process.env.API_KEY) {
+            throw new Error("API Key is not configured. Please ensure the environment variable is set.");
         }
         
         try {
-            const ai = new GoogleGenAI({ apiKey });
+            const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
             const response = await ai.models.generateContent({
                 // Using gemini-2.5-flash for faster responses, improving UX for a prototyping tool.

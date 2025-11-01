@@ -1,6 +1,6 @@
 
 
-// FIX: Import React to make the React namespace available for types.
+
 import React, { useState, useCallback, useEffect } from 'react';
 import usePersistentState from './usePersistentState';
 import { PANEL_DEFAULT_SIZE_PERCENT, PANEL_MIN_SIZE_PERCENT, PANEL_MAX_SIZE_PERCENT, LOCAL_STORAGE_KEYS } from '../constants';
@@ -67,8 +67,6 @@ export const useResizablePanels = (mainContainerRef: React.RefObject<HTMLDivElem
     const handleDividerKeyDown = useCallback((e: React.KeyboardEvent) => {
         const step = e.shiftKey ? 10 : 1;
         
-        // Fix: Use a functional update to prevent stale state issues.
-        // This is crucial because dividerPosition is not in the dependency array.
         setDividerPosition(currentPosition => {
             let newPosition: number | null = null;
             if (e.key === 'ArrowLeft') {

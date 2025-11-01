@@ -1,4 +1,4 @@
-// FIX: Import React to make the React namespace available for types.
+
 import React, { useState, useEffect, useCallback } from 'react';
 
 // A custom hook to persist state in localStorage

@@ -1,5 +1,6 @@
 
 
+
 import React, { useRef } from 'react';
 import { CloseIcon, CheckCircleIcon } from './Icons';
 import { useModalAccessibility } from '../hooks/useModalAccessibility';
@@ -9,7 +10,6 @@ interface HelpModalProps {
   onClose: () => void;
 }
 
-// FIX: Moved the `Key` component outside of `HelpModal`. Defining components inside other components is an anti-pattern that can cause performance issues and unexpected behavior, including type errors.
 const Key = ({ children }: { children: React.ReactNode }) => (
     <kbd className="font-sans mx-0.5 px-1.5 py-0.5 border border-slate-300 dark:border-slate-600 bg-slate-200/50 dark:bg-slate-700/50 rounded-md">
       {children}
@@ -92,14 +92,12 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
                             <div className="flex-shrink-0">
                                 {shortcut.keys.map((key, i) => (
                                     <React.Fragment key={key}>
-                                        {/* FIX: Explicitly pass children as a prop to resolve a potential tooling/compiler issue. */}
-                                        <Key children={key} />
+                                        <Key>{key}</Key>
                                         {i < shortcut.keys.length - 1 && <span className="mx-0.5 text-slate-400 dark:text-slate-500">/</span>}
                                     </React.Fragment>
                                 ))}
                                 {shortcut.plus && <span className="mx-0.5 text-slate-400 dark:text-slate-500">+</span>}
-                                {/* FIX: Explicitly pass children as a prop to resolve a potential tooling/compiler issue. */}
-                                {shortcut.final && <Key children={shortcut.final} />}
+                                {shortcut.final && <Key>{shortcut.final}</Key>}
                             </div>
                         </div>
                     ))}

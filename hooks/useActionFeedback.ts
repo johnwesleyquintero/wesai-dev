@@ -7,7 +7,6 @@ import { useState, useCallback, useRef, useEffect } from 'react';
  */
 export const useActionFeedback = (duration: number = 2000) => {
   const [isActionDone, setIsActionDone] = useState(false);
-  // FIX: Use `ReturnType<typeof setTimeout>` for robust type safety across environments.
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mountedRef = useRef(true); // Add ref to track mounted state.
 

@@ -1,4 +1,5 @@
 
+
 export const RESET_ANIMATION_DURATION_MS = 300;
 export const PROMPT_MAX_LENGTH = 4000;
 
@@ -18,7 +19,6 @@ export const LOCAL_STORAGE_KEYS = {
     PROMPT: 'prompt',
     RESPONSE: 'response',
     THEME: 'theme',
-    API_KEY: 'api-key',
     LINE_WRAP_ENABLED: 'line-wrap-enabled',
     CODE_FONT_SIZE: 'code-font-size',
     DIVIDER_POSITION: 'divider-position',

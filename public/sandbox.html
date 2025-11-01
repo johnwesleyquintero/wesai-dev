@@ -92,9 +92,24 @@
 <body>
     <div id="root"></div>
     <script type="text/javascript">
-        const root = ReactDOM.createRoot(document.getElementById('root'));
         let parentOrigin = null;
         let renderKey = 0; // Key to reset the ErrorBoundary on new code
+        
+        // --- Global Error Handler ---
+        // Catches errors outside React's render cycle (e.g., event handlers, async code)
+        // that the ErrorBoundary might miss, providing comprehensive coverage.
+        window.onerror = function(message, source, lineno, colno, error) {
+            console.error("Sandbox Global Error:", message, error);
+            if (parentOrigin) {
+                // Coerce message to string as it can be an Event object
+                const errorMessage = typeof message === 'string' ? message : (error ? error.message : 'An unknown script error occurred.');
+                window.parent.postMessage({ type: 'RENDER_ERROR', payload: { message: errorMessage } }, parentOrigin);
+            }
+            // Return false to allow the browser's default error handling (e.g., logging to console) to continue.
+            return false;
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
 
         // --- React Error Boundary to catch runtime errors ---
         class ErrorBoundary extends React.Component {

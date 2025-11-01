@@ -1,16 +1,12 @@
 
 
 
-
-
-
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import Header from './components/Header';
 import PromptInput from './components/PromptInput';
 import OutputDisplay from './components/OutputDisplay';
 import HelpModal from './components/HelpModal';
 import ConfirmModal from './components/ConfirmModal';
-import SettingsModal from './components/SettingsModal';
 import { brainstormIdea } from './services/geminiService';
 import { CodeOutput } from './copilot/agent';
 import { RESET_ANIMATION_DURATION_MS, LOCAL_STORAGE_KEYS, PANEL_DEFAULT_SIZE_PERCENT } from './constants';
@@ -24,18 +20,15 @@ declare const pako: any;
 const App: React.FC = () => {
   const [prompt, setPrompt] = usePersistentState<string>(LOCAL_STORAGE_KEYS.PROMPT, '');
   const [response, setResponse] = usePersistentState<CodeOutput | null>(LOCAL_STORAGE_KEYS.RESPONSE, null);
-  const [apiKey, setApiKey] = usePersistentState<string | null>(LOCAL_STORAGE_KEYS.API_KEY, null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isHelpOpen, setIsHelpOpen] = useState<boolean>(false);
-  const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
   const [isResetting, setIsResetting] = useState<boolean>(false);
   const [isPromptHighlighting, setIsPromptHighlighting] = useState<boolean>(false);
   const [isResetModalOpen, setIsResetModalOpen] = useState<boolean>(false);
   const [ariaLiveMessage, setAriaLiveMessage] = useState<string>('');
-  // FIX: Use `ReturnType<typeof setTimeout>` for robust type safety across environments.
   const resetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const { addToast } = useToast();
+  const generationRef = useRef(0);
   
   const mainContainerRef = useRef<HTMLDivElement>(null);
   const { isDragging, handleMouseDown, handleDividerKeyDown, setDividerPosition } = useResizablePanels(mainContainerRef);
@@ -97,7 +90,6 @@ const App: React.FC = () => {
   }, [error]);
 
   useEffect(() => {
-    // FIX: Add `isResetting` check to prevent announcing completion if a reset is in progress.
     if (!isLoading && response && !error && !isResetting) {
         // Announce completion after a short delay to feel more natural
         const timer = setTimeout(() => {
@@ -152,47 +144,54 @@ const App: React.FC = () => {
   const handleGenerate = useCallback(async () => {
     if (!prompt.trim() || isLoading) return;
 
-    if (!apiKey) {
-        addToast('Please set your API key to generate.', 'info');
-        setIsSettingsOpen(true);
-        return;
-    }
+    // Increment generation ID and capture it for this request to prevent race conditions.
+    const currentGenerationId = ++generationRef.current;
 
     setIsLoading(true);
     setError(null);
     setResponse(null);
 
     try {
-      const result = await brainstormIdea(prompt, apiKey);
-      setResponse(result);
+      const result = await brainstormIdea(prompt);
+      // Only update state if this is still the active generation request.
+      if (generationRef.current === currentGenerationId) {
+        setResponse(result);
+      }
     } catch (e) {
-      if (e instanceof Error) {
-        setError(e.message);
-      } else {
-        setError('An unexpected error occurred.');
+      if (generationRef.current === currentGenerationId) {
+        if (e instanceof Error) {
+          setError(e.message);
+        } else {
+          setError('An unexpected error occurred.');
+        }
       }
     } finally {
-      setIsLoading(false);
+      if (generationRef.current === currentGenerationId) {
+        setIsLoading(false);
+      }
     }
-  }, [prompt, isLoading, apiKey, setResponse, addToast]);
+  }, [prompt, isLoading, setResponse]);
 
   const handleReset = useCallback(() => {
-    // 1. Trigger the visual fade-out animation on the current content.
+    // 1. Invalidate any ongoing generation requests to prevent them from updating the state.
+    generationRef.current++;
+
+    // 2. Trigger the visual fade-out animation and clear loading state.
     setIsResetting(true);
+    setIsLoading(false);
     
     // Clear any pending timeout from a previous click to avoid race conditions.
     if (resetTimeoutRef.current) {
         clearTimeout(resetTimeoutRef.current);
     }
 
-    // 2. After the animation duration, clear all the state and end the animation.
-    // This ensures the old content fades out before the new state appears.
+    // 3. After the animation duration, clear all the state and end the animation.
     resetTimeoutRef.current = setTimeout(() => {
         setPrompt('');
         setResponse(null);
         setError(null);
         setDividerPosition(PANEL_DEFAULT_SIZE_PERCENT);
-        setIsResetting(false); // This removes the fade-out class and allows new content to animate in.
+        setIsResetting(false); // This removes the fade-out class.
     }, RESET_ANIMATION_DURATION_MS);
   }, [setPrompt, setResponse, setError, setDividerPosition]);
 
@@ -224,7 +223,6 @@ const App: React.FC = () => {
       <Header 
         onHelpClick={() => setIsHelpOpen(true)}
         onResetClick={() => setIsResetModalOpen(true)}
-        onSettingsClick={() => setIsSettingsOpen(true)}
       />
       <main ref={mainContainerRef} className="flex-grow p-4 md:p-6 lg:p-8 flex flex-col md:flex-row overflow-hidden gap-4 min-h-0">
         
@@ -239,7 +237,6 @@ const App: React.FC = () => {
             handleGenerate={handleGenerate}
             isLoading={isLoading}
             isHighlighting={isPromptHighlighting}
-            isApiKeySet={!!apiKey}
            />
         </div>
         
@@ -254,7 +251,7 @@ const App: React.FC = () => {
             className="hidden md:flex flex-col justify-center items-center w-4 cursor-col-resize group focus:outline-none"
         >
             <div className={`w-1.5 h-12 rounded-full transition-colors ${isDragging ? 'bg-indigo-400' : 'bg-slate-200 dark:bg-slate-700 group-hover:bg-slate-300 dark:group-hover:bg-slate-600 group-focus:bg-indigo-400'}`}>
-                <GripVerticalIcon className={`w-full h-full scale-50 transition-opacity duration-300 text-slate-500 dark:text-slate-400 ${isDragging ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 group-focus:opacity-100'}`} />
+                <GripVerticalIcon aria-hidden="true" className={`w-full h-full scale-50 transition-opacity duration-300 text-slate-500 dark:text-slate-400 ${isDragging ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 group-focus:opacity-100'}`} />
             </div>
         </div>
         
@@ -281,12 +278,6 @@ const App: React.FC = () => {
       <HelpModal
         isOpen={isHelpOpen}
         onClose={() => setIsHelpOpen(false)}
-      />
-      <SettingsModal
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-        currentKey={apiKey}
-        onSaveKey={setApiKey}
       />
       <ConfirmModal
         isOpen={isResetModalOpen}

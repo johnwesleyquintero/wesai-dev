@@ -1,3 +1,5 @@
+
+
 import { useEffect, useRef } from 'react';
 
 /**
@@ -6,8 +8,6 @@ import { useEffect, useRef } from 'react';
  * @returns The value from the previous render.
  */
 function usePrevious<T>(value: T): T | undefined {
-  // Fix: The `useRef` hook requires an initial value. Provide `undefined` and
-  // update the generic type to `T | undefined` to correctly type the ref's `current` property.
   const ref = useRef<T | undefined>(undefined);
   
   // Store current value in ref after every render
