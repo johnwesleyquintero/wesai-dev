@@ -13,12 +13,14 @@ interface ConfirmModalProps {
 
 const ConfirmModal: React.FC<ConfirmModalProps> = ({ isOpen, onClose, onConfirm, title, message, confirmText = 'Confirm', confirmVariant = 'default' }) => {
   const modalRef = useRef<HTMLDivElement>(null);
+  const cancelButtonRef = useRef<HTMLButtonElement>(null);
   const previouslyFocusedElement = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (isOpen) {
       previouslyFocusedElement.current = document.activeElement as HTMLElement;
-      modalRef.current?.focus();
+      // Focus the cancel button for a safer, more accessible default action.
+      cancelButtonRef.current?.focus();
     } else {
       previouslyFocusedElement.current?.focus();
     }
@@ -63,6 +65,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({ isOpen, onClose, onConfirm,
 
         <div className="mt-6 flex justify-end space-x-3">
             <button
+                ref={cancelButtonRef}
                 onClick={onClose}
                 className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 font-medium py-2 px-4 rounded-lg transition-colors duration-fast focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-800"
             >

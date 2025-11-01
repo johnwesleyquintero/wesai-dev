@@ -1,107 +1,148 @@
-
-
-import React, { useState, useCallback, useEffect } from 'react';
-import usePersistentState from './usePersistentState';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { PANEL_DEFAULT_SIZE_PERCENT, PANEL_MIN_SIZE_PERCENT, PANEL_MAX_SIZE_PERCENT, LOCAL_STORAGE_KEYS } from '../constants';
 
-export const useResizablePanels = (mainContainerRef: React.RefObject<HTMLDivElement>) => {
-    // Manages the value in localStorage
-    const [persistedDividerPosition, setPersistedDividerPosition] = usePersistentState(LOCAL_STORAGE_KEYS.DIVIDER_POSITION, PANEL_DEFAULT_SIZE_PERCENT);
-    // Manages the live value during drag for smooth UI updates
-    const [liveDividerPosition, setLiveDividerPosition] = useState(persistedDividerPosition);
-    
-    const [isDragging, setIsDragging] = useState(false);
+// Helper to safely get the initial position from localStorage
+const getInitialPosition = (): number => {
+    try {
+        const storedValue = localStorage.getItem(LOCAL_STORAGE_KEYS.DIVIDER_POSITION);
+        if (storedValue) {
+            const parsed = JSON.parse(storedValue);
+            // Add validation to ensure the stored value is within bounds
+            if (typeof parsed === 'number' && parsed >= PANEL_MIN_SIZE_PERCENT && parsed <= PANEL_MAX_SIZE_PERCENT) {
+                return parsed;
+            }
+        }
+    } catch (error) {
+        // Suppress client-side errors
+    }
+    return PANEL_DEFAULT_SIZE_PERCENT;
+};
 
-    // Apply panel widths via CSS custom properties using the live position
+export const useResizablePanels = (mainContainerRef: React.RefObject<HTMLDivElement>) => {
+    const [dividerPosition, setDividerPosition] = useState<number>(getInitialPosition);
+    const [isDragging, setIsDragging] = useState<boolean>(false);
+    // Use a ref to store the latest position for persisting, avoiding re-triggering effects.
+    const positionRef = useRef<number>(dividerPosition);
+
+    // Keep the ref updated with the latest state value.
+    useEffect(() => {
+        positionRef.current = dividerPosition;
+    }, [dividerPosition]);
+
+    // Apply the width to the panel via CSS custom property.
     useEffect(() => {
         if (mainContainerRef.current) {
-            mainContainerRef.current.style.setProperty('--panel-one-width', `${liveDividerPosition}%`);
-            mainContainerRef.current.style.setProperty('--panel-two-width', `calc(100% - ${liveDividerPosition}% - 1rem)`);
+            mainContainerRef.current.style.setProperty('--panel-one-basis', `${dividerPosition}%`);
         }
-    }, [liveDividerPosition, mainContainerRef]);
+    }, [dividerPosition, mainContainerRef]);
 
     const handleMouseDown = useCallback((e: React.MouseEvent) => {
         e.preventDefault();
+        e.stopPropagation();
         setIsDragging(true);
     }, []);
 
+    // Memoize mouse move handler. It will only update the state.
+    const handleMouseMove = useCallback((e: MouseEvent) => {
+        if (!mainContainerRef.current) return;
+
+        const containerRect = mainContainerRef.current.getBoundingClientRect();
+        if (containerRect.width === 0) return;
+
+        const newPosition = ((e.clientX - containerRect.left) / containerRect.width) * 100;
+        const clampedPosition = Math.max(PANEL_MIN_SIZE_PERCENT, Math.min(PANEL_MAX_SIZE_PERCENT, newPosition));
+
+        setDividerPosition(clampedPosition);
+    }, [mainContainerRef]);
+
+    // Memoize mouse up handler. It will stop the drag and persist the final value.
     const handleMouseUp = useCallback(() => {
         setIsDragging(false);
-        // On drag end, persist the final live position.
+    }, []);
+
+    // Effect to add and remove global event listeners based on dragging state.
+    useEffect(() => {
         if (isDragging) {
-          setPersistedDividerPosition(liveDividerPosition);
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
         }
-    }, [isDragging, liveDividerPosition, setPersistedDividerPosition]);
+        return () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, [isDragging, handleMouseMove, handleMouseUp]);
 
-    const handleMouseMove = useCallback((e: MouseEvent) => {
-        if (isDragging && mainContainerRef.current) {
-            const containerRect = mainContainerRef.current.getBoundingClientRect();
-            const newPosition = ((e.clientX - containerRect.left) / containerRect.width) * 100;
-
-            // Constrain panel sizes
-            if (newPosition >= PANEL_MIN_SIZE_PERCENT && newPosition <= PANEL_MAX_SIZE_PERCENT) {
-                setLiveDividerPosition(newPosition);
-            }
-        }
-    }, [isDragging, mainContainerRef]);
-
-    const handleDividerKeyDown = useCallback((e: React.KeyboardEvent) => {
-        let newPosition: number | null = null;
-        if (e.key === 'ArrowLeft') {
-            e.preventDefault();
-            newPosition = Math.max(PANEL_MIN_SIZE_PERCENT, liveDividerPosition - 1);
-        } else if (e.key === 'ArrowRight') {
-            e.preventDefault();
-            newPosition = Math.min(PANEL_MAX_SIZE_PERCENT, liveDividerPosition + 1);
-        } else if (e.key === 'Home') {
-            e.preventDefault();
-            newPosition = PANEL_MIN_SIZE_PERCENT;
-        } else if (e.key === 'End') {
-            e.preventDefault();
-            newPosition = PANEL_MAX_SIZE_PERCENT;
-        }
-        
-        if (newPosition !== null) {
-            // Update both live and persisted state for discrete changes
-            setLiveDividerPosition(newPosition);
-            setPersistedDividerPosition(newPosition);
-        }
-    }, [liveDividerPosition, setPersistedDividerPosition]);
-
+    // This effect handles the side-effects of dragging, like cursor changes and persisting the final state.
     useEffect(() => {
         const previewIframe = document.querySelector('iframe[title="Component Preview"]') as HTMLIFrameElement | null;
-
         if (isDragging) {
-            window.addEventListener('mousemove', handleMouseMove);
-            window.addEventListener('mouseup', handleMouseUp);
             document.body.style.cursor = 'col-resize';
             document.body.style.userSelect = 'none';
             if (previewIframe) {
                 previewIframe.style.pointerEvents = 'none';
             }
-        }
-        return () => {
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('mouseup', handleMouseUp);
+        } else {
+            // This block runs when dragging stops.
             document.body.style.cursor = '';
             document.body.style.userSelect = '';
             if (previewIframe) {
                 previewIframe.style.pointerEvents = 'auto';
             }
-        };
-    }, [isDragging, handleMouseMove, handleMouseUp]);
+            // Persist the final position to localStorage.
+            try {
+                localStorage.setItem(LOCAL_STORAGE_KEYS.DIVIDER_POSITION, JSON.stringify(positionRef.current));
+            } catch (error) {
+                // Suppress client-side errors
+            }
+        }
+    }, [isDragging]);
 
-    // This function is for external updates, like the reset button.
-    const setDividerPosition = useCallback((newPosition: number) => {
-        setLiveDividerPosition(newPosition);
-        setPersistedDividerPosition(newPosition);
-    }, [setPersistedDividerPosition]);
+
+    // Keyboard navigation for the divider.
+    const handleDividerKeyDown = useCallback((e: React.KeyboardEvent) => {
+        let newPosition: number | null = null;
+        const step = (e.shiftKey) ? 10 : 1; // Allow faster movement with Shift key
+
+        const currentPosition = positionRef.current;
+
+        if (e.key === 'ArrowLeft') {
+            newPosition = Math.max(PANEL_MIN_SIZE_PERCENT, currentPosition - step);
+        } else if (e.key === 'ArrowRight') {
+            newPosition = Math.min(PANEL_MAX_SIZE_PERCENT, currentPosition + step);
+        } else if (e.key === 'Home') {
+            newPosition = PANEL_MIN_SIZE_PERCENT;
+        } else if (e.key === 'End') {
+            newPosition = PANEL_MAX_SIZE_PERCENT;
+        }
+
+        if (newPosition !== null) {
+            e.preventDefault();
+            setDividerPosition(newPosition);
+            // Persist immediately for keyboard changes.
+            try {
+                localStorage.setItem(LOCAL_STORAGE_KEYS.DIVIDER_POSITION, JSON.stringify(newPosition));
+            } catch (error) {
+                // Suppress client-side errors
+            }
+        }
+    }, []);
+
+    // Function for external updates (e.g., reset button).
+    const setPosition = useCallback((newPosition: number) => {
+        const clampedPosition = Math.max(PANEL_MIN_SIZE_PERCENT, Math.min(PANEL_MAX_SIZE_PERCENT, newPosition));
+        setDividerPosition(clampedPosition);
+        try {
+            localStorage.setItem(LOCAL_STORAGE_KEYS.DIVIDER_POSITION, JSON.stringify(clampedPosition));
+        } catch (error) {
+            // Suppress client-side errors
+        }
+    }, []);
 
     return {
-        dividerPosition: liveDividerPosition, // The component should always render based on the live position
-        setDividerPosition, // Expose the function to set both states
+        dividerPosition,
+        setDividerPosition: setPosition, // Expose the external update function
         isDragging,
         handleMouseDown,
-        handleDividerKeyDown
+        handleDividerKeyDown,
     };
 };

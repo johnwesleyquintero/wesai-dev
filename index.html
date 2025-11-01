@@ -19,6 +19,17 @@
     <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" disabled>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
+        // Prevents theme flicker on page load by applying the saved theme before React mounts.
+        (function() {
+            try {
+                const theme = localStorage.getItem('theme');
+                if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.add('dark');
+                }
+            } catch (e) { /* ignore */ }
+        })();
+    </script>
+    <script>
         tailwind.config = {
           darkMode: 'class', // Enable class-based dark mode
           theme: {
@@ -151,6 +162,9 @@
         background-color: #f8fafc; /* slate-50 */
         z-index: 9999;
     }
+    .dark .preloader {
+        background-color: #020617; /* slate-950 */
+    }
     .preloader-spinner {
         position: relative;
         width: 6rem; /* w-24 */
@@ -172,14 +186,8 @@
     .preloader-spinner .spinner-logo path {
         animation: pulse-subtle 2.5s infinite ease-in-out;
     }
-    @media (prefers-color-scheme: dark) {
-        /* This applies if the 'dark' class hasn't been added by React yet */
-        .preloader {
-            background-color: #020617; /* slate-950 */
-        }
-        .preloader-spinner .spinner-track {
-            stroke: rgba(51, 65, 85, 0.4); /* slate-700/40 */
-        }
+    .dark .preloader-spinner .spinner-track {
+        stroke: rgba(51, 65, 85, 0.4); /* slate-700/40 */
     }
     /* --- Global Styles --- */
     pre, code {
@@ -245,8 +253,8 @@
     }
     /* Animated Aurora Background */
     @keyframes aurora-glow {
-      0% { transform: scale(1) rotate(0deg); opacity: 0.8; }
-      100% { transform: scale(1.5) rotate(10deg); opacity: 1; }
+      0% { transform: rotate(0deg); opacity: 0.8; }
+      100% { transform: rotate(10deg); opacity: 1; }
     }
     body::after {
         content: '';
